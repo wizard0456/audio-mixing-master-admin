@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: THICCCBOI-Black;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-Black.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-Bold;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-Bold.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-ExtraBold;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-ExtraBold.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-Light;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-Light.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-Medium;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-Medium.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-Regular;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-Regular.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-SemiBold;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-SemiBold.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-ThicccAF;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-ThicccAF.woff2);
+}
+
+@font-face {
+    font-family: THICCCBOI-Thin;
+    src: url(./assets/fonts/Thicccboi/THICCCBOI-Thin.woff2);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --sidebar-width: 230px;
+    --sidebar-logo-height: 200px;
+}
+
+body {
+    background: #fff;
+}
+
+#root {
+    height: fit-content;
+}
+
+.sidebar > div{
+    width: var(--sidebar-width);
+}
+
+.sidebar-logo {
+    height: var(--sidebar-logo-height);
+    padding: 0px 40px;
+    padding-top: 50px;
+}
+
+.sidebar-list {
+    height: calc(100% - var(--sidebar-logo-height));
+}
+
+.sidebar-list a.active .icon {
+    color: #4BC500;
+}
+
+.sidebar-close-btn {
+    display: none;
+}
+
+.body-wrapper {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+}
+
+.hamburger-icon-wrapper {
+    display: none;
+}
+
+.ReactModalPortal>div {
+    z-index: 999;
+    background-color: #0009 !important;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+    /* Add transition property */
+}
+
+.ReactModalPortal>div>div {
+    padding: 0% !important;
+    border-radius: 20px !important;
+    border: none !important;
+    transition: all 0.3s ease-in-out;
+    /* Add transition property */
+}
+
+.ReactModalPortal>div.ReactModal__Overlay--after-open {
+    opacity: 1;
+}
+
+.modal-action-btn>button {
+    background: linear-gradient(105deg, rgba(87, 188, 144, 1) 0%, rgba(0, 75, 64, 1) 100%);
+}
+
+.new-customer-modal-header {
+    background-image: none;
+}
+
+
+@media screen and (max-width: 1200px) {
+    .sidebar > div{
+        left: -100%;
+        
+        transition: all 0.3s 0.2s ease-in-out;
+    }
+
+    .sidebar.active > div{
+        left: 0%;
+    }
+
+    .sidebar::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 20;
+        transition: all 0.3s ease-in-out;
+        /* Add transition property */
+        
+    }
+
+    .sidebar.active::before {
+        width: 100%;
+        
+    }
+
+    .body-wrapper {
+        width: 100%;
+        margin-left: 0px;
+    }
+    
+    .top-header {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .content-wrapper  {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .hamburger-icon-wrapper,
+    .sidebar-close-btn {
+        display: block;
+    }
+
+    .sidebar-close-btn {
+        position: fixed;
+        top: 55px;
+        right: 5%;
+        font-size: 30px;
+    }
+}
+
+
+@media screen and (max-width: 768px) {
+    .sidebar-list-item a {
+        font-size: 16px;
+    }
+
+    .top-header {
+        padding-top: 30px;
+        padding-bottom: 30px;
+    }
+
+    .content-wrapper {
+        padding-top: 130px;
+    }
+
+    .content-wrapper .content-header-action-btn-wrapper .action-btn {
+        width: 250px;
+    }
+}
+
+@media screen and (max-width: 550px) {
+    .sidebar > div {
+        width: 100%;
+        border-radius: 0%;
+    }
+
+    .sidebar-logo {
+        height: fit-content;
+        padding: 60px;
+        text-align: center;
+        justify-content: space-between;
+    }
+
+    .sidebar-close-btn {
+        position: relative;
+        top: 7px;
+        right: 0px;
+        font-size: 30px;
+    }
+
+    .ReactModalPortal>div>div {
+        width: 100% !important;
+    }
+
+    .content-wrapper .content-header-action-btn-wrapper .action-btn {
+        width: 230px;
+    }
+}
