@@ -12,7 +12,6 @@ Modal.setAppElement(rootElement);
 
 ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-
     <App />
     <ToastContainer
       position="top-right"

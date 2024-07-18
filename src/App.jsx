@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Provider } from 'react-redux';
-import { store } from './app/store.js';
+import store from "./store.js";
 
 import Login from "./pages/Login.jsx";
 import Users from "./pages/Users.jsx";

@@ -1,12 +1,21 @@
 import PropTypes from 'prop-types';
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import LOGO from "../assets/images/logo.png";
 import { FaMusic, FaUsers } from "react-icons/fa6";
 import { GoChecklist } from 'react-icons/go';
 import { BsFillFileMusicFill } from 'react-icons/bs';
 import { PiImageSquareFill } from 'react-icons/pi';
+import { useDispatch } from 'react-redux';
+import { logout } from '../reducers/authSlice';
 
 const Sidebar = ({ openSidebar, setOpenSidebar }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/login", { replace: true });
+  }
+
   return (
     <div className={`sidebar ${openSidebar ? "active" : ""}`}>
       <div className="fixed top-0 h-full overflow-hidden bg-[#091600] z-50">
@@ -35,7 +44,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
             <NavLink to="/samples" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base laeding-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaMusic /></span> <span className="font-semibold relative top-[2px]">Sample</span></NavLink>
           </li>
           <li className="block w-full">
-            <button className='font-semibold font-THICCCBOI-SemiBold text-base laeding-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center'><span className="font-semibold relative top-[2px]">Logout</span></button>
+            <button onClick={handleLogout} className='font-semibold font-THICCCBOI-SemiBold text-base laeding-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center'><span className="font-semibold relative top-[2px]">Logout</span></button>
           </li>
         </ul>
       </div>

@@ -1,20 +1,49 @@
 import { useLayoutEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Sidebar from "./Sidebar";
-import { useLocation } from 'react-router-dom';
+import { useLocation, Navigate } from 'react-router-dom';
 import LOGO from "../assets/images/logo.png";
 import { RxHamburgerMenu } from "react-icons/rx";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser, selectUser } from '../reducers/authSlice';
+import Cookies from 'js-cookie';
 
 const Layout = ({ children }) => {
     const [openSidebar, setOpenSidebar] = useState(false);
     const location = useLocation();
-
-
+    const user = useSelector(selectUser);
+    const dispatch = useDispatch();
 
     useLayoutEffect(() => {
         // Close the sidebar whenever the route changes
         setOpenSidebar(false);
     }, [location]);
+
+    useLayoutEffect(() => {
+        const userDataFromCookies = Cookies.get("user");
+        const userDataFromLocalStorage = localStorage.getItem("user");
+        
+        if (userDataFromCookies) {
+            const userData = JSON.parse(userDataFromCookies);
+            dispatch(addUser(userData));
+        } else if (userDataFromLocalStorage) {
+            const userData = JSON.parse(userDataFromLocalStorage);
+            dispatch(addUser(userData));
+        }
+    }, [dispatch]);
+
+    if (!user) {
+        const userDataFromCookies = Cookies.get("user");
+        const userDataFromLocalStorage = localStorage.getItem("user");
+
+        if (userDataFromCookies || userDataFromLocalStorage) {
+            // Prevent redirect if user data is found in cookies or local storage
+            return null;
+        }
+
+        // Redirect to login if no user data is found
+        return <Navigate to="/login" replace={true} />;
+    }
 
     return (
         <>
