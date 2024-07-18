@@ -2,8 +2,6 @@ import Modal from 'react-modal';
 import { MdDelete } from "react-icons/md";
 import propTypes from 'prop-types';
 
-Modal.setAppElement('#root'); // Bind modal to your appElement
-
 const ConfirmationModal = ({ isOpen, onRequestClose, onConfirm, message }) => {
     return (
         <Modal
