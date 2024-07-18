@@ -9,6 +9,8 @@ import Orders from "./pages/Orders.jsx";
 import Services from "./pages/Services.jsx";
 import Gallery from "./pages/Gallery.jsx";
 import Samples from "./pages/Samples.jsx";
+import Labels from "./pages/Labels.jsx";
+import Categories from "./pages/Categories.jsx";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +24,14 @@ const router = createBrowserRouter([
   {
     path: "/orders",
     element: <Layout><Orders /></Layout>,
+  },
+  {
+    path: "/labels",
+    element: <Layout><Labels /></Layout>,
+  },
+  {
+    path: "/Categories",
+    element: <Layout><Categories /></Layout>,
   },
   {
     path: "/orders-details",
