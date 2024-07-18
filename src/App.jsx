@@ -8,6 +8,7 @@ import Layout from "./components/Layout.jsx";
 import Orders from "./pages/Orders.jsx";
 import Services from "./pages/Services.jsx";
 import Gallery from "./pages/Gallery.jsx";
+import Samples from "./pages/Samples.jsx";
 
 const router = createBrowserRouter([
   {
@@ -36,7 +37,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/samples",
-    element: <Layout><div>Samples page</div></Layout>,
+    element: <Layout><Samples /></Layout>,
   },
   {
     path: "/login",

@@ -16,11 +16,11 @@ const Orders = () => {
                     <div className="bg-[#0F2005] font-THICCCBOI-SemiBold font-semibold text-[12px] text-white px-5 py-2 rounded-lg flex items-center">
                         Active Orders <span className="bg-[#4BC500] text-white ml-2 w-7 h-7 flex items-center justify-center rounded-full">5</span>
                     </div>
-                    <div className="bg-[#F6F6F6]  font-THICCCBOI-SemiBold font-semibold text-[12px] px-4 py-2 rounded-lg flex items-center">
-                        Completed <span className="bg-gray-400 text-white ml-2 w-7 h-7 flex items-center justify-center rounded-full">30</span>
+                    <div className="bg-[#E9E9E9]  font-THICCCBOI-SemiBold font-semibold text-[12px] px-4 py-2 rounded-lg flex items-center">
+                        Completed <span className="bg-[#474747] text-white ml-2 w-7 h-7 flex items-center justify-center rounded-full">30</span>
                     </div>
-                    <div className="bg-[#F6F6F6]  font-THICCCBOI-SemiBold font-semibold text-[12px] px-4 py-2 rounded-lg flex items-center">
-                        Cancelled <span className="bg-gray-400 text-white ml-2 w-7 h-7 flex items-center justify-center rounded-full">30</span>
+                    <div className="bg-[#E9E9E9]  font-THICCCBOI-SemiBold font-semibold text-[12px] px-4 py-2 rounded-lg flex items-center">
+                        Cancelled <span className="bg-[#474747] text-white ml-2 w-7 h-7 flex items-center justify-center rounded-full">30</span>
                     </div>
                 </div>
                 <div className="flex justify-between items-center mb-6">
