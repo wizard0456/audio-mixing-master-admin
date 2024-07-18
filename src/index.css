@@ -118,7 +118,12 @@ body {
 }
 
 .ReactModalPortal>div>div {
-    padding: 0% !important;
+    inset: 0 !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%)!important;
+    height: fit-content !important;
+    padding: 20px !important;
     border-radius: 20px !important;
     border: none !important;
     transition: all 0.3s ease-in-out;
@@ -129,14 +134,9 @@ body {
     opacity: 1;
 }
 
-.modal-action-btn>button {
-    background: linear-gradient(105deg, rgba(87, 188, 144, 1) 0%, rgba(0, 75, 64, 1) 100%);
+.ReactModal__Content {
+    max-width: 500px;
 }
-
-.new-customer-modal-header {
-    background-image: none;
-}
-
 
 /* react-daterange-picker */
 .react-daterange-picker,
