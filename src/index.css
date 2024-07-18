@@ -98,6 +98,16 @@ body {
     display: none;
 }
 
+
+.gallery-image:hover .gallery-buttons-wrapper {
+    bottom: 0;
+}
+
+.gallery-image:hover .gallery-delete-wrapper {
+    top: 10px;
+} 
+
+/* react-modal */
 .ReactModalPortal>div {
     z-index: 999;
     background-color: #0009 !important;
@@ -127,7 +137,7 @@ body {
 }
 
 
-.customDateRangePicker.css
+/* react-daterange-picker */
 .react-daterange-picker,
 .react-daterange-picker__wrapper,
 .react-daterange-picker__inputGroup {

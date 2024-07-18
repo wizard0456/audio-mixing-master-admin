@@ -7,6 +7,7 @@ import Users from "./pages/Users.jsx";
 import Layout from "./components/Layout.jsx";
 import Orders from "./pages/Orders.jsx";
 import Services from "./pages/Services.jsx";
+import Gallery from "./pages/Gallery.jsx";
 
 const router = createBrowserRouter([
   {
@@ -31,7 +32,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/gallery",
-    element: <Layout><div>Gallery page</div></Layout>,
+    element: <Layout><Gallery /></Layout>,
   },
   {
     path: "/samples",
