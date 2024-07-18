@@ -6,6 +6,7 @@ import Login from "./pages/Login.jsx";
 import Users from "./pages/Users.jsx";
 import Layout from "./components/Layout.jsx";
 import Orders from "./pages/Orders.jsx";
+import Services from "./pages/Services.jsx";
 
 const router = createBrowserRouter([
   {
@@ -26,7 +27,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/services",
-    element: <Layout><div>Services page</div></Layout>,
+    element: <Layout><Services /></Layout>,
   },
   {
     path: "/gallery",
