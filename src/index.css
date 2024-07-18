@@ -60,13 +60,14 @@
 
 body {
     background: #fff;
+    color: #111111;
 }
 
 #root {
     height: fit-content;
 }
 
-.sidebar > div{
+.sidebar>div {
     width: var(--sidebar-width);
 }
 
@@ -126,14 +127,66 @@ body {
 }
 
 
+.customDateRangePicker.css
+.react-daterange-picker,
+.react-daterange-picker__wrapper,
+.react-daterange-picker__inputGroup {
+    border-radius: 8px;
+    padding: 4px;
+    background-color: #F6F6F6;
+    color: #7A7A7A;
+    border: none;
+    min-width: fit-content !important;
+}
+
+.react-daterange-picker__inputGroup__input {
+    color: #7A7A7A;
+    background: none;
+    outline: none;
+    font-size: 12px;
+    font-family: THICCCBOI-Bold, sans-serif;
+    font-weight: 700;
+    border: none;
+}
+
+.react-daterange-picker__inputGroup__input:focus {
+    outline: none;
+    background-color: transparent !important;
+}
+.react-daterange-picker__inputGroup__input:invalid {
+    background: transparent !important;
+}
+
+.react-daterange-picker__range-divider {
+    margin-left: 6px;
+    margin-right: 6px;
+}
+
+.react-daterange-picker__calendar-button,
+.react-daterange-picker__clear-button {
+    color: #7A7A7A;
+}
+
+.react-daterange-picker__calendar {
+    border-radius: 8px;
+}
+
+.react-calendar__tile--active {   
+    background: #000000;
+    color: white;
+}
+
+
+
+
 @media screen and (max-width: 1200px) {
-    .sidebar > div{
+    .sidebar>div {
         left: -100%;
-        
+
         transition: all 0.3s 0.2s ease-in-out;
     }
 
-    .sidebar.active > div{
+    .sidebar.active>div {
         left: 0%;
     }
 
@@ -148,25 +201,25 @@ body {
         z-index: 20;
         transition: all 0.3s ease-in-out;
         /* Add transition property */
-        
+
     }
 
     .sidebar.active::before {
         width: 100%;
-        
+
     }
 
     .body-wrapper {
         width: 100%;
         margin-left: 0px;
     }
-    
+
     .top-header {
         padding-left: 30px;
         padding-right: 30px;
     }
 
-    .content-wrapper  {
+    .content-wrapper {
         padding-left: 30px;
         padding-right: 30px;
     }
@@ -205,7 +258,7 @@ body {
 }
 
 @media screen and (max-width: 550px) {
-    .sidebar > div {
+    .sidebar>div {
         width: 100%;
         border-radius: 0%;
     }
