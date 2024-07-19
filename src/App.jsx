@@ -11,6 +11,7 @@ import Gallery from "./pages/Gallery.jsx";
 import Samples from "./pages/Samples.jsx";
 import Labels from "./pages/Labels.jsx";
 import Categories from "./pages/Categories.jsx";
+import ServiceDetail from "./pages/ServiceDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
   {
     path: "/services",
     element: <Layout><Services /></Layout>,
+  },
+  {
+    path: "/service-detail/:id",
+    element: <Layout><ServiceDetail /></Layout>,
   },
   {
     path: "/gallery",
