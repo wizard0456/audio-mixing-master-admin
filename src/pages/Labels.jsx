@@ -20,6 +20,7 @@ const Labels = () => {
     const [adding, setAdding] = useState(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [labelToDelete, setLabelToDelete] = useState(null);
+    const [loading, setLoading] = useState(false); // New loading state
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
 
@@ -28,6 +29,7 @@ const Labels = () => {
     }, [currentPage]);
 
     const fetchLabels = async (page) => {
+        setLoading(true); // Set loading to true when fetching starts
         try {
             const response = await axios({
                 method: "get",
@@ -44,6 +46,8 @@ const Labels = () => {
             if (error.response && error.response.status === 401) {
                 dispatch(logout());
             }
+        } finally {
+            setLoading(false); // Set loading to false when fetching ends
         }
     };
 
@@ -264,49 +268,55 @@ const Labels = () => {
                 </div>
             </div>
 
-            <table className='w-full border-0'>
-                <thead>
-                    <tr>
-                        <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">ID</th>
-                        <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Name</th>
-                        <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Created At</th>
-                        <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Updated At</th>
-                        <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {labels.map(label => (
-                        <tr key={label.id}>
-                            <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                <div className='px-3 py-5 bg-[#F6F6F6]'>{label.id}</div>
-                            </td>
-                            <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                <div className='px-3 py-5 bg-[#F6F6F6]'>{label.name}</div>
-                            </td>
-                            <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString()}</div>
-                            </td>
-                            <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.updated_at).toLocaleDateString()}</div>
-                            </td>
-                            <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
-                                    <button 
-                                        onClick={() => openModal(label)}
-                                    >
-                                        <TiPencil color="#0F2005" />
-                                    </button>
-                                    <button 
-                                        onClick={() => openConfirmationModal(label.id)}
-                                    >
-                                        <FaTrashAlt color="#FF0000" />
-                                    </button>
-                                </div>
-                            </td>
+            {loading ? (
+                <div className="flex justify-center items-center">
+                    Loading...
+                </div>
+            ) : (
+                <table className='w-full border-0'>
+                    <thead>
+                        <tr>
+                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">ID</th>
+                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Name</th>
+                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Created At</th>
+                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Updated At</th>
+                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {labels.map(label => (
+                            <tr key={label.id}>
+                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{label.id}</div>
+                                </td>
+                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{label.name}</div>
+                                </td>
+                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString()}</div>
+                                </td>
+                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.updated_at).toLocaleDateString()}</div>
+                                </td>
+                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                    <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
+                                        <button 
+                                            onClick={() => openModal(label)}
+                                        >
+                                            <TiPencil color="#0F2005" />
+                                        </button>
+                                        <button 
+                                            onClick={() => openConfirmationModal(label.id)}
+                                        >
+                                            <FaTrashAlt color="#FF0000" />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
 
             <div className="flex justify-center mt-6">
                 <ReactPaginate

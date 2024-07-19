@@ -27,72 +27,74 @@ const Services = () => {
 
 
             <table className='w-full border-0'>
-                <tr>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Service ID</div>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>#AMM67</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-4 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>Package Name</div>
-                            <div className="block bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px] rounded-full w-fit px-3 py-1 text-white">$599/ Monthly</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Discount</div>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>20%</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Created on</div>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>12/21/2023</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
-                            <button className="bg-[#4BC500] px-3 py-2  rounded-full text-white font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px]">View Details</button>
-                            <button><TiPencil color="#969696" /></button>
-                            <button><FaTrashAlt color="#FF0000" /></button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Service ID</div>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>#AMM67</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-4 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>Package Name</div>
-                            <div className="block bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px] rounded-full w-fit px-3 py-1 text-white">$599/ Monthly</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Discount</div>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>20%</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>
-                            <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Created on</div>
-                            <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>12/21/2023</div>
-                        </div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
-                            <button className="bg-[#4BC500] px-3 py-2  rounded-full text-white font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px]">View Details</button>
-                            <button><TiPencil color="#969696" /></button>
-                            <button><FaTrashAlt color="#FF0000" /></button>
-                        </div>
-                    </td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-5 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Service ID</div>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>#AMM67</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-4 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>Package Name</div>
+                                <div className="block bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px] rounded-full w-fit px-3 py-1 text-white">$599/ Monthly</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-5 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Discount</div>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>20%</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-5 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Created on</div>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>12/21/2023</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
+                                <button className="bg-[#4BC500] px-3 py-2  rounded-full text-white font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px]">View Details</button>
+                                <button><TiPencil color="#969696" /></button>
+                                <button><FaTrashAlt color="#FF0000" /></button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-5 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Service ID</div>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>#AMM67</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-4 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>Package Name</div>
+                                <div className="block bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px] rounded-full w-fit px-3 py-1 text-white">$599/ Monthly</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-5 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Discount</div>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>20%</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='px-3 py-5 bg-[#F6F6F6]'>
+                                <div className='font-THICCCBOI-Light font-normal text-[12px] leading-[14px]'>Created on</div>
+                                <div className='font-THICCCBOI-SemiBold font-semibold text-base leading-6'>12/21/2023</div>
+                            </div>
+                        </td>
+                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
+                                <button className="bg-[#4BC500] px-3 py-2  rounded-full text-white font-THICCCBOI-SemiBold font-semibold text-[12px] leading-[14px]">View Details</button>
+                                <button><TiPencil color="#969696" /></button>
+                                <button><FaTrashAlt color="#FF0000" /></button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </>
     );
