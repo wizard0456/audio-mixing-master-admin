@@ -12,6 +12,9 @@ import Samples from "./pages/Samples.jsx";
 import Labels from "./pages/Labels.jsx";
 import Categories from "./pages/Categories.jsx";
 import ServiceDetail from "./pages/ServiceDetail.jsx";
+import Newsletter from "./pages/Newsletter.jsx";
+import ContactForm from "./pages/ContactForm.jsx";
+import OrderForm from "./pages/OrderForm.jsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +56,18 @@ const router = createBrowserRouter([
   {
     path: "/samples",
     element: <Layout><Samples /></Layout>,
+  },
+  {
+    path: "/new-letter",
+    element: <Layout><Newsletter /></Layout>,
+  },
+  {
+    path: "/contact-us",
+    element: <Layout><ContactForm /></Layout>,
+  },
+  {
+    path: "/order-us",
+    element: <Layout><OrderForm /></Layout>,
   },
   {
     path: "/login",

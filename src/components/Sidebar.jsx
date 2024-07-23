@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { NavLink, useNavigate } from "react-router-dom";
 import LOGO from "../assets/images/logo.png";
-import { FaMusic, FaUsers, FaSignOutAlt, FaTags } from "react-icons/fa";
+import { FaMusic, FaUsers, FaSignOutAlt, FaTags, FaEnvelope, FaPhone, FaClipboardList } from "react-icons/fa";
 import { GoChecklist } from 'react-icons/go';
 import { BsFillFileMusicFill } from 'react-icons/bs';
 import { PiImageSquareFill } from 'react-icons/pi';
@@ -51,6 +51,15 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
             <NavLink to="/samples" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaMusic /></span> <span className="font-semibold relative top-[2px]">Sample</span></NavLink>
           </li>
           <li className="block w-full">
+            <NavLink to="/new-letter" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaEnvelope /></span> <span className="font-semibold relative top-[2px]">News Letter</span></NavLink>
+          </li>
+          <li className="block w-full">
+            <NavLink to="/contact-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon rotate-5"><FaPhone /></span> <span className="font-semibold relative top-[2px]">Contact Form</span></NavLink>
+          </li>
+          <li className="block w-full">
+            <NavLink to="/order-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Order Form</span></NavLink>
+          </li>
+          <li className="block w-full">
             <button onClick={handleLogout} className='font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center'><span className="icon"><FaSignOutAlt /></span> <span className="font-semibold relative top-[2px]">Logout</span></button>
           </li>
         </ul>
@@ -64,4 +73,4 @@ Sidebar.propTypes = {
   setOpenSidebar: PropTypes.func.isRequired,
 }
 
-export default Sidebar
+export default Sidebar;
