@@ -84,6 +84,10 @@ const App = () => {
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
+    // <h1>
+
+    //   This code
+    // </h1>
   );
 };
 

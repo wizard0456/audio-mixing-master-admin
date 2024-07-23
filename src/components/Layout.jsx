@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Sidebar from "./Sidebar";
 import { useLocation, Navigate } from 'react-router-dom';
@@ -14,25 +14,25 @@ const Layout = ({ children }) => {
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         // Close the sidebar whenever the route changes
         setOpenSidebar(false);
     }, [location]);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         const userDataFromCookies = Cookies.get("user");
         const userDataFromLocalStorage = localStorage.getItem("user");
-        
-        if (userDataFromCookies) {
-            const userData = JSON.parse(userDataFromCookies);
-            dispatch(addUser(userData));
-        } else if (userDataFromLocalStorage) {
+
+        if (userDataFromLocalStorage) {
             const userData = JSON.parse(userDataFromLocalStorage);
+            dispatch(addUser(userData));
+        } else if (userDataFromCookies) {
+            const userData = JSON.parse(userDataFromCookies);
             dispatch(addUser(userData));
         }
     }, [dispatch]);
 
-    if (!user) {
+    if (user == null) {
         const userDataFromCookies = Cookies.get("user");
         const userDataFromLocalStorage = localStorage.getItem("user");
 
@@ -46,27 +46,25 @@ const Layout = ({ children }) => {
     }
 
     return (
-        <>
-            <div className="position-relative top-0 flex h-screen">
-                <Sidebar openSidebar={openSidebar} setOpenSidebar={setOpenSidebar} />
-                <main className="body-wrapper relative z-10">
-                    <header className='top-header flex items-center justify-between bg-[#091600] p-5'>
-                        <img src={LOGO} className='w-20' alt="" />
-                        <button className='hamburger-icon-wrapper' onClick={() => setOpenSidebar(!openSidebar)}>
-                            <RxHamburgerMenu className='w-20' color='white' size={25} />
-                        </button>
-                    </header>
-                    <div className='px-5 mt-10'>
-                        {children}
-                    </div>
-                </main>
-            </div>
-        </>
+        <div className="position-relative top-0 flex h-screen">
+            <Sidebar openSidebar={openSidebar} setOpenSidebar={setOpenSidebar} />
+            <main className="body-wrapper relative z-10">
+                <header className='top-header flex items-center justify-between bg-[#091600] p-5'>
+                    <img src={LOGO} className='w-20' alt="Logo" />
+                    <button className='hamburger-icon-wrapper' onClick={() => setOpenSidebar(!openSidebar)}>
+                        <RxHamburgerMenu className='w-20' color='white' size={25} />
+                    </button>
+                </header>
+                <div className='px-5 mt-10'>
+                    {children}
+                </div>
+            </main>
+        </div>
     );
 }
 
 Layout.propTypes = {
-    children: PropTypes.node
+    children: PropTypes.node.isRequired
 }
 
 export default Layout;

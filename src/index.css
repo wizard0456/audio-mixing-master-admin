@@ -208,7 +208,7 @@ body {
         left: 0;
         width: 0%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.8);
         z-index: 20;
         transition: all 0.3s ease-in-out;
         /* Add transition property */

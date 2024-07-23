@@ -28,7 +28,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
           </div>
         </div>
 
-        <ul className="sidebar-list flex flex-col gap-5 mx-5">
+        <ul className="sidebar-list flex flex-col gap-5 mx-5 overflow-auto">
           <li className="block w-full">
             <NavLink to="/users" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaUsers /></span> <span className="font-semibold relative top-[2px]">User</span></NavLink>
           </li>
