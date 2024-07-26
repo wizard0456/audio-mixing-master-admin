@@ -55,7 +55,7 @@ const Layout = ({ children }) => {
                         <RxHamburgerMenu className='w-20' color='white' size={25} />
                     </button>
                 </header>
-                <div className='px-5 mt-10'>
+                <div className='px-5 py-10'>
                     {children}
                 </div>
             </main>
