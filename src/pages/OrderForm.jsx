@@ -70,10 +70,6 @@ const OrderForm = () => {
         setConfirmationModalOpen(false);
     };
 
-    console.log("render")
-
-    console.log(totalPages, currentPage)
-
     const handleDeleteOrder = async () => {
         if (!orderToDelete) return;
         setIsDeleting(true); // Start loading state

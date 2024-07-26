@@ -8,7 +8,7 @@ import Toggle from 'react-toggle';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
-import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this path is correct
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -18,13 +18,13 @@ const Categories = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [categoryName, setCategoryName] = useState('');
     const [isActive, setIsActive] = useState(true);
-    const [editingCategory, setEditingCategory] = useState(null); // State to manage the category being edited
+    const [editingCategory, setEditingCategory] = useState(null);
     const [adding, setAdding] = useState(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-    const [categoryToDelete, setCategoryToDelete] = useState(null); // State to manage the category to be deleted
-    const [filter, setFilter] = useState('all'); // State to manage the filter
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
+    const [filter, setFilter] = useState('all');
     const user = useSelector(selectUser);
-    const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
+    const [isDeleting, setIsDeleting] = useState(false);
     const abortController = useRef(null);
 
     useEffect(() => {
@@ -52,6 +52,8 @@ const Categories = () => {
                 },
                 signal: abortController.current.signal,
             });
+
+            console.log(response.data);
             setCategories(response.data.data);
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
@@ -102,7 +104,7 @@ const Categories = () => {
         try {
             if (editingCategory) {
                 // Update category
-                const response = await axios({
+                await axios({
                     method: "put",
                     url: `${API_Endpoint}admin/categories/${editingCategory.id}?name=${categoryName}&is_active=${isActive ? 1 : 0}`,
                     headers: {
@@ -110,11 +112,6 @@ const Categories = () => {
                         "Content-Type": "application/json"
                     }
                 });
-                setCategories(prevCategories =>
-                    prevCategories.map(cat =>
-                        cat.id === editingCategory.id ? response.data : cat
-                    )
-                );
             } else {
                 // Add new category
                 await axios({
@@ -126,9 +123,9 @@ const Categories = () => {
                     },
                     data: { name: categoryName, is_active: isActive ? 1 : 0 }
                 });
-                fetchCategories(currentPage, filter); // Reload fetching
             }
             closeModal();
+            fetchCategories(currentPage, filter); // Reload fetching
         } catch (error) {
             console.error(`Error ${editingCategory ? 'updating' : 'adding'} category`, error);
         } finally {
@@ -206,7 +203,7 @@ const Categories = () => {
                 onRequestClose={closeConfirmationModal}
                 onConfirm={handleDeleteCategory}
                 message="Are you sure you want to delete this category?"
-                isDeleting={isDeleting} // Pass the isDeleting state to modal
+                isDeleting={isDeleting}
             />
 
             {loading ? (

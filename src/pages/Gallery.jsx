@@ -18,6 +18,7 @@ const Gallery = () => {
     const [imageToDelete, setImageToDelete] = useState(null);
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const fetchGallery = async () => {
@@ -84,7 +85,7 @@ const Gallery = () => {
             }
             console.error('Error uploading image:', error);
             setUploading(false);
-            toast.error("Error uploading image.",{
+            toast.error("Error uploading image.", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -133,6 +134,8 @@ const Gallery = () => {
     const handleDeleteImage = async () => {
         if (!imageToDelete) return;
 
+        setIsDeleting(true);
+
         try {
             await axios({
                 method: 'delete',
@@ -143,7 +146,8 @@ const Gallery = () => {
             });
             setImages(images.filter(image => image.id !== imageToDelete));
             closeConfirmationModal();
-            toast.success("Image deleted successfully!",{
+            setIsDeleting(true);
+            toast.success("Image deleted successfully!", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -158,8 +162,9 @@ const Gallery = () => {
             if (error.response && error.response.status === 401) {
                 dispatch(logout());
             }
+            setIsDeleting(true);
             console.error('Error deleting image:', error);
-            toast.error("Error deleting image.",{
+            toast.error("Error deleting image.", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -181,7 +186,7 @@ const Gallery = () => {
         <>
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Gallery</h1>
-                <button 
+                <button
                     className="bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-base text-white px-5 py-4 rounded-lg"
                     onClick={openModal}
                 >
@@ -198,10 +203,10 @@ const Gallery = () => {
                 <form onSubmit={handleImageUpload} className="space-y-4">
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Select Image</label>
-                        <input 
-                            type="file" 
-                            name="image" 
-                            accept="image/*" 
+                        <input
+                            type="file"
+                            name="image"
+                            accept="image/*"
                             className="w-full px-3 py-2 border rounded-md"
                             onChange={handleImageUploadForm}
                         />
@@ -212,7 +217,7 @@ const Gallery = () => {
                         </div>
                     )}
                     <div className="flex justify-end space-x-4">
-                        <button 
+                        <button
                             type="button"
                             className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
                             onClick={closeModal}
@@ -220,7 +225,7 @@ const Gallery = () => {
                         >
                             Close
                         </button>
-                        <button 
+                        <button
                             type="submit"
                             className="bg-[#4BC500] font-semibold text-base text-white px-5 py-2 rounded-lg"
                             disabled={uploading}
@@ -236,6 +241,7 @@ const Gallery = () => {
                 onRequestClose={closeConfirmationModal}
                 onConfirm={handleDeleteImage}
                 message="Are you sure you want to delete this image?"
+                isDeleting={isDeleting}
             />
 
             <div className="grid grid-cols-5 items-stretch gap-4">
@@ -245,7 +251,7 @@ const Gallery = () => {
                         <div className="gallery-buttons-wrapper absolute w-full h-fit py-5 flex items-center justify-center bg-black bg-opacity-50 rounded-b-lg">
                             <FaEye className="cursor-pointer" color="white" size={20} />
                         </div>
-                        <div 
+                        <div
                             className='gallery-delete-wrapper absolute h-10 w-10 right-3 flex items-center justify-center bg-[#FF0000] rounded-full cursor-pointer'
                             onClick={() => openConfirmationModal(image.id)}
                         >
