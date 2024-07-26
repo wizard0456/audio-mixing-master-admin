@@ -5,7 +5,7 @@ import { TiPencil } from "react-icons/ti";
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import Toggle from 'react-toggle';
-import { API_Endpoint } from '../utilities/constants';
+import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
@@ -40,7 +40,7 @@ const Labels = () => {
         abortController.current = new AbortController();
 
         setLoading(true);
-        let url = `${API_Endpoint}admin/labels?page=${page}&per_page=10`;
+        let url = `${API_Endpoint}admin/labels?page=${page}&per_page=${Per_Page}`;
         if (filter !== 'all') {
             url += `&is_active=${filter}`;
         }
