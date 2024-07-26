@@ -15,6 +15,7 @@ import ServiceDetail from "./pages/ServiceDetail.jsx";
 import Newsletter from "./pages/Newsletter.jsx";
 import ContactForm from "./pages/ContactForm.jsx";
 import OrderForm from "./pages/OrderForm.jsx";
+import AddService from "./pages/AddService.jsx";
 
 const router = createBrowserRouter([
   {
@@ -44,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/services",
     element: <Layout><Services /></Layout>,
+  },
+  {
+    path: "/add-service",
+    element: <Layout><AddService /></Layout>,
   },
   {
     path: "/service-detail/:id",

@@ -106,12 +106,12 @@ body {
 
 .gallery-image:hover .gallery-delete-wrapper {
     top: 10px;
-} 
+}
 
 /* react-modal */
 .ReactModalPortal>div {
     z-index: 999;
-    background-color: #0009 !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     /* Add transition property */
@@ -121,13 +121,18 @@ body {
     inset: 0 !important;
     top: 50% !important;
     left: 50% !important;
-    transform: translate(-50%, -50%)!important;
+    transform: translate(-50%, -50%) !important;
     height: fit-content !important;
     padding: 20px !important;
     border-radius: 20px !important;
     border: none !important;
     transition: all 0.3s ease-in-out;
     /* Add transition property */
+    max-width: 500px !important;
+    /* Ensure the max-width is enforced */
+    background: white;
+    /* Ensure the modal content is visible */
+    margin: 0%;
 }
 
 .ReactModalPortal>div.ReactModal__Overlay--after-open {
@@ -136,6 +141,9 @@ body {
 
 .ReactModal__Content {
     max-width: 500px;
+    /* Ensure the max-width is enforced */
+    margin: auto;
+    /* Center content within the modal */
 }
 
 /* react-daterange-picker */
@@ -164,6 +172,7 @@ body {
     outline: none;
     background-color: transparent !important;
 }
+
 .react-daterange-picker__inputGroup__input:invalid {
     background: transparent !important;
 }
@@ -182,12 +191,48 @@ body {
     border-radius: 8px;
 }
 
-.react-calendar__tile--active {   
+.react-calendar__tile--active {
     background: #000000;
     color: white;
 }
 
 
+/* React Pagination */
+.pagination {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+}
+
+
+.pagination li {
+    height: 100%;
+    width: 100%;
+}
+
+.pagination li a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #F6F6F6;
+    padding: 10px 15px;
+    font-size: 12px;
+    font-family: THICCCBOI-Bold, sans-serif;
+    font-weight: 700;
+    text-decoration: none;
+    margin: 0 5px;
+    border-radius: 8px;
+}
+
+.pagination .disabled a {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination .active a {
+    background-color: #000000;
+    color: white;
+}
 
 
 @media screen and (max-width: 1200px) {

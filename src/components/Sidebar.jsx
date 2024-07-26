@@ -54,7 +54,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
             <NavLink to="/new-letter" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaEnvelope /></span> <span className="font-semibold relative top-[2px]">News Letter</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/contact-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon rotate-5"><FaPhone /></span> <span className="font-semibold relative top-[2px]">Contact Form</span></NavLink>
+            <NavLink to="/contact-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon transform-[rotate(90deg)]"><FaPhone /></span> <span className="font-semibold relative top-[2px]">Contact Form</span></NavLink>
           </li>
           <li className="block w-full">
             <NavLink to="/order-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Order Form</span></NavLink>

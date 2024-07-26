@@ -5,6 +5,7 @@ import './index.css';
 import Modal from 'react-modal';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import "react-toggle/style.css"; // Import the react-toggle CSS
 
 // Set the app element to the root element of your application
 const rootElement = document.getElementById('root');

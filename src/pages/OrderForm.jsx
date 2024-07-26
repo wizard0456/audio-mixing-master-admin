@@ -1,26 +1,28 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaTrashAlt, FaEye } from "react-icons/fa";
+import { FaTrashAlt, FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
-import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
+import { API_Endpoint, Asset_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
 import Modal from 'react-modal';
 import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this path is correct
+import { Slide, toast } from 'react-toastify';
 
 const OrderForm = () => {
     const [orders, setOrders] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0); // Set initial page to 0
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null); // State to manage the order to be deleted
+    const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
     const user = useSelector(selectUser);
 
     useEffect(() => {
-        fetchOrders(currentPage);
+        fetchOrders(currentPage + 1); // fetchOrders expects a 1-based page number
     }, [currentPage]);
 
     const fetchOrders = async (page) => {
@@ -28,13 +30,13 @@ const OrderForm = () => {
         try {
             const response = await axios({
                 method: "get",
-                url: `${API_Endpoint}upload/lead/generation?page=${page}`,
+                url: `${API_Endpoint}upload/lead/generation?page=${page}&per_page=${Per_Page}`,
                 headers: {
                     "Authorization": `Bearer ${user.token}`
                 }
             });
             setOrders(response.data.data);
-            setCurrentPage(response.data.current_page);
+            // setCurrentPage(response.data.current_page - 1); // API returns 1-based page number
             setTotalPages(response.data.last_page);
         } catch (error) {
             console.error("Error fetching orders", error);
@@ -44,7 +46,7 @@ const OrderForm = () => {
     };
 
     const handlePageClick = (event) => {
-        const selectedPage = event.selected + 1;
+        const selectedPage = event.selected;
         setCurrentPage(selectedPage);
     };
 
@@ -68,8 +70,13 @@ const OrderForm = () => {
         setConfirmationModalOpen(false);
     };
 
+    console.log("render")
+
+    console.log(totalPages, currentPage)
+
     const handleDeleteOrder = async () => {
         if (!orderToDelete) return;
+        setIsDeleting(true); // Start loading state
         try {
             await axios({
                 method: 'delete',
@@ -78,16 +85,40 @@ const OrderForm = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-            fetchOrders(currentPage); // Reload fetching
+            fetchOrders(currentPage + 1); // Reload orders after deletion
             closeConfirmationModal();
+            toast.success('Order deleted successfully!', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
         } catch (error) {
             console.error('Error deleting order:', error);
+            toast.error('Error deleting order.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        } finally {
+            setIsDeleting(false); // End loading state
         }
     };
 
     return (
         <>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Order Form</h1>
             </div>
 
@@ -96,6 +127,7 @@ const OrderForm = () => {
                 onRequestClose={closeConfirmationModal}
                 onConfirm={handleDeleteOrder}
                 message="Are you sure you want to delete this order?"
+                isDeleting={isDeleting} // Pass the isDeleting state to modal
             />
 
             <Modal
@@ -105,20 +137,17 @@ const OrderForm = () => {
             >
                 {selectedOrder && (
                     <div>
-                        <h2 className="text-2xl mb-4 font-semibold">Order Details</h2>
-                        <p><strong>ID:</strong> {selectedOrder.id}</p>
-                        <p><strong>Name:</strong> {selectedOrder.name}</p>
-                        <p><strong>Email:</strong> {selectedOrder.email}</p>
-                        <p><strong>Artist Name:</strong> {selectedOrder.arlist_name}</p>
-                        <p><strong>Track Title:</strong> {selectedOrder.tarck_title}</p>
-                        <p><strong>Services:</strong> {selectedOrder.services}</p>
-                        <p><strong>Reference:</strong> {selectedOrder.reference}</p>
-                        <p><strong>Created At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString()}</p>
-                        <p><strong>Updated At:</strong> {new Date(selectedOrder.updated_at).toLocaleDateString()}</p>
+                        <h2 className="font-THICCCBOI-Bold text-2xl text-center mb-4 font-bold">Order Details</h2>
+                        <p className='py-1'><strong>Name:</strong> {selectedOrder.name}</p>
+                        <p className='py-1'><strong>Email:</strong> {selectedOrder.email}</p>
+                        <p className='py-1'><strong>Artist Name:</strong> {selectedOrder.arlist_name}</p>
+                        <p className='py-1'><strong>Track Title:</strong> {selectedOrder.tarck_title}</p>
+                        <p className='py-1'><strong>Services:</strong> {selectedOrder.services}</p>
+                        <p className='py-1'><strong>Reference:</strong> {selectedOrder.reference}</p>
+                        <p className='py-1'><strong>Received At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString()}</p>
                         {selectedOrder.image && (
                             <div className="my-4">
                                 <p><strong>Media:</strong></p>
-
                                 <audio controls>
                                     <source src={`${Asset_Endpoint}${selectedOrder.image}`} type="audio/mpeg" />
                                     Your browser does not support the audio element.
@@ -127,7 +156,7 @@ const OrderForm = () => {
                         )}
                         <button
                             type="button"
-                            className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded mt-4"
+                            className="bg-red-500 font-THICCCBOI-Bold font-bold text-base mx-auto block text-white px-4 py-2 rounded mt-4"
                             onClick={closeModal}
                         >
                             Close
@@ -137,80 +166,89 @@ const OrderForm = () => {
             </Modal>
 
             {loading ? (
-                <div className="flex justify-center items-center">
+                <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                     Loading...
                 </div>
             ) : (
-                <table className='w-full border-0'>
-                    <thead>
-                        <tr>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">ID</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Name</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Email</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Artist Name</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Track Title</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Services</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Reference</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Created At</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Updated At</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {orders.map(order => (
-                            <tr key={order.id}>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.id}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.name}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.email}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.arlist_name}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.tarck_title}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.services}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{order.reference}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(order.created_at).toLocaleDateString()}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(order.updated_at).toLocaleDateString()}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
-                                        <button onClick={() => openModal(order)}><FaEye color="#4BC500" /></button>
-                                        <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                orders.length !== 0 ? (
+                    <>
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Email</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Artist Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Track Title</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Services</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Reference</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orders.map(order => (
+                                    <tr key={order.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{order.name}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.email}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.arlist_name}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.tarck_title}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.services}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.reference}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(order.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <button onClick={() => openModal(order)}><FaEye color="#4BC500" /></button>
+                                                <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                    </>
+                ) : (
+                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                        No orders found
+                    </div>
+                )
             )}
 
-            <div className="flex justify-center mt-6">
-                <ReactPaginate
-                    previousLabel={"« Previous"}
-                    nextLabel={"Next »"}
-                    breakLabel={"..."}
-                    pageCount={totalPages}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={3}
-                    onPageChange={handlePageClick}
-                    containerClassName={"pagination"}
-                    activeClassName={"active"}
-                />
-            </div>
+            
+            {!loading && (
+                orders.length != 0
+                && (
+                    <div className="flex justify-center mt-6">
+                        <ReactPaginate
+                            previousLabel={<FaAngleDoubleLeft pointerEvents={"none"} />}
+                            nextLabel={<FaAngleDoubleRight pointerEvents={"none"} />}
+                            breakLabel={"..."}
+                            pageCount={totalPages}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={3}
+                            onPageChange={handlePageClick}
+                            containerClassName={"pagination"}
+                            activeClassName={"active"}
+                            forcePage={currentPage}
+                        />
+                    </div>
+                )
+            )
+            }
         </>
     );
 }

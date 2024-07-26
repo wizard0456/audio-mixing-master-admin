@@ -1,26 +1,25 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaTrashAlt, FaEye } from "react-icons/fa";
+import { FaTrashAlt, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
-import { API_Endpoint } from '../utilities/constants';
+import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
-import Modal from 'react-modal';
-import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this path is correct
+import ConfirmationModal from '../components/ConfirmationModal';
+import { Slide, toast } from 'react-toastify';
 
 const Newsletter = () => {
   const [leads, setLeads] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0); // Set initial page to 0
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedLead, setSelectedLead] = useState(null);
   const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-  const [leadToDelete, setLeadToDelete] = useState(null); // State to manage the lead to be deleted
+  const [leadToDelete, setLeadToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
   const user = useSelector(selectUser);
 
   useEffect(() => {
-    fetchLeads(currentPage);
+    fetchLeads(currentPage + 1);
   }, [currentPage]);
 
   const fetchLeads = async (page) => {
@@ -28,13 +27,12 @@ const Newsletter = () => {
     try {
       const response = await axios({
         method: 'get',
-        url: `${API_Endpoint}lead/generation?page=${page}`,
+        url: `${API_Endpoint}lead/generation?page=${page}&per_page=${Per_Page}`,
         headers: {
           'Authorization': `Bearer ${user.token}`
         }
       });
       setLeads(response.data.data);
-      setCurrentPage(response.data.current_page);
       setTotalPages(response.data.last_page);
     } catch (error) {
       console.error('Error fetching leads', error);
@@ -44,18 +42,8 @@ const Newsletter = () => {
   };
 
   const handlePageClick = (event) => {
-    const selectedPage = event.selected + 1;
+    const selectedPage = event.selected;
     setCurrentPage(selectedPage);
-  };
-
-  const openModal = (lead) => {
-    setSelectedLead(lead);
-    setModalIsOpen(true);
-  };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-    setSelectedLead(null);
   };
 
   const openConfirmationModal = (lead) => {
@@ -70,6 +58,7 @@ const Newsletter = () => {
 
   const handleDeleteLead = async () => {
     if (!leadToDelete) return;
+    setIsDeleting(true); // Start loading state
     try {
       await axios({
         method: 'delete',
@@ -78,16 +67,41 @@ const Newsletter = () => {
           'Authorization': `Bearer ${user.token}`
         }
       });
-      fetchLeads(currentPage); // Reload fetching
+      fetchLeads(currentPage + 1); // Reload fetching
       closeConfirmationModal();
+      toast.success('Lead deleted successfully!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     } catch (error) {
       console.error('Error deleting lead:', error);
+      toast.error('Error deleting lead.', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
+      closeConfirmationModal();
+    } finally {
+      setIsDeleting(false); // End loading state
     }
   };
 
   return (
     <>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
         <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Newsletter</h1>
       </div>
 
@@ -96,86 +110,66 @@ const Newsletter = () => {
         onRequestClose={closeConfirmationModal}
         onConfirm={handleDeleteLead}
         message="Are you sure you want to delete this lead?"
+        isDeleting={isDeleting} // Pass the isDeleting state to modal
       />
 
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Lead Details"
-      >
-        {selectedLead && (
-          <div>
-            <h2 className="text-2xl mb-4 font-semibold">Lead Details</h2>
-            <p><strong>ID:</strong> {selectedLead.id}</p>
-            <p><strong>Email:</strong> {selectedLead.email}</p>
-            <p><strong>Created At:</strong> {new Date(selectedLead.created_at).toLocaleDateString()}</p>
-            <p><strong>Updated At:</strong> {new Date(selectedLead.updated_at).toLocaleDateString()}</p>
-            <button
-              type="button"
-              className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded mt-4"
-              onClick={closeModal}
-            >
-              Close
-            </button>
-          </div>
-        )}
-      </Modal>
-
       {loading ? (
-        <div className="flex justify-center items-center">
+        <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
           Loading...
         </div>
       ) : (
-        <table className='w-full border-0'>
-          <thead>
-            <tr>
-              <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">ID</th>
-              <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Email</th>
-              <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Created At</th>
-              <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Updated At</th>
-              <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leads.map(lead => (
-              <tr key={lead.id}>
-                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                  <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.id}</div>
-                </td>
-                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                  <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.email}</div>
-                </td>
-                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                  <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
-                </td>
-                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                  <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.updated_at).toLocaleDateString()}</div>
-                </td>
-                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                  <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
-                    <button onClick={() => openModal(lead)}><FaEye color="#4BC500" /></button>
-                    <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
-                  </div>
-                </td>
+        leads.length !== 0 ? (
+          <table className='w-full border-0'>
+            <thead>
+              <tr>
+                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Email</th>
+                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Created At</th>
+                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {leads?.map(lead => (
+                <tr key={lead.id}>
+                  <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                    <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.email}</div>
+                  </td>
+                  <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
+                  </td>
+                  <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                    <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                      <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+            No leads found
+          </div>
+        )
       )}
 
-      <div className="flex justify-center mt-6">
-        <ReactPaginate
-          previousLabel={"« Previous"}
-          nextLabel={"Next »"}
-          breakLabel={"..."}
-          pageCount={totalPages}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={3}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
-      </div>
+      {loading || (
+        leads.length !== 0 && (
+          <div className="flex justify-center mt-6">
+            <ReactPaginate
+              previousLabel={<FaAngleDoubleLeft />}
+              nextLabel={<FaAngleDoubleRight />}
+              breakLabel={"..."}
+              pageCount={totalPages}
+              marginPagesDisplayed={2}
+              pageRangeDisplayed={3}
+              onPageChange={handlePageClick}
+              containerClassName={"pagination"}
+              activeClassName={"active"}
+              forcePage={currentPage}
+            />
+          </div>
+        )
+      )}
     </>
   );
 }

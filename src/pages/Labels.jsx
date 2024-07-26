@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
@@ -8,6 +9,7 @@ import { API_Endpoint } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
+import ConfirmationModal from '../components/ConfirmationModal';
 
 const Labels = () => {
     const [labels, setLabels] = useState([]);
@@ -19,7 +21,10 @@ const Labels = () => {
     const [isActive, setIsActive] = useState(true);
     const [adding, setAdding] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [filter, setFilter] = useState('active');
+    const [filter, setFilter] = useState('all');
+    const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+    const [labelToDelete, setLabelToDelete] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false);
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const abortController = useRef(null);
@@ -167,69 +172,44 @@ const Labels = () => {
         }
     };
 
+    const openConfirmationModal = (label) => {
+        setLabelToDelete(label);
+        setConfirmationModalOpen(true);
+    };
+
+    const closeConfirmationModal = () => {
+        setLabelToDelete(null);
+        setConfirmationModalOpen(false);
+    };
+
+    const handleDeleteLabel = async () => {
+        if (!labelToDelete) return;
+        setIsDeleting(true);
+        try {
+            await axios({
+                method: 'delete',
+                url: `${API_Endpoint}admin/labels/${labelToDelete.id}`,
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            setIsDeleting(false);
+            fetchLabels(currentPage, filter); // Reload fetching
+            closeConfirmationModal();
+        } catch (error) {
+            console.error('Error deleting label:', error);
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <>
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Labels</h1>
-                <button
-                    className="bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-base text-white px-5 py-4 rounded-lg"
-                    onClick={() => openModal()}
-                >
-                    Add Labels
-                </button>
             </div>
 
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Add/Update Label Modal"
-            >
-                <h2 className="text-2xl mb-4 font-semibold">{labelId ? 'Update' : 'Add'} Label</h2>
-                <form onSubmit={handleAddOrUpdateLabel} className="space-y-4">
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="label">Label Name</label>
-                        <input
-                            type="text"
-                            name="label"
-                            value={labelName}
-                            onChange={(e) => setLabelName(e.target.value)}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        />
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <p><strong>Status:</strong></p>
-                        <Toggle
-                            checked={isActive}
-                            onChange={() => setIsActive(!isActive)}
-                            icons={false}
-                            aria-label="Label status"
-                        />
-                    </div>
-                    <div className="flex justify-end space-x-4">
-                        <button
-                            type="button"
-                            className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
-                            onClick={closeModal}
-                            disabled={adding}
-                        >
-                            Close
-                        </button>
-                        <button
-                            type="submit"
-                            className="bg-[#4BC500] font-semibold text-base text-white px-5 py-2 rounded-lg"
-                            disabled={adding}
-                        >
-                            {adding ? (labelId ? 'Updating...' : 'Adding...') : (labelId ? 'Update Label' : 'Add Label')}
-                        </button>
-                    </div>
-                </form>
-            </Modal>
-
-        
-
-            <div className='flex items-center justify-between'>
-                <div className="flex gap-4 mb-6">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex gap-4">
                     <button
                         className={`px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
@@ -249,66 +229,133 @@ const Labels = () => {
                         Inactive Labels
                     </button>
                 </div>
+                <button
+                    onClick={() => openModal()}
+                    className="bg-[#4BC500] font-semibold text-base text-white px-5 py-2 rounded-lg"
+                >
+                    Add Label
+                </button>
             </div>
 
+            <ConfirmationModal
+                isOpen={confirmationModalOpen}
+                onRequestClose={closeConfirmationModal}
+                onConfirm={handleDeleteLabel}
+                message="Are you sure you want to delete this label?"
+                isDeleting={isDeleting} // Pass the isDeleting state to modal
+            />
+
             {loading ? (
-                <div className="flex justify-center items-center">
+                <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                     Loading...
                 </div>
             ) : (
-                <table className='w-full border-0'>
-                    <thead>
-                        <tr>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">ID</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Name</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Created At</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Status</th>
-                            <th className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {labels.map(label => (
-                            <tr key={label.id}>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{label.id}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{label.name}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString()}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='px-3 py-5 bg-[#F6F6F6]'>{label.is_active == 1 ? 'Active' : 'Inactive'}</div>
-                                </td>
-                                <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                    <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6]'>
-                                        <button
-                                            onClick={() => openModal(label)}
-                                        >
-                                            <TiPencil color="#0F2005" />
-                                        </button>
-                                    </div>
-                                </td>
+                labels.length !== 0 ? (
+                    <table className='w-full border-0'>
+                        <thead>
+                            <tr>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Name</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Created At</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {labels.map(label => (
+                                <tr key={label.id}>
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{label.name}</div>
+                                    </td>
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString()}</div>
+                                    </td>
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{label.is_active == 1 ? 'Active' : 'Inactive'}</div>
+                                    </td>
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                            <button onClick={() => openModal(label)}><TiPencil color="#969696" /></button>
+                                            <button onClick={() => openConfirmationModal(label)}><FaTrashAlt color="#FF0000" /></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                        No labels found
+                    </div>
+                )
             )}
 
-            <div className="flex justify-center mt-6">
-                <ReactPaginate
-                    previousLabel={"« Previous"}
-                    nextLabel={"Next »"}
-                    breakLabel={"..."}
-                    pageCount={totalPages}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={3}
-                    onPageChange={handlePageClick}
-                    containerClassName={"pagination"}
-                    activeClassName={"active"}
-                />
-            </div>
+            {loading || (
+                labels.length !== 0 && (
+                    <div className="flex justify-center mt-6">
+                        <ReactPaginate
+                            previousLabel={<FaAngleDoubleLeft />}
+                            nextLabel={<FaAngleDoubleRight />}
+                            breakLabel={"..."}
+                            pageCount={totalPages}
+                            marginPagesDisplayed={2}
+                            pageRangeDisplayed={3}
+                            onPageChange={handlePageClick}
+                            containerClassName={"pagination"}
+                            activeClassName={"active"}
+                            forcePage={currentPage - 1}
+                        />
+                    </div>
+                )
+            )}
+
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Add or Update Label"
+            >
+                <div>
+                    <h2 className="text-2xl mb-4 font-semibold">{labelId ? 'Update Label' : 'Add Label'}</h2>
+                    <form onSubmit={handleAddOrUpdateLabel} className="space-y-4">
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="label">Label Name</label>
+                            <input
+                                type="text"
+                                name="label"
+                                className="w-full px-3 py-2 border rounded-md"
+                                value={labelName}
+                                onChange={(e) => setLabelName(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="flex items-center gap-2 mb-4">
+                            <p><strong>Status:</strong></p>
+                            <Toggle
+                                checked={isActive}
+                                onChange={() => setIsActive(!isActive)}
+                                icons={false}
+                                aria-label="Label status"
+                            />
+                        </div>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                type="button"
+                                className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                                onClick={closeModal}
+                                disabled={adding}
+                            >
+                                Close
+                            </button>
+                            <button
+                                type="submit"
+                                className="bg-[#4BC500] font-semibold text-base text-white px-5 py-2 rounded-lg"
+                                disabled={adding}
+                            >
+                                {adding ? (labelId ? 'Updating...' : 'Adding...') : (labelId ? 'Update Label' : 'Add Label')}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </Modal>
         </>
     );
 }
