@@ -16,6 +16,7 @@ import Newsletter from "./pages/Newsletter.jsx";
 import ContactForm from "./pages/ContactForm.jsx";
 import OrderForm from "./pages/OrderForm.jsx";
 import AddService from "./pages/AddService.jsx";
+import Chat from "./pages/Chat.jsx";
 
 const router = createBrowserRouter([
   {
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
   {
     path: "/service-detail/:id",
     element: <Layout><ServiceDetail /></Layout>,
+  },
+  {
+    path: "/chat",
+    element: <Layout><Chat /></Layout>,
   },
   {
     path: "/gallery",

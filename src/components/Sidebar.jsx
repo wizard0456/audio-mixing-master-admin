@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { NavLink, useNavigate } from "react-router-dom";
 import LOGO from "../assets/images/logo.png";
-import { FaMusic, FaUsers, FaSignOutAlt, FaTags, FaEnvelope, FaPhone, FaClipboardList } from "react-icons/fa";
+import { FaMusic, FaUsers, FaSignOutAlt, FaTags, FaEnvelope, FaPhone, FaClipboardList, FaComments } from "react-icons/fa"; // Added FaComments icon for chat
 import { GoChecklist } from 'react-icons/go';
 import { BsFillFileMusicFill } from 'react-icons/bs';
 import { PiImageSquareFill } from 'react-icons/pi';
@@ -30,37 +30,40 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
 
         <ul className="sidebar-list flex flex-col gap-5 mx-5 overflow-auto">
           <li className="block w-full">
-            <NavLink to="/users" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaUsers /></span> <span className="font-semibold relative top-[2px]">User</span></NavLink>
+            <NavLink to="/users" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaUsers /></span> <span className="font-semibold relative top-[2px]">User</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/orders" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><GoChecklist /></span> <span className="font-semibold relative top-[2px]">Orders</span></NavLink>
+            <NavLink to="/orders" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><GoChecklist /></span> <span className="font-semibold relative top-[2px]">Orders</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/services" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><BsFillFileMusicFill /></span> <span className="font-semibold relative top-[2px]">Services</span></NavLink>
+            <NavLink to="/services" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><BsFillFileMusicFill /></span> <span className="font-semibold relative top-[2px]">Services</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/labels" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaTags /></span> <span className="font-semibold relative top-[2px]">Labels</span></NavLink>
+            <NavLink to="/labels" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaTags /></span> <span className="font-semibold relative top-[2px]">Labels</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/categories" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><MdCategory /></span> <span className="font-semibold relative top-[2px]">Categorys</span></NavLink>
+            <NavLink to="/categories" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><MdCategory /></span> <span className="font-semibold relative top-[2px]">Categorys</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/gallery" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><PiImageSquareFill /></span> <span className="font-semibold relative top-[2px]">Gallery</span></NavLink>
+            <NavLink to="/gallery" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><PiImageSquareFill /></span> <span className="font-semibold relative top-[2px]">Gallery</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/samples" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaMusic /></span> <span className="font-semibold relative top-[2px]">Sample</span></NavLink>
+            <NavLink to="/samples" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaMusic /></span> <span className="font-semibold relative top-[2px]">Sample</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/new-letter" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaEnvelope /></span> <span className="font-semibold relative top-[2px]">News Letter</span></NavLink>
+            <NavLink to="/new-letter" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaEnvelope /></span> <span className="font-semibold relative top-[2px]">News Letter</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/contact-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon transform-[rotate(90deg)]"><FaPhone /></span> <span className="font-semibold relative top-[2px]">Contact Form</span></NavLink>
+            <NavLink to="/contact-us" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon transform-[rotate(90deg)]"><FaPhone /></span> <span className="font-semibold relative top-[2px]">Contact Form</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/order-us" className={({ isActive }) => `font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Order Form</span></NavLink>
+            <NavLink to="/order-us" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Order Form</span></NavLink>
           </li>
           <li className="block w-full">
-            <button onClick={handleLogout} className='font-semibold font-THICCCBOI-SemiBold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center'><span className="icon"><FaSignOutAlt /></span> <span className="font-semibold relative top-[2px]">Logout</span></button>
+            <NavLink to="/chat" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaComments /></span> <span className="font-semibold relative top-[2px]">Admin Chat</span></NavLink>
+          </li>
+          <li className="block w-full">
+            <button onClick={handleLogout} className='font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center'><span className="icon"><FaSignOutAlt /></span> <span className="font-semibold relative top-[2px]">Logout</span></button>
           </li>
         </ul>
       </div>
