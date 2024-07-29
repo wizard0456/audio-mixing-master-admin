@@ -12,6 +12,7 @@ const userSlice = createSlice({
     reducers: {
         addUser(state, action) {
             state.user = action.payload;
+            console.log("addUser", state.user);
             localStorage.setItem("user", JSON.stringify(action.payload));
             Cookies.set("user", JSON.stringify(action.payload));
         },

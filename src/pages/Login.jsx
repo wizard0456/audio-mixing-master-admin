@@ -26,8 +26,8 @@ const Login = () => {
                 }
             });
             const result = response.data;
-            dispatch(addUser({ token: result.token, role: result.role, permissions: result.permissions }));
-            toast.success('Login successful',{
+            dispatch(addUser({ token: result.token, id: result.id, role: result.role, permissions: result.permissions }));
+            toast.success('Login successful', {
                 position: "top-right",
                 autoClose: 10000,
                 hideProgressBar: true,
@@ -42,6 +42,17 @@ const Login = () => {
             navigate('/', { replace: true });
         } catch (error) {
             console.error('Error:', error);
+            toast.error(error.response.data.error, {
+                position: "top-right",
+                autoClose: 10000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            })
         } finally {
             setLoading(false);
         }

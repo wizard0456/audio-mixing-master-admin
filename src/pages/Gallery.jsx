@@ -146,7 +146,7 @@ const Gallery = () => {
             });
             setImages(images.filter(image => image.id !== imageToDelete));
             closeConfirmationModal();
-            setIsDeleting(true);
+            setIsDeleting(false);
             toast.success("Image deleted successfully!", {
                 position: "top-right",
                 autoClose: 3000,
@@ -162,7 +162,7 @@ const Gallery = () => {
             if (error.response && error.response.status === 401) {
                 dispatch(logout());
             }
-            setIsDeleting(true);
+            setIsDeleting(false);
             console.error('Error deleting image:', error);
             toast.error("Error deleting image.", {
                 position: "top-right",
