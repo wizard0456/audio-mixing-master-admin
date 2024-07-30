@@ -10,7 +10,6 @@ import Toggle from 'react-toggle'; // Import the react-toggle package
 import { API_Endpoint, Asset_Endpoint, Per_Page } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
-import "react-toggle/style.css"; // Import the react-toggle CSS
 import { Slide, toast } from 'react-toastify';
 import ConfirmationModal from '../components/ConfirmationModal';
 
@@ -366,7 +365,7 @@ const Samples = () => {
     };
 
     return (
-        <>
+        <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Samples</h1>
             </div>
@@ -547,7 +546,7 @@ const Samples = () => {
                     </form>
                 </div>
             </Modal>
-        </>
+        </section>
     );
 };
 

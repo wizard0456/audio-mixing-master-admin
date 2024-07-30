@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Toggle from 'react-toggle';
-import { Slide, toast, ToastContainer } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Users = () => {
@@ -211,8 +211,7 @@ const Users = () => {
     };
 
     return (
-        <>
-            <ToastContainer />
+        <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Users</h1>
             </div>
@@ -367,7 +366,7 @@ const Users = () => {
                     </div>
                 )
             )}
-        </>
+        </section>
     );
 }
 

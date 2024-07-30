@@ -1,6 +1,6 @@
 import  { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaTrashAlt, FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
+import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
@@ -60,11 +60,6 @@ const Orders = () => {
         setSelectedOrder(null);
     };
 
-    const openConfirmationModal = (order) => {
-        setOrderToDelete(order);
-        setConfirmationModalOpen(true);
-    };
-
     const closeConfirmationModal = () => {
         setOrderToDelete(null);
         setConfirmationModalOpen(false);
@@ -113,7 +108,7 @@ const Orders = () => {
     };
 
     return (
-        <>
+        <section className='px-5 py-10'>
             <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9 mb-6">Orders</h1>
 
             <ConfirmationModal
@@ -249,7 +244,7 @@ const Orders = () => {
                 )
             )
             }
-        </>
+        </section>
     );
 }
 

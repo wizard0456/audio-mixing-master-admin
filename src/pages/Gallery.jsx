@@ -183,7 +183,7 @@ const Gallery = () => {
     }
 
     return (
-        <>
+        <section className='px-5 py-10'>
             <div className="mb-6 flex items-center justify-between">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Gallery</h1>
                 <button
@@ -260,7 +260,7 @@ const Gallery = () => {
                     </div>
                 ))}
             </div>
-        </>
+        </section>
     );
 }
 

@@ -164,7 +164,7 @@ const Categories = () => {
     };
 
     return (
-        <>
+        <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Categories</h1>
             </div>
@@ -317,7 +317,7 @@ const Categories = () => {
                     </form>
                 </div>
             </Modal>
-        </>
+        </section>
     );
 }
 
