@@ -17,6 +17,7 @@ import ContactForm from "./pages/ContactForm.jsx";
 import OrderForm from "./pages/OrderForm.jsx";
 import AddService from "./pages/AddService.jsx";
 import Chat from "./pages/Chat.jsx";
+import OrderDetail from "./pages/OrderDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -41,7 +42,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/orders-details",
-    element: <Layout><div>Orders details</div></Layout>,
+    element: <Layout><OrderDetail /></Layout>,
   },
   {
     path: "/services",

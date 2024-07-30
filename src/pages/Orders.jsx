@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
@@ -10,7 +10,7 @@ import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this 
 import { Slide, toast } from 'react-toastify';
 
 const Orders = () => {
-    const [orders, setOrders] = useState([]);
+    const [orders, setOrders] = useState([]); // Initialize orders as an empty array
     const [currentPage, setCurrentPage] = useState(0); // Set initial page to 0
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -19,27 +19,32 @@ const Orders = () => {
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null); // State to manage the order to be deleted
     const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
+    const [orderStatus, setOrderStatus] = useState('all'); // State for order status filter
     const user = useSelector(selectUser);
 
     useEffect(() => {
         fetchOrders(currentPage + 1); // fetchOrders expects a 1-based page number
-    }, [currentPage]);
+    }, [currentPage, orderStatus]);
 
     const fetchOrders = async (page) => {
         setLoading(true);
         try {
+            let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}`;
+            if (orderStatus !== 'all') {
+                url += `&order_status=${orderStatus}`;
+            }
             const response = await axios({
                 method: "get",
-                url: `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}`,
+                url: url,
                 headers: {
                     "Authorization": `Bearer ${user.token}`
                 }
             });
-            setOrders(response.data.data);
-            // setCurrentPage(response.data.current_page - 1); // API returns 1-based page number
-            setTotalPages(response.data.last_page);
+            setOrders(response.data.data || []); // Ensure orders is an array
+            setTotalPages(response.data.last_page || 1); // Ensure totalPages is set
         } catch (error) {
             console.error("Error fetching orders", error);
+            setOrders([]); // Set orders to an empty array on error
         } finally {
             setLoading(false);
         }
@@ -48,6 +53,11 @@ const Orders = () => {
     const handlePageClick = (event) => {
         const selectedPage = event.selected;
         setCurrentPage(selectedPage);
+    };
+
+    const handleStatusChange = (event) => {
+        setOrderStatus(event.target.value);
+        setCurrentPage(0); // Reset to first page on filter change
     };
 
     const openModal = (order) => {
@@ -109,7 +119,24 @@ const Orders = () => {
 
     return (
         <section className='px-5 py-10'>
-            <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9 mb-6">Orders</h1>
+            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Orders</h1>
+            </div>
+
+            <div className="mb-6 flex justify-end">
+                <select
+                    value={orderStatus}
+                    onChange={handleStatusChange}
+                    className="px-4 py-2 rounded-md bg-white border border-gray-300"
+                >
+                    <option value="all">All</option>
+                    <option value="padding">padding</option>
+                    <option value="inprocess">Inprocess</option>
+                    <option value="complete">Complete</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="active">Active</option>
+                </select>
+            </div>
 
             <ConfirmationModal
                 isOpen={confirmationModalOpen}
@@ -223,7 +250,6 @@ const Orders = () => {
                 )
             )}
 
-            
             {!loading && (
                 orders.length != 0
                 && (
