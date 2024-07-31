@@ -1,33 +1,23 @@
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { addUser } from '../reducers/authSlice';
+import { Slide, toast } from 'react-toastify';
 import Logo from "../assets/images/logo.png";
 import { API_Endpoint } from '../utilities/constants';
-import { Slide, toast } from 'react-toastify';
 
-const Login = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+const ForgetPassword = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);
 
-    const handleLogin = async (data) => {
+    const handleForgetPassword = async (data) => {
         setLoading(true);
         try {
-            const response = await axios({
+            await axios({
                 method: 'post',
-                url: `${API_Endpoint}auth/login`,
-                data: {
-                    email: data.email,
-                    password: data.password
-                }
+                url: `${API_Endpoint}auth/forget-password`,
+                data: { email: data.email }
             });
-            const result = response.data;
-            dispatch(addUser({ token: result.token, id: result.id, role: result.role, permissions: result.permissions }));
-            toast.success('Login successful', {
+            toast.success('Password reset link sent to your email', {
                 position: "top-right",
                 autoClose: 10000,
                 hideProgressBar: true,
@@ -37,9 +27,7 @@ const Login = () => {
                 progress: undefined,
                 theme: "light",
                 transition: Slide,
-
             });
-            navigate('/', { replace: true });
         } catch (error) {
             console.error('Error:', error);
             toast.error(error.response.data.error, {
@@ -52,7 +40,7 @@ const Login = () => {
                 progress: undefined,
                 theme: "light",
                 transition: Slide,
-            })
+            });
         } finally {
             setLoading(false);
         }
@@ -66,10 +54,10 @@ const Login = () => {
                         <div className="flex items-center justify-center mb-4">
                             <img src={Logo} alt="Logo" className="h-16 w-32" />
                         </div>
-                        <h1 className="font-THICCCBOI-SemiBold text-[12px] leading-[14px] font-semibold tracking-[.5em] text-center">ADMIN</h1>
+                        <h1 className="font-THICCCBOI-SemiBold text-[12px] leading-[14px] font-semibold tracking-[.5em] text-center">FORGET PASSWORD</h1>
                     </div>
                 </div>
-                <form onSubmit={handleSubmit(handleLogin)}>
+                <form onSubmit={handleSubmit(handleForgetPassword)}>
                     <div className="mb-5">
                         <label className="block font-THICCCBOI-SemiBold text-[12px] leading-[14px] font-semibold mb-3" htmlFor="email">
                             Email
@@ -83,28 +71,12 @@ const Login = () => {
                         />
                         {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
                     </div>
-                    <div className="mb-5">
-                        <label className="block font-THICCCBOI-SemiBold text-[12px] leading-[14px] font-semibold mb-3" htmlFor="password">
-                            Password
-                        </label>
-                        <input
-                            type="password"
-                            id="password"
-                            {...register('password', { required: 'Password is required' })}
-                            className="font-normal font-THICCCBOI-Regular text-base leading-4 w-full px-5 py-4 bg-[#0F2005] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Enter Password"
-                        />
-                        {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
-                    </div>
-                    <div className='mb-5 text-right w-full font-THICCCBOI-Regular text-base leading-4 font-normal'>
-                        <Link to="/forgot-password">Forgot password?</Link>
-                    </div>
                     <button
                         type="submit"
                         disabled={loading}
                         className={`font-THICCCBOI-SemiBold text-base leading-[18px] text-center w-full ${loading ? 'bg-green-400' : 'bg-[#4BC500]'} text-white font-semibold py-4 px-5 rounded-lg transition duration-300`}
                     >
-                        {loading ? 'Verifying...' : 'Login'}
+                        {loading ? 'Sending...' : 'Send Reset Link'}
                     </button>
                 </form>
             </div>
@@ -112,4 +84,4 @@ const Login = () => {
     );
 }
 
-export default Login;
+export default ForgetPassword;

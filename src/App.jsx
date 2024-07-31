@@ -18,71 +18,44 @@ import OrderForm from "./pages/OrderForm.jsx";
 import AddService from "./pages/AddService.jsx";
 import Chat from "./pages/Chat.jsx";
 import OrderDetail from "./pages/OrderDetail.jsx";
+import Tags from "./pages/Tags.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
+import ForgetPassword from "./pages/ForgetPassword.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout><div>Home</div></Layout>,
-  },
-  {
-    path: "/users",
-    element: <Layout><Users /></Layout>,
-  },
-  {
-    path: "/orders",
-    element: <Layout><Orders /></Layout>,
-  },
-  {
-    path: "/labels",
-    element: <Layout><Labels /></Layout>,
-  },
-  {
-    path: "/Categories",
-    element: <Layout><Categories /></Layout>,
-  },
-  {
-    path: "/orders-details",
-    element: <Layout><OrderDetail /></Layout>,
-  },
-  {
-    path: "/services",
-    element: <Layout><Services /></Layout>,
-  },
-  {
-    path: "/add-service",
-    element: <Layout><AddService /></Layout>,
-  },
-  {
-    path: "/service-detail/:id",
-    element: <Layout><ServiceDetail /></Layout>,
-  },
-  {
-    path: "/chat",
-    element: <Layout><Chat /></Layout>,
-  },
-  {
-    path: "/gallery",
-    element: <Layout><Gallery /></Layout>,
-  },
-  {
-    path: "/samples",
-    element: <Layout><Samples /></Layout>,
-  },
-  {
-    path: "/new-letter",
-    element: <Layout><Newsletter /></Layout>,
-  },
-  {
-    path: "/contact-us",
-    element: <Layout><ContactForm /></Layout>,
-  },
-  {
-    path: "/order-us",
-    element: <Layout><OrderForm /></Layout>,
+    element: <Layout />,
+    children: [
+      { path: "/", element: <div>Home</div> },
+      { path: "/users", element: <Users />, },
+      { path: "/orders", element: <Orders />, },
+      { path: "/labels", element: <Labels />, },
+      { path: "/tags", element: <Tags />, },
+      { path: "/Categories", element: <Categories />, },
+      { path: "/order-detail", element: <OrderDetail />, },
+      { path: "/services", element: <Services />, },
+      { path: "/add-service", element: <AddService />, },
+      { path: "/service-detail/:id", element: <ServiceDetail />, },
+      { path: "/chat", element: <Chat />, },
+      { path: "/gallery", element: <Gallery />, },
+      { path: "/samples", element: <Samples />, },
+      { path: "/new-letter", element: <Newsletter />, },
+      { path: "/contact-us", element: <ContactForm />, },
+      { path: "/order-us", element: <OrderForm />, },
+    ]
   },
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgetPassword />,
+  },
+  {
+    path: "/reset-password/:token",
+    element: <ResetPassword />,
   },
   {
     path: "*",

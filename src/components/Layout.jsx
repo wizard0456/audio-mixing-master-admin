@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react';
-import PropTypes from 'prop-types';
 import Sidebar from "./Sidebar";
-import { useLocation, Navigate } from 'react-router-dom';
+import { useLocation, Navigate, Outlet } from 'react-router-dom';
 import LOGO from "../assets/images/logo.png";
 import { RxHamburgerMenu } from "react-icons/rx";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, selectUser } from '../reducers/authSlice';
 import Cookies from 'js-cookie';
 
-const Layout = ({ children }) => {
+const Layout = () => {
     const [openSidebar, setOpenSidebar] = useState(false);
     const location = useLocation();
     const user = useSelector(selectUser);
@@ -55,14 +54,10 @@ const Layout = ({ children }) => {
                         <RxHamburgerMenu className='w-20' color='white' size={25} />
                     </button>
                 </header>
-                {children}
+                <Outlet />
             </main>
         </div>
     );
-}
-
-Layout.propTypes = {
-    children: PropTypes.node.isRequired
 }
 
 export default Layout;

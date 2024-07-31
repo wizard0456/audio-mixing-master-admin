@@ -10,48 +10,51 @@ import { API_Endpoint } from '../utilities/constants';
 
 const AddService = () => {
     const [serviceData, setServiceData] = useState({
+        parent_id: 0,
+        category_id: '',
+        label_id: '',
         name: '',
+        image: '',
         price: '',
         discounted_price: '',
-        monthly_price: '',
-        monthly_discount_price: '',
-        detail: '',
+        service_type: 'one-time', // default service type
         brief_detail: '',
         includes: '',
         description: '',
         requirements: '',
         notes: '',
-        tags: '',
-        image: null,
-        category_id: '',
-        label_id: ''
+        tags: ''
     });
-    const [isMonthly, setIsMonthly] = useState(false);
     const [adding, setAdding] = useState(false);
     const [categories, setCategories] = useState([]);
     const [labels, setLabels] = useState([]);
+    const [tags, setTags] = useState([]);
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchCategoriesAndLabels();
+        fetchCategoriesLabelsAndTags();
     }, []);
 
-    const fetchCategoriesAndLabels = async () => {
+    const fetchCategoriesLabelsAndTags = async () => {
         try {
-            const [categoriesResponse, labelsResponse] = await Promise.all([
+            const [categoriesResponse, labelsResponse, tagsResponse] = await Promise.all([
                 axios.get(`${API_Endpoint}admin/categories`, {
                     headers: { "Authorization": `Bearer ${user.token}` }
                 }),
                 axios.get(`${API_Endpoint}admin/labels`, {
                     headers: { "Authorization": `Bearer ${user.token}` }
+                }),
+                axios.get(`${API_Endpoint}admin/tags`, {
+                    headers: { "Authorization": `Bearer ${user.token}` }
                 })
             ]);
             setCategories(categoriesResponse.data.data);
             setLabels(labelsResponse.data.data);
+            setTags(tagsResponse.data.data);
         } catch (error) {
-            console.error("Error fetching categories and labels", error);
+            console.error("Error fetching categories, labels, and tags", error);
         }
     };
 
@@ -59,19 +62,15 @@ const AddService = () => {
         event.preventDefault();
         setAdding(true);
         try {
-            const formData = new FormData();
-            Object.keys(serviceData).forEach(key => {
-                formData.append(key, serviceData[key]);
-            });
-
+            const payload = { ...serviceData, parent_id: 0 };
             await axios({
                 method: 'post',
-                url: `${API_Endpoint}admin/services`,
+                url: `${API_Endpoint}create-subscription`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/json'
                 },
-                data: formData
+                data: payload
             });
             toast.success("Service added successfully!", {
                 position: "top-right",
@@ -112,11 +111,7 @@ const AddService = () => {
     };
 
     const handleFileChange = (e) => {
-        setServiceData(prevData => ({ ...prevData, image: e.target.files[0] }));
-    };
-
-    const handleToggleChange = () => {
-        setIsMonthly(prevState => !prevState);
+        setServiceData(prevData => ({ ...prevData, image: e.target.value }));
     };
 
     return (
@@ -139,62 +134,70 @@ const AddService = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">Price</label>
-                        <input
-                            type="number"
-                            name="price"
-                            value={serviceData.price}
+                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="service_type">Service Type</label>
+                        <select
+                            name="service_type"
+                            value={serviceData.service_type}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border rounded-md"
-                            required
-                        />
-                    </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discounted_price">Discounted Price</label>
-                        <input
-                            type="number"
-                            name="discounted_price"
-                            value={serviceData.discounted_price}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        />
+                        >
+                            <option value="one-time">One-time</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
                     </div>
                 </div>
 
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    {isMonthly && (
-                        <>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_price">Monthly Price</label>
-                                <input
-                                    type="number"
-                                    name="monthly_price"
-                                    value={serviceData.monthly_price}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_discount_price">Monthly Discounted Price</label>
-                                <input
-                                    type="number"
-                                    name="monthly_discount_price"
-                                    value={serviceData.monthly_discount_price}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                />
-                            </div>
-                        </>
-                    )}
-                    <div className="mb-4 flex justify-start items-center md:pt-5 gap-5">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="isMonthly">Monthly Data</label>
-                        <Toggle
-                            id="isMonthly"
-                            defaultChecked={isMonthly}
-                            onChange={handleToggleChange}
-                        />
+                {serviceData.service_type === 'one-time' && (
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">Price</label>
+                            <input
+                                type="number"
+                                name="price"
+                                value={serviceData.price}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discounted_price">Discounted Price</label>
+                            <input
+                                type="number"
+                                name="discounted_price"
+                                value={serviceData.discounted_price}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded-md"
+                            />
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {serviceData.service_type === 'monthly' && (
+                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_price">Monthly Price</label>
+                            <input
+                                type="number"
+                                name="price"
+                                value={serviceData.price}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded-md"
+                                required
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_discount_price">Monthly Discounted Price</label>
+                            <input
+                                type="number"
+                                name="discounted_price"
+                                value={serviceData.discounted_price}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded-md"
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                     <div className="mb-4">
@@ -260,13 +263,18 @@ const AddService = () => {
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tags">Tags</label>
-                        <input
-                            type="text"
+                        <select
                             name="tags"
                             value={serviceData.tags}
                             onChange={handleInputChange}
                             className="w-full px-3 py-2 border rounded-md"
-                        />
+                            required
+                        >
+                            <option value="">Select Tag</option>
+                            {tags.length > 0 && tags.map(tag => (
+                                <option key={tag.id} value={tag.tag_name}>{tag.tag_name}</option>
+                            ))}
+                        </select>
                     </div>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="label_id">Label</label>
@@ -278,7 +286,7 @@ const AddService = () => {
                             required
                         >
                             <option value="">Select Label</option>
-                            {labels.length > 0 && labels?.map(label => (
+                            {labels.length > 0 && labels.map(label => (
                                 <option key={label.id} value={label.id}>{label.name}</option>
                             ))}
                         </select>
@@ -293,7 +301,7 @@ const AddService = () => {
                             required
                         >
                             <option value="">Select Category</option>
-                            {categories.length > 0 && categories?.map(category => (
+                            {categories.length > 0 && categories.map(category => (
                                 <option key={category.id} value={category.id}>{category.name}</option>
                             ))}
                         </select>
@@ -301,12 +309,14 @@ const AddService = () => {
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Image</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Image URL</label>
                     <input
-                        type="file"
+                        type="text"
                         name="image"
+                        value={serviceData.image}
                         onChange={handleFileChange}
                         className="w-full px-3 py-2 border rounded-md"
+                        required
                     />
                 </div>
 

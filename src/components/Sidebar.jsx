@@ -45,6 +45,9 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
             <NavLink to="/categories" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><MdCategory /></span> <span className="font-semibold relative top-[2px]">Categorys</span></NavLink>
           </li>
           <li className="block w-full">
+            <NavLink to="/tags" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaTags /></span> <span className="font-semibold relative top-[2px]">Tags</span></NavLink>
+          </li>
+          <li className="block w-full">
             <NavLink to="/gallery" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><PiImageSquareFill /></span> <span className="font-semibold relative top-[2px]">Gallery</span></NavLink>
           </li>
           <li className="block w-full">

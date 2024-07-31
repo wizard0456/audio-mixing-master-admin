@@ -5,17 +5,15 @@ import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
-import Modal from 'react-modal';
 import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this path is correct
 import { Slide, toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]); // Initialize orders as an empty array
     const [currentPage, setCurrentPage] = useState(0); // Set initial page to 0
     const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(false);
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [orderToDelete, setOrderToDelete] = useState(null); // State to manage the order to be deleted
     const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
@@ -58,16 +56,6 @@ const Orders = () => {
     const handleStatusChange = (event) => {
         setOrderStatus(event.target.value);
         setCurrentPage(0); // Reset to first page on filter change
-    };
-
-    const openModal = (order) => {
-        setSelectedOrder(order);
-        setModalIsOpen(true);
-    };
-
-    const closeModal = () => {
-        setModalIsOpen(false);
-        setSelectedOrder(null);
     };
 
     const closeConfirmationModal = () => {
@@ -146,43 +134,6 @@ const Orders = () => {
                 isDeleting={isDeleting} // Pass the isDeleting state to modal
             />
 
-            <Modal
-                isOpen={modalIsOpen}
-                onRequestClose={closeModal}
-                contentLabel="Order Details"
-            >
-                {selectedOrder && (
-                    <div>
-                        <h2 className="font-THICCCBOI-Bold text-2xl text-center mb-4 font-bold">Order Details</h2>
-                        <p className='py-1'><strong>Order ID:</strong> {selectedOrder.id}</p>
-                        <p className='py-1'><strong>Transaction ID:</strong> {selectedOrder.transaction_id}</p>
-                        <p className='py-1'><strong>Amount:</strong> ${selectedOrder.amount}</p>
-                        <p className='py-1'><strong>Currency:</strong> {selectedOrder.currency}</p>
-                        <p className='py-1'><strong>Payer Name:</strong> {selectedOrder.payer_name}</p>
-                        <p className='py-1'><strong>Payer Email:</strong> {selectedOrder.payer_email}</p>
-                        <p className='py-1'><strong>Payment Status:</strong> {selectedOrder.payment_status}</p>
-                        <p className='py-1'><strong>Created At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString()}</p>
-                        <div className="mb-4">
-                            <strong>Order Items:</strong>
-                            <ul>
-                                {selectedOrder.order_items.map((item) => (
-                                    <li key={item.id} className="ml-4">
-                                        {item.name} - ${item.total_price}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <button
-                            type="button"
-                            className="bg-red-500 font-THICCCBOI-Bold font-bold text-base mx-auto block text-white px-4 py-2 rounded mt-4"
-                            onClick={closeModal}
-                        >
-                            Close
-                        </button>
-                    </div>
-                )}
-            </Modal>
-
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                     Loading...
@@ -233,7 +184,7 @@ const Orders = () => {
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                                <button onClick={() => openModal(order)}><FaEye color="#4BC500" /></button>
+                                                <Link to={`/order-detail`} state={{ order }}><FaEye color="#4BC500" /></Link>
                                                 {/* <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
