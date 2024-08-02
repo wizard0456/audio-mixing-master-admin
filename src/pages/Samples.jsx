@@ -6,7 +6,7 @@ import { TiPencil } from "react-icons/ti";
 import axios from 'axios';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
-import Toggle from 'react-toggle'; // Import the react-toggle package
+import Toggle from 'react-toggle';
 import { API_Endpoint, Asset_Endpoint, Per_Page } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
@@ -30,7 +30,6 @@ const Samples = () => {
     const [loading, setLoading] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [selectedSample, setSelectedSample] = useState(null);
-
     const [uploading, setUploading] = useState(false);
     const [newSample, setNewSample] = useState({
         name: '',
@@ -72,7 +71,6 @@ const Samples = () => {
             });
             setSamples(response.data.data);
             setTotalPages(response.data.last_page);
-
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
@@ -83,7 +81,6 @@ const Samples = () => {
                     dispatch(logout());
                 }
                 console.error('Error fetching samples:', error);
-
                 setLoading(false);
             }
         }
@@ -91,47 +88,42 @@ const Samples = () => {
 
     useEffect(() => {
         samples.forEach(sample => {
-            if (audioRefs.current[`before_${sample.id}`]) {
-                audioRefs.current[`before_${sample.id}`].onloadedmetadata = () => {
-                    if (audioRefs.current[`before_${sample.id}`]) {
-                        setDurations(prevDurations => ({
-                            ...prevDurations,
-                            [`before_${sample.id}`]: audioRefs.current[`before_${sample.id}`].duration,
-                            [`after_${sample.id}`]: audioRefs.current[`after_${sample.id}`]?.duration,
-                        }));
-                    }
+            const beforeRef = audioRefs.current[`before_${sample.id}`];
+            const afterRef = audioRefs.current[`after_${sample.id}`];
+
+            if (beforeRef) {
+                beforeRef.onloadedmetadata = () => {
+                    setDurations(prev => ({
+                        ...prev,
+                        [`before_${sample.id}`]: beforeRef.duration,
+                        [`after_${sample.id}`]: afterRef?.duration,
+                    }));
                 };
 
-                audioRefs.current[`before_${sample.id}`].ontimeupdate = () => {
-                    if (audioRefs.current[`before_${sample.id}`]) {
-                        setCurrentTimes(prevCurrentTimes => ({
-                            ...prevCurrentTimes,
-                            [`before_${sample.id}`]: audioRefs.current[`before_${sample.id}`].currentTime,
-                            [`after_${sample.id}`]: audioRefs.current[`after_${sample.id}`]?.currentTime,
-                        }));
-                    }
+                beforeRef.ontimeupdate = () => {
+                    setCurrentTimes(prev => ({
+                        ...prev,
+                        [`before_${sample.id}`]: beforeRef.currentTime,
+                        [`after_${sample.id}`]: afterRef?.currentTime,
+                    }));
                 };
             }
 
-            if (audioRefs.current[`after_${sample.id}`]) {
-                audioRefs.current[`after_${sample.id}`].onloadedmetadata = () => {
-                    if (audioRefs.current[`after_${sample.id}`]) {
-                        setDurations(prevDurations => ({
-                            ...prevDurations,
-                            [`before_${sample.id}`]: audioRefs.current[`before_${sample.id}`]?.duration,
-                            [`after_${sample.id}`]: audioRefs.current[`after_${sample.id}`].duration,
-                        }));
-                    }
+            if (afterRef) {
+                afterRef.onloadedmetadata = () => {
+                    setDurations(prev => ({
+                        ...prev,
+                        [`before_${sample.id}`]: beforeRef?.duration,
+                        [`after_${sample.id}`]: afterRef.duration,
+                    }));
                 };
 
-                audioRefs.current[`after_${sample.id}`].ontimeupdate = () => {
-                    if (audioRefs.current[`after_${sample.id}`]) {
-                        setCurrentTimes(prevCurrentTimes => ({
-                            ...prevCurrentTimes,
-                            [`before_${sample.id}`]: audioRefs.current[`before_${sample.id}`]?.currentTime,
-                            [`after_${sample.id}`]: audioRefs.current[`after_${sample.id}`].currentTime,
-                        }));
-                    }
+                afterRef.ontimeupdate = () => {
+                    setCurrentTimes(prev => ({
+                        ...prev,
+                        [`before_${sample.id}`]: beforeRef?.currentTime,
+                        [`after_${sample.id}`]: afterRef.currentTime,
+                    }));
                 };
             }
         });
@@ -143,17 +135,17 @@ const Samples = () => {
 
         if (isPlaying[type] === id) {
             audioRefs.current[`${type}_${id}`].pause();
-            setIsPlaying(prevIsPlaying => ({ ...prevIsPlaying, [type]: null }));
+            setIsPlaying(prev => ({ ...prev, [type]: null }));
         } else {
             if (otherId) {
                 audioRefs.current[`${otherType}_${otherId}`].pause();
-                setIsPlaying(prevIsPlaying => ({ ...prevIsPlaying, [otherType]: null }));
+                setIsPlaying(prev => ({ ...prev, [otherType]: null }));
             }
             if (isPlaying[type] !== null) {
                 audioRefs.current[`${type}_${isPlaying[type]}`].pause();
             }
             audioRefs.current[`${type}_${id}`].play();
-            setIsPlaying(prevIsPlaying => ({ ...prevIsPlaying, [type]: id }));
+            setIsPlaying(prev => ({ ...prev, [type]: id }));
         }
     };
 
@@ -169,15 +161,15 @@ const Samples = () => {
             const offsetX = e.clientX - rect.left;
             const newTime = (offsetX / rect.width) * durations[`${type}_${id}`];
             audioRefs.current[`${type}_${id}`].currentTime = newTime;
-            setCurrentTimes(prevCurrentTimes => ({
-                ...prevCurrentTimes,
+            setCurrentTimes(prev => ({
+                ...prev,
                 [`${type}_${id}`]: newTime
             }));
         }
     };
 
     const handleMouseDown = (type, id) => {
-        setDragging(prevDragging => ({ ...prevDragging, [`${type}_${id}`]: true }));
+        setDragging(prev => ({ ...prev, [`${type}_${id}`]: true }));
     };
 
     const handleMouseUp = () => {
@@ -192,12 +184,12 @@ const Samples = () => {
     }, []);
 
     const handleEnded = (type, id) => {
-        setCurrentTimes(prevCurrentTimes => ({
-            ...prevCurrentTimes,
+        setCurrentTimes(prev => ({
+            ...prev,
             [`${type}_${id}`]: 0
         }));
-        setIsPlaying(prevIsPlaying => ({
-            ...prevIsPlaying,
+        setIsPlaying(prev => ({
+            ...prev,
             [type]: null
         }));
     };
@@ -207,6 +199,19 @@ const Samples = () => {
     };
 
     const handleFilterChange = (newFilter) => {
+        // Pause all playing audio elements
+        Object.values(audioRefs.current).forEach(audio => {
+            if (audio) {
+                audio.pause();
+            }
+        });
+
+        // Reset current times
+        setCurrentTimes({});
+        setDurations({});
+        setIsPlaying({ before: null, after: null });
+
+        // Update the filter and reset the current page
         setFilter(newFilter);
         setCurrentPage(0); // Reset to the first page when filter changes
     };
@@ -229,7 +234,6 @@ const Samples = () => {
     };
 
     const deleteSample = async () => {
-        console.log(sampleDelete)
         if (!sampleDelete) return;
         setIsDeleting(true);
         try {
@@ -274,7 +278,7 @@ const Samples = () => {
 
     const handleFileChange = (event) => {
         const { name, files } = event.target;
-        setNewSample((prev) => ({
+        setNewSample(prev => ({
             ...prev,
             [name]: files[0]
         }));
@@ -333,7 +337,7 @@ const Samples = () => {
                 theme: "light",
                 transition: Slide,
             });
-            fetchSamples(); // Re-fetch samples to reflect updated data
+            fetchSamples();
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 dispatch(logout());
@@ -400,7 +404,7 @@ const Samples = () => {
                 onRequestClose={closeConfirmationModal}
                 onConfirm={deleteSample}
                 message="Are you sure you want to delete this Sample?"
-                isDeleting={isDeleting} // Pass the isDeleting state to modal
+                isDeleting={isDeleting}
             />
 
             {loading ? (
