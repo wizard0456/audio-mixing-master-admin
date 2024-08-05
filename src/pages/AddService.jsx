@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import Toggle from 'react-toggle';
-import "react-toggle/style.css";
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
@@ -10,14 +8,14 @@ import { API_Endpoint } from '../utilities/constants';
 
 const AddService = () => {
     const [serviceData, setServiceData] = useState({
-        parent_id: 0,
         category_id: '',
         label_id: '',
         name: '',
-        image: '',
-        price: '',
-        discounted_price: '',
-        service_type: 'one-time', // default service type
+        image: null,
+        one_time_price: '',
+        one_time_discounted_price: '',
+        monthly_price: '',
+        monthly_discounted_price: '',
         brief_detail: '',
         includes: '',
         description: '',
@@ -29,6 +27,7 @@ const AddService = () => {
     const [categories, setCategories] = useState([]);
     const [labels, setLabels] = useState([]);
     const [tags, setTags] = useState([]);
+    const [serviceOption, setServiceOption] = useState('oneTime');
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -62,15 +61,24 @@ const AddService = () => {
         event.preventDefault();
         setAdding(true);
         try {
-            const payload = { ...serviceData, parent_id: 0 };
+            const formData = new FormData();
+            Object.keys({ ...serviceData }).forEach(key => {
+                formData.append(key, serviceData[key]);
+            });
+
+
+            // Appending service option to formData
+            formData.append('service_option', serviceOption);
+
+
             await axios({
                 method: 'post',
-                url: `${API_Endpoint}create-subscription`,
+                url: `${API_Endpoint}admin/services`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data'
                 },
-                data: payload
+                data: formData
             });
             toast.success("Service added successfully!", {
                 position: "top-right",
@@ -84,7 +92,7 @@ const AddService = () => {
                 transition: Slide,
             });
             setAdding(false);
-            navigate('/services');
+            // navigate('/services');
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 dispatch(logout());
@@ -111,7 +119,25 @@ const AddService = () => {
     };
 
     const handleFileChange = (e) => {
-        setServiceData(prevData => ({ ...prevData, image: e.target.value }));
+        setServiceData(prevData => ({ ...prevData, image: e.target.files[0] }));
+    };
+
+    const handleServiceOptionChange = (e) => {
+        const selectedOption = e.target.value;
+        setServiceOption(selectedOption);
+
+        // Update serviceData based on the selected service option
+        setServiceData(prevData => {
+            let updatedData = { ...prevData };
+            if (selectedOption === 'oneTime') {
+                updatedData.monthly_price = 0;
+                updatedData.monthly_discounted_price = 0;
+            } else if (selectedOption === 'monthly') {
+                updatedData.one_time_price = 0;
+                updatedData.one_time_discounted_price = 0;
+            }
+            return updatedData;
+        });
     };
 
     return (
@@ -121,7 +147,21 @@ const AddService = () => {
             </div>
 
             <form onSubmit={handleAddService} className="space-y-4 mx-auto">
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="service_option">Service Option</label>
+                    <select
+                        name="service_option"
+                        value={serviceOption}
+                        onChange={handleServiceOptionChange}
+                        className="w-full px-3 py-2 border rounded-md"
+                    >
+                        <option value="oneTime">One-time</option>
+                        <option value="monthly">Subscription</option>
+                        <option value="both">Both</option>
+                    </select>
+                </div>
+
+                <div className='grid grid-cols-1 gap-4'>
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">Service Name</label>
                         <input
@@ -133,39 +173,27 @@ const AddService = () => {
                             required
                         />
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="service_type">Service Type</label>
-                        <select
-                            name="service_type"
-                            value={serviceData.service_type}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        >
-                            <option value="one-time">One-time</option>
-                            <option value="monthly">Monthly</option>
-                        </select>
-                    </div>
                 </div>
 
-                {serviceData.service_type === 'one-time' && (
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                {(serviceOption === 'oneTime' || serviceOption === 'both') && (
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="price">Price</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="one_time_price">One-time Price</label>
                             <input
                                 type="number"
-                                name="price"
-                                value={serviceData.price}
+                                name="one_time_price"
+                                value={serviceData.one_time_price}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded-md"
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="discounted_price">Discounted Price</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="one_time_discounted_price">One-time Discounted Price</label>
                             <input
                                 type="number"
-                                name="discounted_price"
-                                value={serviceData.discounted_price}
+                                name="one_time_discounted_price"
+                                value={serviceData.one_time_discounted_price}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded-md"
                             />
@@ -173,25 +201,25 @@ const AddService = () => {
                     </div>
                 )}
 
-                {serviceData.service_type === 'monthly' && (
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                {(serviceOption === 'monthly' || serviceOption === 'both') && (
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_price">Monthly Price</label>
                             <input
                                 type="number"
-                                name="price"
-                                value={serviceData.price}
+                                name="monthly_price"
+                                value={serviceData.monthly_price}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded-md"
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_discount_price">Monthly Discounted Price</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_discounted_price">Monthly Discounted Price</label>
                             <input
                                 type="number"
-                                name="discounted_price"
-                                value={serviceData.discounted_price}
+                                name="monthly_discounted_price"
+                                value={serviceData.monthly_discounted_price}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded-md"
                             />
@@ -309,11 +337,10 @@ const AddService = () => {
                 </div>
 
                 <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Image URL</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Image</label>
                     <input
-                        type="text"
+                        type="file"
                         name="image"
-                        value={serviceData.image}
                         onChange={handleFileChange}
                         className="w-full px-3 py-2 border rounded-md"
                         required
