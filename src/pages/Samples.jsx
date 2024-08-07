@@ -509,6 +509,7 @@ const Samples = () => {
                                 accept="audio/*"
                                 className="w-full px-3 py-2 border rounded-md"
                                 onChange={handleFileChange}
+                                required
                             />
                         </div>
                         <div className="mb-4">
@@ -519,6 +520,7 @@ const Samples = () => {
                                 accept="audio/*"
                                 className="w-full px-3 py-2 border rounded-md"
                                 onChange={handleFileChange}
+                                required
                             />
                         </div>
                         <div className="flex items-center gap-2">

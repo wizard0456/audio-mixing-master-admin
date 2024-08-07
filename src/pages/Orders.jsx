@@ -105,6 +105,8 @@ const Orders = () => {
         }
     };
 
+    console.log(orders)
+
     return (
         <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
@@ -184,7 +186,7 @@ const Orders = () => {
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                                <Link to={`/order-detail`} state={{ order }}><FaEye color="#4BC500" /></Link>
+                                                <Link to={`/order-detail/${order.id}`}><FaEye color="#4BC500" /></Link>
                                                 {/* <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>

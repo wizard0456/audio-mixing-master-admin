@@ -21,6 +21,7 @@ import OrderDetail from "./pages/OrderDetail.jsx";
 import Tags from "./pages/Tags.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import ForgetPassword from "./pages/ForgetPassword.jsx";
+import Coupons from "./pages/Coupons.jsx";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,8 @@ const router = createBrowserRouter([
       { path: "/labels", element: <Labels />, },
       { path: "/tags", element: <Tags />, },
       { path: "/Categories", element: <Categories />, },
-      { path: "/order-detail", element: <OrderDetail />, },
+      { path: "/coupons", element: <Coupons />, },
+      { path: "/order-detail/:id", element: <OrderDetail />, },
       { path: "/services", element: <Services />, },
       { path: "/add-service", element: <AddService />, },
       { path: "/service-detail/:id", element: <ServiceDetail />, },
