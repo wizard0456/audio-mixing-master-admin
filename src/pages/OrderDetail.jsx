@@ -50,8 +50,6 @@ const OrderDetail = () => {
         3: "Canceled"
     };
 
-    console.log(order)
-
     const handleStatusChange = async (event) => {
         const newStatus = event.target.value;
         setOrderStatus(newStatus);
@@ -60,7 +58,7 @@ const OrderDetail = () => {
         formData.append('order_status', newStatus);
 
         try {
-            const response = await axios(`${API_Endpoint}order/update-status/${id}`, {
+            await axios(`${API_Endpoint}order/update-status/${id}`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -69,7 +67,6 @@ const OrderDetail = () => {
                 data: formData,
             });
 
-            console.log(response.data)
             setOrder(prevOrder => ({
                 ...prevOrder,
                 order: {
@@ -77,6 +74,7 @@ const OrderDetail = () => {
                     Order_status: newStatus
                 }
             }));
+
             toast.success("Order status updated successfully", {
                 position: "top-right",
                 autoClose: 3000,
@@ -119,7 +117,6 @@ const OrderDetail = () => {
 
     const handleFileSubmit = async (event) => {
         event.preventDefault();
-        console.log(selectedFiles);
 
         const formData = new FormData();
         Array.from(selectedFiles).forEach((file) => {
@@ -138,8 +135,6 @@ const OrderDetail = () => {
                 },
                 data: formData,
             });
-
-            console.log(response.data);
 
             setFiles(JSON.parse(response.data.order_files));
 

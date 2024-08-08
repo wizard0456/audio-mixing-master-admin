@@ -58,7 +58,7 @@ const Users = () => {
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
+                return;
             } else {
                 console.error("Error fetching users", error);
                 setLoading(false);
@@ -274,7 +274,7 @@ const Users = () => {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Current Status</label>
                                 <p>{selectedUser.status === 1 ? 'Active' : 'Inactive'}</p>
                             </div>
-                           
+
                             <div className="flex justify-center">
                                 <button
                                     type="button"
@@ -320,7 +320,7 @@ const Users = () => {
                                                 onChange={() => handleToggleActivation(user.id, user.is_active)}
                                                 icons={false}
                                                 aria-label="User status"
-                                                
+
                                             />
                                         </div>
                                     </td>

@@ -53,14 +53,13 @@ const Categories = () => {
                 signal: abortController.current.signal,
             });
 
-            console.log(response.data);
             setCategories(response.data.data);
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
+                return;
             } else {
                 console.error("Error fetching categories", error);
                 setLoading(false);

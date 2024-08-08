@@ -74,7 +74,6 @@ const Samples = () => {
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
                 return;
             } else {
                 if (error.response && error.response.status === 401) {

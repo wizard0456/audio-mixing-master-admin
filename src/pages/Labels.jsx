@@ -60,7 +60,7 @@ const Labels = () => {
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
+                return;
             } else {
                 console.error("Error fetching labels", error);
                 setLoading(false);

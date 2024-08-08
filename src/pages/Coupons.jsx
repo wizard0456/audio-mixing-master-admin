@@ -9,7 +9,7 @@ import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
 import Select from 'react-select';
-import { toast } from 'react-toastify';
+import { Slide, toast } from 'react-toastify';
 
 const Coupons = () => {
     const [coupons, setCoupons] = useState([]);
@@ -67,11 +67,21 @@ const Coupons = () => {
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
+                return;
             } else {
                 console.error("Error fetching coupons", error);
                 setLoading(false);
-                toast.error('Error fetching coupons');
+                toast.error('Error fetching coupons', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Slide,
+                });
             }
         }
     };
@@ -83,11 +93,21 @@ const Coupons = () => {
                 value: service.id,
                 label: service.name
             }));
-            console.log('Services:', servicesOptions);
+
             setServices(servicesOptions);
         } catch (error) {
             console.error('Error fetching services', error);
-            toast.error('Error fetching services');
+            toast.error('Error fetching services', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
         }
     };
 
@@ -103,8 +123,6 @@ const Coupons = () => {
 
     const openModal = (coupon = null) => {
         if (coupon) {
-            console.log('Editing coupon:', coupon);
-
             setCouponCode(coupon.code);
             setDiscountType(coupon.discount_type);
             setDiscountValue(coupon.discount_value);
@@ -166,7 +184,17 @@ const Coupons = () => {
                         product_ids: productIds
                     }
                 });
-                toast.success('Coupon updated successfully');
+                toast.success('Coupon updated successfully', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Slide,
+                });
             } else {
                 // Add new coupon
                 await axios({
@@ -187,13 +215,33 @@ const Coupons = () => {
                         product_ids: productIds
                     }
                 });
-                toast.success('Coupon added successfully');
+                toast.success('Coupon added successfully', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Slide,
+                });
             }
             closeModal();
             fetchCoupons(currentPage, filter); // Reload fetching
         } catch (error) {
             console.error(`Error ${editingCoupon ? 'updating' : 'adding'} coupon`, error);
-            toast.error(`Error ${editingCoupon ? 'updating' : 'adding'} coupon`);
+            toast.error(`Error ${editingCoupon ? 'updating' : 'adding'} coupon`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
         } finally {
             setAdding(false);
         }
@@ -213,13 +261,20 @@ const Coupons = () => {
                 }
             });
 
-            console.log('Response:', response.data);
-
-
             setCouponDetails(response.data);
         } catch (error) {
             console.error('Error fetching coupon details', error);
-            toast.error('Error fetching coupon details');
+            toast.error('Error fetching coupon details', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
         }
     };
 
@@ -263,7 +318,7 @@ const Coupons = () => {
                 </button>
             </div>
 
-            
+
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">

@@ -60,7 +60,7 @@ const Tags = () => {
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
-                console.log('Request canceled', error.message);
+                return;
             } else {
                 console.error("Error fetching tags", error);
                 setLoading(false);

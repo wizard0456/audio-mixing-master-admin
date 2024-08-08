@@ -24,7 +24,7 @@ const ConfirmationModal = ({ isOpen, onRequestClose, onConfirm, message, isDelet
                     <button
                         type="button"
                         className="bg-[#FF0000] font-semibold text-base text-white px-4 py-2 rounded"
-                        onClick={()=> {onConfirm();console.log(isDeleting)} }
+                        onClick={() => { onConfirm() }}
                         disabled={isDeleting} // Disable button while deleting
                     >
                         {isDeleting ? 'Deleting...' : 'Delete'}
