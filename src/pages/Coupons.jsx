@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
@@ -8,10 +8,8 @@ import Toggle from 'react-toggle';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
-import ConfirmationModal from '../components/ConfirmationModal';
 import Select from 'react-select';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
 
 const Coupons = () => {
     const [coupons, setCoupons] = useState([]);
@@ -28,14 +26,13 @@ const Coupons = () => {
     const [isActive, setIsActive] = useState(true);
     const [editingCoupon, setEditingCoupon] = useState(null);
     const [adding, setAdding] = useState(false);
-    const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-    const [couponToDelete, setCouponToDelete] = useState(null);
     const [filter, setFilter] = useState('all');
     const user = useSelector(selectUser);
-    const [isDeleting, setIsDeleting] = useState(false);
     const [services, setServices] = useState([]);
     const [selectedServices, setSelectedServices] = useState([]);
     const abortController = useRef(null);
+    const [couponDetails, setCouponDetails] = useState(null);
+    const [viewModalIsOpen, setViewModalIsOpen] = useState(false);
 
     useEffect(() => {
         fetchCoupons(currentPage, filter);
@@ -86,6 +83,7 @@ const Coupons = () => {
                 value: service.id,
                 label: service.name
             }));
+            console.log('Services:', servicesOptions);
             setServices(servicesOptions);
         } catch (error) {
             console.error('Error fetching services', error);
@@ -105,6 +103,8 @@ const Coupons = () => {
 
     const openModal = (coupon = null) => {
         if (coupon) {
+            console.log('Editing coupon:', coupon);
+
             setCouponCode(coupon.code);
             setDiscountType(coupon.discount_type);
             setDiscountValue(coupon.discount_value);
@@ -113,7 +113,7 @@ const Coupons = () => {
             setEndDate(coupon.end_date);
             setIsActive(coupon.is_active === "1");
             setEditingCoupon(coupon);
-            setSelectedServices(coupon.product_ids.map(id => services.find(service => service.value === id)));
+            setSelectedServices(JSON.parse(coupon.product_ids).map(id => services.find(service => service.value === id)));
         } else {
             setCouponCode('');
             setDiscountType('fixed');
@@ -199,41 +199,37 @@ const Coupons = () => {
         }
     };
 
-    const openConfirmationModal = (coupon) => {
-        setCouponToDelete(coupon);
-        setConfirmationModalOpen(true);
-    };
 
-    const closeConfirmationModal = () => {
-        setCouponToDelete(null);
-        setConfirmationModalOpen(false);
-    };
+    const fetchCouponDetails = async (couponId) => {
+        setCouponDetails(null); // Reset coupon details
+        setViewModalIsOpen(true); // Open the modal immediately
 
-    const handleDeleteCoupon = async () => {
-        if (!couponToDelete) return;
-        setIsDeleting(true);
         try {
-            await axios({
-                method: 'delete',
-                url: `${API_Endpoint}admin/coupons/${couponToDelete.id}`,
+            const response = await axios({
+                method: 'get',
+                url: `${API_Endpoint}admin/coupons/${couponId}`,
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    "Authorization": `Bearer ${user.token}`
                 }
             });
-            setIsDeleting(false);
-            fetchCoupons(currentPage, filter); // Reload fetching
-            closeConfirmationModal();
-            toast.success('Coupon deleted successfully');
+
+            console.log('Response:', response.data);
+
+
+            setCouponDetails(response.data);
         } catch (error) {
-            console.error('Error deleting coupon:', error);
-            setIsDeleting(false);
-            toast.error('Error deleting coupon');
+            console.error('Error fetching coupon details', error);
+            toast.error('Error fetching coupon details');
         }
+    };
+
+    const closeViewModal = () => {
+        setViewModalIsOpen(false);
+        setCouponDetails(null);
     };
 
     return (
         <section className='px-5 py-10'>
-            <ToastContainer />
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Coupons</h1>
             </div>
@@ -267,13 +263,7 @@ const Coupons = () => {
                 </button>
             </div>
 
-            <ConfirmationModal
-                isOpen={confirmationModalOpen}
-                onRequestClose={closeConfirmationModal}
-                onConfirm={handleDeleteCoupon}
-                message="Are you sure you want to delete this coupon?"
-                isDeleting={isDeleting}
-            />
+            
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
@@ -324,8 +314,8 @@ const Coupons = () => {
                                     </td>
                                     <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                            <button onClick={() => fetchCouponDetails(coupon.id)}><FaEye color="#969696" /></button>
                                             <button onClick={() => openModal(coupon)}><TiPencil color="#969696" /></button>
-                                            <button onClick={() => openConfirmationModal(coupon)}><FaTrashAlt color="#FF0000" /></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -473,6 +463,40 @@ const Coupons = () => {
                             </button>
                         </div>
                     </form>
+                </div>
+            </Modal>
+
+            <Modal
+                isOpen={viewModalIsOpen}
+                onRequestClose={closeViewModal}
+                contentLabel="View Coupon Details"
+            >
+                <div>
+                    <h2 className="text-2xl mb-4 font-semibold">Coupon Details</h2>
+                    {couponDetails ? (
+                        <div className="space-y-4">
+                            <p><strong>Code:</strong> {couponDetails.code}</p>
+                            <p><strong>Discount Type:</strong> {couponDetails.discount_type}</p>
+                            <p><strong>Discount Value:</strong> {couponDetails.discount_value}</p>
+                            <p><strong>Max Uses:</strong> {couponDetails.max_uses}</p>
+                            <p><strong>Uses:</strong> {couponDetails.uses}</p>
+                            <p><strong>Start Date:</strong> {new Date(couponDetails.start_date).toLocaleDateString()}</p>
+                            <p><strong>End Date:</strong> {new Date(couponDetails.end_date).toLocaleDateString()}</p>
+                            <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
+                            <p><strong>Products:</strong> {(JSON.parse(couponDetails.product_ids).map(item => <span key={item} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{services[services.findIndex(service => service.value == item)].label}</span>))}</p>
+                        </div>
+                    ) : (
+                        <div>Loading...</div>
+                    )}
+                    <div className="flex justify-end space-x-4 mt-4">
+                        <button
+                            type="button"
+                            className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                            onClick={closeViewModal}
+                        >
+                            Close
+                        </button>
+                    </div>
                 </div>
             </Modal>
         </section>
