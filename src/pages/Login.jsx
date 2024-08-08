@@ -22,7 +22,8 @@ const Login = () => {
                 url: `${API_Endpoint}auth/login`,
                 data: {
                     email: data.email,
-                    password: data.password
+                    password: data.password,
+                    role: "administeration"
                 }
             });
             const result = response.data;
