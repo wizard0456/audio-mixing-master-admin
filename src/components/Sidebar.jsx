@@ -19,16 +19,16 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
 
   return (
     <div className={`sidebar ${openSidebar ? "active" : ""}`}>
-      <div className="fixed top-0 h-full overflow-hidden bg-[#091600] z-50">
+      <div className="fixed top-0 h-full overflow-hidden py-10 bg-[#091600] z-50">
         <div className="sidebar-logo flex sm:items-start sm:justify-center">
-          <img src={LOGO} className='w-32 h-16' alt="logo" />
+          <img src={LOGO} className='w-32 h-fit' alt="logo" />
 
           <div className="sidebar-close-btn">
             <button onClick={() => setOpenSidebar(false)} className="text-white">🗙</button>
           </div>
         </div>
 
-        <ul className="sidebar-list flex flex-col gap-5 mx-5 overflow-auto">
+        <ul className="sidebar-list flex flex-col gap-5 pr-2 mx-5 overflow-auto">
           <li className="block w-full">
             <NavLink to="/users" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaUsers /></span> <span className="font-semibold relative top-[2px]">User</span></NavLink>
           </li>

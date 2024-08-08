@@ -284,45 +284,45 @@ const Coupons = () => {
                     <table className='w-full border-0'>
                         <thead>
                             <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Code</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Discount Type</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Discount Value</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Max Uses</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Uses</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Start Date</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">End Date</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Code</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Discount Type</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Discount Value</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Max Uses</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Uses</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Start Date</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">End Date</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Status</th>
+                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {coupons?.map(coupon => (
                                 <tr key={coupon.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{coupon.code}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_type}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_value}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.max_uses}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.uses}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString()}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.end_date).toLocaleDateString()}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
                                     </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6">
+                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                             <button onClick={() => openModal(coupon)}><TiPencil color="#969696" /></button>
                                             <button onClick={() => openConfirmationModal(coupon)}><FaTrashAlt color="#FF0000" /></button>

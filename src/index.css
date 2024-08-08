@@ -47,6 +47,33 @@
     src: url(./assets/fonts/Thicccboi/THICCCBOI-Thin.woff2);
 }
 
+/* Select */
+::selection {
+    background: #4BC300;
+    color: #fff;
+    text-shadow: none;
+}
+
+
+::-webkit-scrollbar {
+    width: 6px;
+    background-color: #060505;
+}
+
+::-webkit-scrollbar-button:start:decrement,
+::-webkit-scrollbar-button:end:increment {
+    display: none;
+}
+
+::-webkit-scrollbar-track-piece {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb:vertical {
+    border-radius: 0px;
+    background-image: linear-gradient(100.68deg, #4BC300 -19.35%, #336613 135.67%) !important;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -74,7 +101,7 @@ body {
 .sidebar-logo {
     height: var(--sidebar-logo-height);
     padding: 0px 40px;
-    padding-top: 50px;
+    padding-top: 30px;
 }
 
 .sidebar-list {

@@ -224,7 +224,7 @@ const OrderDetail = () => {
 
                     <div className='w-1/3 flex flex-col gap-5'>
                         <div className='flex items-center justify-between bg-[#F6F6F6] p-5 rounded-lg'>
-                            <h2 className='font-THICCCBOI-SemiBold font-semibold text-base leading-5'>File Share ({files?.length})</h2>
+                            <h2 className='font-THICCCBOI-SemiBold font-semibold text-base leading-5'>File Share ({files?.length ? files.length : 0})</h2>
                             <button onClick={openModal} className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3 text-white bg-stone-900 p-4 rounded-lg'>Upload Files</button>
                         </div>
 
