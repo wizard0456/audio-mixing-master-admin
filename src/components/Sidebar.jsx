@@ -65,9 +65,9 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
           <li className="block w-full">
             <NavLink to="/order-us" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Order Form</span></NavLink>
           </li>
-          <li className="block w-full">
+          {/* <li className="block w-full">
             <NavLink to="/chat" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaComments /></span> <span className="font-semibold relative top-[2px]">Admin Chat</span></NavLink>
-          </li>
+          </li> */}
           <li className="block w-full">
             <button onClick={handleLogout} className='font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center'><span className="icon"><FaSignOutAlt /></span> <span className="font-semibold relative top-[2px]">Logout</span></button>
           </li>

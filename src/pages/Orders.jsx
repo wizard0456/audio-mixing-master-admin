@@ -148,10 +148,10 @@ const Orders = () => {
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Transaction ID</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Amount</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Currency</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Payer Name</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Payer Email</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">User Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">User Email</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Payment Status</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Order At</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
                                 </tr>
                             </thead>
@@ -171,10 +171,10 @@ const Orders = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{order.currency}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.payer_name}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.username}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.payer_email}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.useremail}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{order.payment_status}</div>

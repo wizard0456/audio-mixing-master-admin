@@ -181,11 +181,20 @@ const OrderDetail = () => {
                     <div className='w-2/3 flex item-start justify-between gap-5'>
                         <div className='w-2/4 flex flex-col gap-5'>
                             <div className='p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
-                                <p className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3'>Order By:</p>
+                                <p className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3'>User Details:</p>
 
                                 <div className='flex flex-col gap-2'>
-                                    <h3 className='font-THICCCBOI-SemiBold font-semibold text-base leading-5'>{order.order.payer_name}</h3>
-                                    <p className='font-THICCCBOI-Regular font-normal text-sm leading-3'>{order.order.payer_email}</p>
+                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Name:</span> {order.user_name}</p>
+                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Email:</span> {order.user_email}</p>
+                                </div>
+                            </div>
+
+                            <div className='p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
+                                <p className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3'>Payer Details:</p>
+
+                                <div className='flex flex-col gap-2'>
+                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Payer Name:</span> {order.order.payer_name}</p>
+                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Payer Email:</span> {order.order.payer_email}</p>
                                 </div>
                             </div>
 

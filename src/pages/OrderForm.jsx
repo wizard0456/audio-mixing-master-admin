@@ -30,7 +30,7 @@ const OrderForm = () => {
         try {
             const response = await axios({
                 method: "get",
-                url: `${API_Endpoint}upload/lead/generation?page=${page}&per_page=${Per_Page}`,
+                url: `${API_Endpoint}upload/lead/gen?page=${page}&per_page=${Per_Page}`,
                 headers: {
                     "Authorization": `Bearer ${user.token}`
                 }
@@ -141,13 +141,19 @@ const OrderForm = () => {
                         <p className='py-1'><strong>Services:</strong> {selectedOrder.services}</p>
                         <p className='py-1'><strong>Reference:</strong> {selectedOrder.reference}</p>
                         <p className='py-1'><strong>Received At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString()}</p>
-                        {selectedOrder.image && (
+                        {selectedOrder.file_type == 1 ? (
                             <div className="my-4">
-                                <p><strong>Media:</strong></p>
+                                <p><strong>Media File:</strong></p>
                                 <audio controls>
                                     <source src={`${Asset_Endpoint}${selectedOrder.image}`} type="audio/mpeg" />
                                     Your browser does not support the audio element.
                                 </audio>
+                            </div>
+                        ):
+                        (
+                            <div className="my-4">
+                                <p><strong>Media Link:</strong></p>
+                                <a href={selectedOrder.image} target="_blank" rel="noopener noreferrer">{selectedOrder.image}</a>
                             </div>
                         )}
                         <button
