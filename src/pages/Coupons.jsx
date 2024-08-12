@@ -34,9 +34,13 @@ const Coupons = () => {
     const [couponDetails, setCouponDetails] = useState(null);
     const [viewModalIsOpen, setViewModalIsOpen] = useState(false);
 
+    // New state for coupon_type
+    const [orderType, setOrderType] = useState(0);
+
     useEffect(() => {
         fetchCoupons(currentPage, filter);
         fetchServices();
+        setStartDate(new Date().toISOString().split('T')[0]); // Set start date to current date by default
     }, [currentPage, filter]);
 
     const fetchCoupons = async (page, filter) => {
@@ -128,18 +132,20 @@ const Coupons = () => {
             setDiscountValue(coupon.discount_value);
             setMaxUses(coupon.max_uses);
             setStartDate(coupon.start_date);
-            setEndDate(coupon.end_date);
+            setEndDate(coupon.end_date || '');
             setIsActive(coupon.is_active === "1");
+            setOrderType(Number(coupon.coupon_type));
             setEditingCoupon(coupon);
-            setSelectedServices(JSON.parse(coupon.product_ids).map(id => services.find(service => service.value === id)));
+            setSelectedServices(coupon.product_ids ?JSON.parse(JSON.parse(coupon.product_ids)).map(id => services.find(service => service.value === id)) : []);
         } else {
             setCouponCode('');
             setDiscountType('fixed');
             setDiscountValue('');
             setMaxUses('');
-            setStartDate('');
+            setStartDate(new Date().toISOString().split('T')[0]); // Set start date to current date by default
             setEndDate('');
             setIsActive(true);
+            setOrderType(0);
             setEditingCoupon(null);
             setSelectedServices([]);
         }
@@ -152,9 +158,10 @@ const Coupons = () => {
         setDiscountType('fixed');
         setDiscountValue('');
         setMaxUses('');
-        setStartDate('');
+        setStartDate(new Date().toISOString().split('T')[0]); // Reset start date to current date
         setEndDate('');
         setIsActive(true);
+        setOrderType(0);
         setEditingCoupon(null);
         setSelectedServices([]);
     };
@@ -163,6 +170,23 @@ const Coupons = () => {
         event.preventDefault();
         setAdding(true);
         const productIds = selectedServices.map(service => service.value);
+
+        if (orderType === 1 && productIds.length === 0) {
+            toast.error('Please select at least one service for Specific Service order type.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            setAdding(false);
+            return;
+        }
+
         try {
             if (editingCoupon) {
                 // Update coupon
@@ -179,9 +203,10 @@ const Coupons = () => {
                         discount_value: discountValue,
                         max_uses: maxUses,
                         start_date: startDate,
-                        end_date: endDate,
+                        end_date: endDate || null, // Send null if end date is not provided
                         is_active: isActive ? 1 : 0,
-                        product_ids: productIds
+                        product_ids: productIds.length > 0 ? JSON.stringify(productIds) : null,
+                        coupon_type: orderType,
                     }
                 });
                 toast.success('Coupon updated successfully', {
@@ -210,9 +235,10 @@ const Coupons = () => {
                         discount_value: discountValue,
                         max_uses: maxUses,
                         start_date: startDate,
-                        end_date: endDate,
+                        end_date: endDate || null, // Send null if end date is not provided
                         is_active: isActive ? 1 : 0,
-                        product_ids: productIds
+                        product_ids: productIds.length > 0 ? JSON.stringify(productIds) : null,
+                        coupon_type: orderType,
                     }
                 });
                 toast.success('Coupon added successfully', {
@@ -353,7 +379,7 @@ const Coupons = () => {
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_value}</div>
                                     </td>
                                     <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.max_uses}</div>
+                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.max_uses == null ? 'Unlimited' : coupon.max_uses}</div>
                                     </td>
                                     <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.uses}</div>
@@ -362,7 +388,7 @@ const Coupons = () => {
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString()}</div>
                                     </td>
                                     <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.end_date).toLocaleDateString()}</div>
+                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? new Date(coupon.end_date).toLocaleDateString() : 'No End Date'}</div>
                                     </td>
                                     <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                         <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
@@ -447,25 +473,54 @@ const Coupons = () => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="services">Services</label>
-                            <Select
-                                isMulti
-                                options={services}
-                                value={selectedServices}
-                                onChange={setSelectedServices}
-                                className="w-full"
-                                classNamePrefix="select"
-                            />
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Order Type</label>
+                            <div className="flex items-center gap-4">
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="orderType"
+                                        value={orderType}
+                                        checked={orderType === 0}
+                                        onChange={() => setOrderType(0)}
+                                    />
+                                    <span className="ml-2">Complete Order</span>
+                                </label>
+                                <label className="inline-flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="orderType"
+                                        value={orderType}
+                                        checked={orderType === 1}
+                                        onChange={() => setOrderType(1)}
+                                    />
+                                    <span className="ml-2">Specific Service</span>
+                                </label>
+                            </div>
                         </div>
+                        {orderType === 1 && (
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="services">Services <span className="text-red-500">*</span></label>
+                                <Select
+                                    isMulti
+                                    options={services}
+                                    value={selectedServices}
+                                    onChange={setSelectedServices}
+                                    className="w-full"
+                                    classNamePrefix="select"
+                                />
+                                {selectedServices.length === 0 && (
+                                    <p className="text-red-500 text-sm">Please select at least one service.</p>
+                                )}
+                            </div>
+                        )}
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="maxUses">Max Uses</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="maxUses">Max Uses (optional)</label>
                             <input
                                 type="number"
                                 name="maxUses"
                                 className="w-full px-3 py-2 border rounded-md"
                                 value={maxUses}
                                 onChange={(e) => setMaxUses(e.target.value)}
-                                required
                             />
                         </div>
                         <div className="mb-4">
@@ -476,18 +531,18 @@ const Coupons = () => {
                                 className="w-full px-3 py-2 border rounded-md"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
+                                min={new Date().toISOString().split('T')[0]}
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="endDate">End Date</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="endDate">End Date (optional)</label>
                             <input
                                 type="date"
                                 name="endDate"
                                 className="w-full px-3 py-2 border rounded-md"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
-                                required
                             />
                         </div>
 
@@ -533,12 +588,22 @@ const Coupons = () => {
                             <p><strong>Code:</strong> {couponDetails.code}</p>
                             <p><strong>Discount Type:</strong> {couponDetails.discount_type}</p>
                             <p><strong>Discount Value:</strong> {couponDetails.discount_value}</p>
-                            <p><strong>Max Uses:</strong> {couponDetails.max_uses}</p>
+                            <p><strong>Max Uses:</strong> {couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
                             <p><strong>Uses:</strong> {couponDetails.uses}</p>
                             <p><strong>Start Date:</strong> {new Date(couponDetails.start_date).toLocaleDateString()}</p>
-                            <p><strong>End Date:</strong> {new Date(couponDetails.end_date).toLocaleDateString()}</p>
+                            <p><strong>End Date:</strong> {couponDetails.end_date ? new Date(couponDetails.end_date).toLocaleDateString() : 'No End Date'}</p>
                             <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
-                            <p><strong>Products:</strong> {(JSON.parse(couponDetails.product_ids).map(item => <span key={item} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">{services[services.findIndex(service => service.value == item)].label}</span>))}</p>
+                            <p><strong>Products: </strong>
+                                {couponDetails.coupon_type == "1" ? (
+                                    (JSON.parse(JSON.parse(couponDetails.product_ids))).map(item => (
+                                        <span key={item} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                                            {services[services.findIndex(service => service.value == item)]?.label || 'Unknown Service/Product'}
+                                        </span>
+                                    ))
+                                ) : (
+                                    <span>All Services</span>
+                                )}
+                            </p>
                         </div>
                     ) : (
                         <div>Loading...</div>

@@ -18,11 +18,12 @@ const Orders = () => {
     const [orderToDelete, setOrderToDelete] = useState(null); // State to manage the order to be deleted
     const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
     const [orderStatus, setOrderStatus] = useState('all'); // State for order status filter
+    const [searchQuery, setSearchQuery] = useState(''); // State for search query
     const user = useSelector(selectUser);
 
     useEffect(() => {
         fetchOrders(currentPage + 1); // fetchOrders expects a 1-based page number
-    }, [currentPage, orderStatus]);
+    }, [currentPage, orderStatus, searchQuery]);
 
     const fetchOrders = async (page) => {
         setLoading(true);
@@ -30,6 +31,9 @@ const Orders = () => {
             let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}`;
             if (orderStatus !== 'all') {
                 url += `&order_status=${orderStatus}`;
+            }
+            if (searchQuery) {
+                url += `&search=${searchQuery}`;
             }
             const response = await axios({
                 method: "get",
@@ -111,19 +115,31 @@ const Orders = () => {
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Orders</h1>
             </div>
 
-            <div className="mb-6 flex justify-end">
-                <select
-                    value={orderStatus}
-                    onChange={handleStatusChange}
-                    className="px-4 py-2 rounded-md bg-white border border-gray-300"
-                >
-                    <option value="all">All</option>
-                    <option value="padding">padding</option>
-                    <option value="inprocess">Inprocess</option>
-                    <option value="complete">Complete</option>
-                    <option value="inactive">Inactive</option>
-                    <option value="active">Active</option>
-                </select>
+            <div className="mb-6 flex flex-col md:flex-row items-center gap-5 justify-between bg-[#F6F6F6] px-5 py-6 rounded-lg">
+                <div className='flex items-center gap-2 max-w-[300px] w-full'>
+                    <input 
+                        type="text" 
+                        placeholder="Search orders by ID, name or email" 
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full" 
+                    />
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <p className='font-THICCCBOI-SemiBold font-semibold text-base leading-9'>Filter by status:</p>
+                    <select
+                        value={orderStatus}
+                        onChange={handleStatusChange}
+                        className="px-4 py-2 rounded-md bg-white border border-gray-300"
+                    >
+                        <option value="all">All</option>
+                        <option value="0">Pending</option>
+                        <option value="1">Process</option>
+                        <option value="2">Delivered</option>
+                        <option value="3">Cancel</option>
+                    </select>
+                </div>
             </div>
 
             <ConfirmationModal
@@ -202,7 +218,7 @@ const Orders = () => {
             )}
 
             {!loading && (
-                orders.length != 0
+                orders.length !== 0
                 && (
                     <div className="flex justify-center mt-6">
                         <ReactPaginate
@@ -219,8 +235,7 @@ const Orders = () => {
                         />
                     </div>
                 )
-            )
-            }
+            )}
         </section>
     );
 }

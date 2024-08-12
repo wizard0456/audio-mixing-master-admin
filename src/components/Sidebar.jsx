@@ -63,7 +63,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
             <NavLink to="/contact-us" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon transform-[rotate(90deg)]"><FaPhone /></span> <span className="font-semibold relative top-[2px]">Contact Form</span></NavLink>
           </li>
           <li className="block w-full">
-            <NavLink to="/order-us" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Order Form</span></NavLink>
+            <NavLink to="/order-us" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaClipboardList /></span> <span className="font-semibold relative top-[2px]">Uploads</span></NavLink>
           </li>
           {/* <li className="block w-full">
             <NavLink to="/chat" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}> <span className="icon"><FaComments /></span> <span className="font-semibold relative top-[2px]">Admin Chat</span></NavLink>
