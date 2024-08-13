@@ -277,7 +277,7 @@ const OrderDetail = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="bg-[#4BC500] font-semibold text-base text-white px-5 py-2 rounded-lg"
+                                className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
                                 disabled={isUploading}
                             >
                                 {isUploading ? 'Uploading...' : 'Upload'}

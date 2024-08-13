@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: 'https://audadmin.zetdigi.com/',
   optimizeDeps: {
-    include: []
+    include: ["@wojtekmaj/react-daterange-picker"]
   },
   plugins: [react()],
   resolve: {

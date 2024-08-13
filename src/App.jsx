@@ -22,13 +22,14 @@ import Tags from "./pages/Tags.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import ForgetPassword from "./pages/ForgetPassword.jsx";
 import Coupons from "./pages/Coupons.jsx";
+import Welcome from "./pages/Welcome.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <div>Home</div> },
+      { path: "/", element: <Welcome /> },
       { path: "/users", element: <Users />, },
       { path: "/orders", element: <Orders />, },
       { path: "/labels", element: <Labels />, },

@@ -178,7 +178,7 @@ body {
 .react-daterange-picker__wrapper,
 .react-daterange-picker__inputGroup {
     border-radius: 8px;
-    padding: 4px;
+    padding: 3px;
     background-color: #F6F6F6;
     color: #7A7A7A;
     border: none;
