@@ -118,6 +118,83 @@ const Orders = () => {
         }
     };
 
+    const handleGenerateReport = async () => {
+        if (dates[0] && dates[1]) {
+            const startDate = dates[0].toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+    
+            const endDate = dates[1].toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+            });
+    
+            try {
+                const response = await axios({
+                    method: 'post',
+                    url: `${API_Endpoint}generate-pdf`,
+                    headers: {
+                        'Authorization': `Bearer ${user.token}`,
+                    },
+                    data: {
+                        "date_range": [startDate, endDate],
+                    },
+                });
+    
+                const pdfLink = response.data.link;
+    
+                if (pdfLink) {
+                    // Fetch the PDF file as a Blob
+                    const pdfResponse = await axios.get(pdfLink, { responseType: 'blob' });
+                    const pdfBlob = new Blob([pdfResponse.data], { type: 'application/pdf' });
+    
+                    // Trigger download
+                    const link = document.createElement('a');
+                    const url = window.URL.createObjectURL(pdfBlob);
+                    link.href = url;
+                    link.setAttribute('download', 'report.pdf'); // You can set the filename here
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url); // Clean up the URL object
+                } else {
+                    throw new Error('PDF link is missing in the response');
+                }
+    
+            } catch (error) {
+                console.error('Error generating report:', error);
+                toast.error('Error generating report. Please try again.', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Slide,
+                });
+            }
+        } else {
+            toast.error('Please select a date range to generate the report.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        }
+    }
+    
+
+
     return (
         <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
@@ -170,7 +247,7 @@ const Orders = () => {
 
                 <div className="flex items-stretch gap-4">
                     <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker" />
-                    <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-[14px] text-white px-5 py-2 rounded-lg">Generate Report</button>
+                    <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-[14px] text-white px-5 py-2 rounded-lg" onClick={handleGenerateReport}>Generate Report</button>
                 </div>
             </div>
 

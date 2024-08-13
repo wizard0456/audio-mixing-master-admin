@@ -16,13 +16,13 @@ import Newsletter from "./pages/Newsletter.jsx";
 import ContactForm from "./pages/ContactForm.jsx";
 import OrderForm from "./pages/OrderForm.jsx";
 import AddService from "./pages/AddService.jsx";
-import Chat from "./pages/Chat.jsx";
 import OrderDetail from "./pages/OrderDetail.jsx";
 import Tags from "./pages/Tags.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import ForgetPassword from "./pages/ForgetPassword.jsx";
 import Coupons from "./pages/Coupons.jsx";
 import Welcome from "./pages/Welcome.jsx";
+import RestrictedRoute from "./components/RestrictedRoute";
 
 const router = createBrowserRouter([
   {
@@ -30,22 +30,66 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { path: "/", element: <Welcome /> },
-      { path: "/users", element: <Users />, },
-      { path: "/orders", element: <Orders />, },
-      { path: "/labels", element: <Labels />, },
-      { path: "/tags", element: <Tags />, },
-      { path: "/Categories", element: <Categories />, },
-      { path: "/coupons", element: <Coupons />, },
-      { path: "/order-detail/:id", element: <OrderDetail />, },
-      { path: "/services", element: <Services />, },
-      { path: "/add-service", element: <AddService />, },
-      { path: "/service-detail/:id", element: <ServiceDetail />, },
-      { path: "/chat", element: <Chat />, },
-      { path: "/gallery", element: <Gallery />, },
-      { path: "/samples", element: <Samples />, },
-      { path: "/new-letter", element: <Newsletter />, },
-      { path: "/contact-us", element: <ContactForm />, },
-      { path: "/order-us", element: <OrderForm />, },
+      {
+        path: "/users",
+        element: <RestrictedRoute roles={['admin']} element={Users} />,
+      },
+      {
+        path: "/orders",
+        element: <RestrictedRoute roles={['admin', 'engineer', 'user']} element={Orders} />,
+      },
+      {
+        path: "/labels",
+        element: <RestrictedRoute roles={['admin']} element={Labels} />,
+      },
+      {
+        path: "/tags",
+        element: <RestrictedRoute roles={['admin']} element={Tags} />,
+      },
+      {
+        path: "/categories",
+        element: <RestrictedRoute roles={['admin']} element={Categories} />,
+      },
+      {
+        path: "/coupons",
+        element: <RestrictedRoute roles={['admin']} element={Coupons} />,
+      },
+      {
+        path: "/order-detail/:id",
+        element: <RestrictedRoute roles={['admin', 'engineer']} element={OrderDetail} />,
+      },
+      {
+        path: "/services",
+        element: <RestrictedRoute roles={['admin']} element={Services} />,
+      },
+      {
+        path: "/add-service",
+        element: <RestrictedRoute roles={['admin']} element={AddService} />,
+      },
+      {
+        path: "/service-detail/:id",
+        element: <RestrictedRoute roles={['admin']} element={ServiceDetail} />,
+      },
+      {
+        path: "/gallery",
+        element: <RestrictedRoute roles={['admin']} element={Gallery} />,
+      },
+      {
+        path: "/samples",
+        element: <RestrictedRoute roles={['admin']} element={Samples} />,
+      },
+      {
+        path: "/new-letter",
+        element: <RestrictedRoute roles={['admin']} element={Newsletter} />,
+      },
+      {
+        path: "/contact-us",
+        element: <RestrictedRoute roles={['admin']} element={ContactForm} />,
+      },
+      {
+        path: "/order-us",
+        element: <RestrictedRoute roles={['admin']} element={OrderForm} />,
+      },
     ]
   },
   {
@@ -71,10 +115,6 @@ const App = () => {
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
-    // <h1>
-
-    //   This code
-    // </h1>
   );
 };
 
