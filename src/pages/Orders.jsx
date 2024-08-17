@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 import 'react-calendar/dist/Calendar.css';
+import Loading from '../components/Loading';
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -261,7 +262,7 @@ const Orders = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 orders.length !== 0 ? (

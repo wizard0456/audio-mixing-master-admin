@@ -5,6 +5,7 @@ import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const ServiceDetail = () => {
     const { id } = useParams();
@@ -50,7 +51,11 @@ const ServiceDetail = () => {
     };
 
     if (loading) {
-        return <div>Loading...</div>;
+        return (
+            <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                <Loading />
+            </div>
+        );
     }
 
     if (!service) {
@@ -61,7 +66,7 @@ const ServiceDetail = () => {
         <div className="container mx-auto p-4">
             <h1 className="text-3xl font-semibold mb-4">{service.name}</h1>
             <div className="mb-4">
-                <img src={Asset_Endpoint+service.image} alt="" />
+                <img src={Asset_Endpoint + service.image} alt="" />
             </div>
             <div className="mb-4">
                 <strong>Service ID:</strong> {service.id}

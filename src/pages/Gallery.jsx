@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaEye, FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import Modal from 'react-modal';
 import { Slide, toast } from 'react-toastify';
 import ConfirmationModal from '../components/ConfirmationModal'; // Import the ConfirmationModal component
+import Loading from '../components/Loading';
 
 const Gallery = () => {
     const [images, setImages] = useState([]);
@@ -178,21 +179,29 @@ const Gallery = () => {
         }
     };
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <section className='px-5 py-10'>
-            <div className="mb-6 flex items-center justify-between">
+
+
+
+            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Gallery</h1>
-                <button
-                    className="bg-[#4BC500] font-THICCCBOI-SemiBold font-semibold text-base text-white px-5 py-4 rounded-lg"
-                    onClick={openModal}
-                >
-                    Upload Images
-                </button>
             </div>
+
+            <div className="flex items-center justify-end mb-6">
+                <div className="flex gap-4">
+                    <button
+                        className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                        onClick={openModal}
+                    >
+                        Upload Images
+                    </button>
+                </div>
+            </div>
+
+
+
+
 
             <Modal
                 isOpen={modalIsOpen}
@@ -244,22 +253,27 @@ const Gallery = () => {
                 isDeleting={isDeleting}
             />
 
-            <div className="grid grid-cols-5 items-stretch gap-4">
-                {images.length > 0 && images.map(image => (
-                    <div key={image.id} className="gallery-image relative overflow-hidden">
-                        <img src={`${Asset_Endpoint}${image.image}`} alt={`Gallery ${image.id}`} className="w-full h-full object-cover rounded-lg" />
-                        <div className="gallery-buttons-wrapper absolute w-full h-fit py-5 flex items-center justify-center bg-black bg-opacity-50 rounded-b-lg">
-                            <FaEye className="cursor-pointer" color="white" size={20} />
-                        </div>
-                        <div
-                            className='gallery-delete-wrapper absolute h-10 w-10 right-3 flex items-center justify-center bg-[#FF0000] rounded-full cursor-pointer'
-                            onClick={() => openConfirmationModal(image.id)}
-                        >
-                            <FaTrashAlt className="cursor-pointer" color="white" />
-                        </div>
+            {
+                loading ? (
+                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                        <Loading />
                     </div>
-                ))}
-            </div>
+                ) : (
+                    <div className="grid grid-cols-5 items-stretch gap-4">
+                        {images.length > 0 && images.map(image => (
+                            <div key={image.id} className="gallery-image relative overflow-hidden">
+                                <img src={`${Asset_Endpoint}${image.image}`} alt={`Gallery ${image.id}`} className="w-full h-full object-cover rounded-lg" />
+                                <div
+                                    className='gallery-delete-wrapper absolute h-10 w-10 right-3 flex items-center justify-center bg-[#FF0000] rounded-full cursor-pointer'
+                                    onClick={() => openConfirmationModal(image.id)}
+                                >
+                                    <FaTrashAlt className="cursor-pointer" color="white" />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )
+            }
         </section>
     );
 }

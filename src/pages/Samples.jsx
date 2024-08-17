@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
 import ConfirmationModal from '../components/ConfirmationModal';
+import Loading from '../components/Loading';
 
 const Samples = () => {
     const dispatch = useDispatch();
@@ -408,7 +409,7 @@ const Samples = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 samples.length !== 0 ? (

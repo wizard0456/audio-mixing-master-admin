@@ -10,6 +10,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import Toggle from 'react-toggle';
 import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loading from '../components/Loading';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -253,7 +254,9 @@ const Users = () => {
                 contentLabel="User Details"
             >
                 {userDetailsLoading ? (
-                    <div>Loading...</div>
+                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                        <Loading />
+                    </div>
                 ) : (
                     selectedUser && (
                         <div>
@@ -291,7 +294,7 @@ const Users = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 users.length !== 0 ? (
@@ -325,12 +328,14 @@ const Users = () => {
                                         </div>
                                     </td>
                                     <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-5 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <button
+                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                            {/*
+                                             <button
                                                 className="bg-[#4BC500] px-3 py-[6px] rounded-xl font-THICCCBOI-SemiBold font-semibold text-[12px] leading-3 text-white"
                                             >
                                                 View Orders
                                             </button>
+                                             */}
                                             <button onClick={() => openUserDetailsModal(user)} >
                                                 <FaEye />
                                             </button>

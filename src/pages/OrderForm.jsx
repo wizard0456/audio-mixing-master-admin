@@ -8,6 +8,7 @@ import { selectUser } from '../reducers/authSlice';
 import Modal from 'react-modal';
 import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this path is correct
 import { Slide, toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const OrderForm = () => {
     const [orders, setOrders] = useState([]);
@@ -169,7 +170,7 @@ const OrderForm = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 orders.length !== 0 ? (

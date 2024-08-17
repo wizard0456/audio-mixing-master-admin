@@ -8,6 +8,7 @@ import { selectUser } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Modal from 'react-modal';
 import { Slide, toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const ContactForm = () => {
   const [leads, setLeads] = useState([]);
@@ -151,7 +152,7 @@ const ContactForm = () => {
 
       {loading ? (
         <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-          Loading...
+          <Loading />
         </div>
       ) : (
         leads.length !== 0

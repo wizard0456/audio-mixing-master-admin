@@ -8,6 +8,7 @@ import { toast, Slide } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
+import Loading from '../components/Loading';
 
 const Services = () => {
     const [services, setServices] = useState([]);
@@ -175,7 +176,7 @@ const Services = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 services.length !== 0 ? (

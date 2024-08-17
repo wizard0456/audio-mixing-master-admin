@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { Slide, toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const Newsletter = () => {
   const [leads, setLeads] = useState([]);
@@ -115,7 +116,7 @@ const Newsletter = () => {
 
       {loading ? (
         <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-          Loading...
+          <Loading />
         </div>
       ) : (
         leads.length !== 0 ? (

@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
 import Select from 'react-select';
 import { Slide, toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const Coupons = () => {
     const [coupons, setCoupons] = useState([]);
@@ -136,7 +137,7 @@ const Coupons = () => {
             setIsActive(coupon.is_active === "1");
             setOrderType(Number(coupon.coupon_type));
             setEditingCoupon(coupon);
-            setSelectedServices(coupon.product_ids ?JSON.parse(JSON.parse(coupon.product_ids)).map(id => services.find(service => service.value === id)) : []);
+            setSelectedServices(coupon.product_ids ? JSON.parse(JSON.parse(coupon.product_ids)).map(id => services.find(service => service.value === id)) : []);
         } else {
             setCouponCode('');
             setDiscountType('fixed');
@@ -348,7 +349,7 @@ const Coupons = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 coupons?.length !== 0 ? (
@@ -606,7 +607,9 @@ const Coupons = () => {
                             </p>
                         </div>
                     ) : (
-                        <div>Loading...</div>
+                        <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                            <Loading />
+                        </div>
                     )}
                     <div className="flex justify-end space-x-4 mt-4">
                         <button

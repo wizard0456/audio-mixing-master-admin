@@ -9,6 +9,7 @@ import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
+import Loading from '../components/Loading';
 
 const Categories = () => {
     const [categories, setCategories] = useState([]);
@@ -207,7 +208,7 @@ const Categories = () => {
 
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                    Loading...
+                    <Loading />
                 </div>
             ) : (
                 categories.length !== 0 ? (
