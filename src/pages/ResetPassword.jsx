@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { Slide, toast } from 'react-toastify';
-import { useParams } from 'react-router-dom'; // Import useParams
+import { useParams } from 'react-router-dom'; 
 import Logo from "../assets/images/logo.png";
 import { API_Endpoint } from '../utilities/constants';
 
 const ResetPassword = () => {
-    const { token } = useParams(); // Get the token from the URL
+    const { token } = useParams();
     const { register, handleSubmit, formState: { errors }, watch } = useForm();
     const [loading, setLoading] = useState(false);
 
@@ -18,7 +18,7 @@ const ResetPassword = () => {
                 method: 'post',
                 url: `${API_Endpoint}auth/reset-password`,
                 data: {
-                    token, // Use the token from the URL
+                    token,
                     password: data.password
                 }
             });
@@ -52,7 +52,7 @@ const ResetPassword = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
             <div className="bg-[#091600] text-white rounded-[20px] p-8 w-full max-w-md">
                 <div className="flex justify-center mb-12">
                     <div className="text-center">

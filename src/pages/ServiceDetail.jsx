@@ -5,7 +5,9 @@ import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Loading from '../components/Loading';
+import { FaAngleDoubleLeft } from "react-icons/fa";
 
 const ServiceDetail = () => {
     const { id } = useParams();
@@ -15,90 +17,91 @@ const ServiceDetail = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        fetchServiceDetail(id);
-    }, [id]);
-
-    const fetchServiceDetail = async (serviceId) => {
-        setLoading(true);
-        try {
-            const response = await axios({
-                method: "get",
-                url: `${API_Endpoint}admin/services/${serviceId}`,
-                headers: {
-                    "Authorization": `Bearer ${user.token}`
+        const fetchServiceDetail = async (serviceId) => {
+            setLoading(true);
+            try {
+                const response = await axios({
+                    method: "get",
+                    url: `${API_Endpoint}admin/services/${serviceId}`,
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                });
+                setService(response.data);
+            } catch (error) {
+                console.error("Error fetching service detail", error);
+                if (error.response && error.response.status === 401) {
+                    dispatch(logout());
                 }
-            });
-            setService(response.data);
-        } catch (error) {
-            console.error("Error fetching service detail", error);
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
+                toast.error("Error fetching service detail.", {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Slide,
+                });
+            } finally {
+                setLoading(false);
             }
-            toast.error("Error fetching service detail.", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-        } finally {
-            setLoading(false);
-        }
-    };
+        };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                <Loading />
-            </div>
-        );
-    }
-
-    if (!service) {
-        return <div>No service found</div>;
-    }
+        fetchServiceDetail(id);
+    }, [id, dispatch, user.token]);
 
     return (
-        <div className="container mx-auto p-4">
-            <h1 className="text-3xl font-semibold mb-4">{service.name}</h1>
-            <div className="mb-4">
-                <img src={Asset_Endpoint + service.image} alt="" />
+        <section className='px-4 py-8 md:px-5 md:py-10'>
+            <div className="mb-8 md:mb-10 bg-[#F6F6F6] py-4 md:py-6 rounded-lg px-4 md:px-5">
+                <h1 className="font-semibold text-2xl md:text-3xl leading-7 md:leading-9 flex items-center">
+                    <FaAngleDoubleLeft size={20} className="cursor-pointer mr-2" onClick={() => window.history.back()} /> Service Details / {id}
+                </h1>
             </div>
-            <div className="mb-4">
-                <strong>Service ID:</strong> {service.id}
-            </div>
-            <div className="mb-4">
-                <strong>Category:</strong> {service.category ? service.category.name : '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Label:</strong> {service.label ? service.label.name : '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Price Before:</strong> ${service.price || '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Price After:</strong> ${service.discounted_price || '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Discount:</strong> {service.discounted_price ? `${((1 - service.discounted_price / service.price) * 100).toFixed(0)}%` : '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Service Type:</strong> {service.service_type || '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Detail:</strong> {service.detail || '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Tags:</strong> {service.tags || '-'}
-            </div>
-            <div className="mb-4">
-                <strong>Created At:</strong> {new Date(service.created_at).toLocaleDateString()}
-            </div>
-        </div>
+
+            {
+                loading ?
+                    (
+                        <div className="flex justify-center items-center font-semibold text-base">
+                            <Loading />
+                        </div>
+                    )
+                    :
+                    (
+                        <div className='flex flex-col lg:flex-row lg:items-stretch lg:justify-between gap-5'>
+                            <div className='lg:w-2/3 flex flex-col gap-5'>
+                                <div className='p-4 md:p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
+                                    <div className='flex flex-col gap-2'>
+                                        <p><strong>Name:</strong> {service?.name || '-'}</p>
+                                        <p><strong>Category:</strong> {service.category?.name || '-'}</p>
+                                        <p><strong>Label:</strong> {service.label?.name || '-'}</p>
+                                        <p><strong>Price Before:</strong> ${service.price || '-'}</p>
+                                        <p><strong>Price After:</strong> ${service.discounted_price || '-'}</p>
+                                        <p><strong>Discount:</strong> {service.discounted_price ? `${((1 - service.discounted_price / service.price) * 100).toFixed(0)}%` : '-'}</p>
+                                        <p><strong>Service Type:</strong> {service.service_type || '-'}</p>
+                                        <p><strong>Detail:</strong> {service.detail || '-'}</p>
+                                        <p><strong>Brief Detail:</strong> {service.brief_detail || '-'}</p>
+                                        <p><strong>Includes:</strong> {service.includes || '-'}</p>
+                                        <p><strong>Description:</strong> {service.description || '-'}</p>
+                                        <p><strong>Requirements:</strong> {service.requirements || '-'}</p>
+                                        <p><strong>Notes:</strong> {service.notes || '-'}</p>
+                                        <p><strong>Tags:</strong> {service.tags || '-'}</p>
+                                        <p><strong>Created At:</strong> {new Date(service.created_at).toLocaleDateString()}</p>
+                                        <p><strong>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString()}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className='lg:w-1/3 flex flex-col gap-5'>
+                                <div className='w-full flex justify-center items-center bg-[#F6F6F6] p-4 md:p-5 rounded-lg'>
+                                    <img src={Asset_Endpoint + service.image} alt={service.name} className="max-h-60 md:max-h-80 w-full object-contain rounded-lg" />
+                                </div>
+                            </div>
+                        </div>
+                    )
+            }
+        </section>
     );
 };
 

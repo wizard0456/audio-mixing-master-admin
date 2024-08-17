@@ -6,7 +6,7 @@ import { API_Endpoint, Asset_Endpoint, Per_Page } from '../utilities/constants';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../reducers/authSlice';
 import Modal from 'react-modal';
-import ConfirmationModal from '../components/ConfirmationModal'; // Ensure this path is correct
+import ConfirmationModal from '../components/ConfirmationModal';
 import { Slide, toast } from 'react-toastify';
 import Loading from '../components/Loading';
 
@@ -37,7 +37,6 @@ const OrderForm = () => {
                 }
             });
             setOrders(response.data.data);
-            // setCurrentPage(response.data.current_page - 1); // API returns 1-based page number
             setTotalPages(response.data.last_page);
         } catch (error) {
             console.error("Error fetching orders", error);
@@ -114,9 +113,9 @@ const OrderForm = () => {
     };
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Uploads</h1>
+        <section className='px-4 py-8 md:px-6 md:py-10'>
+            <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Uploads</h1>
             </div>
 
             <ConfirmationModal
@@ -134,7 +133,7 @@ const OrderForm = () => {
             >
                 {selectedOrder && (
                     <div>
-                        <h2 className="font-THICCCBOI-Bold text-2xl text-center mb-4 font-bold">Order Details</h2>
+                        <h2 className="font-THICCCBOI-Bold text-xl md:text-2xl text-center mb-4 font-bold">Order Details</h2>
                         <p className='py-1'><strong>Name:</strong> {selectedOrder.name}</p>
                         <p className='py-1'><strong>Email:</strong> {selectedOrder.email}</p>
                         <p className='py-1'><strong>Artist Name:</strong> {selectedOrder.arlist_name}</p>
@@ -150,11 +149,10 @@ const OrderForm = () => {
                                     Your browser does not support the audio element.
                                 </audio>
                             </div>
-                        ):
-                        (
+                        ) : (
                             <div className="my-4">
                                 <p><strong>Media Link:</strong></p>
-                                <a href={selectedOrder.image} target="_blank" rel="noopener noreferrer">{selectedOrder.image}</a>
+                                <a href={selectedOrder.image} className='text-blue-500 underline hover:no-underline hover:text-blue-700' target="_blank" rel="noopener noreferrer">{selectedOrder.image}</a>
                             </div>
                         )}
                         <button
@@ -175,54 +173,55 @@ const OrderForm = () => {
             ) : (
                 orders.length !== 0 ? (
                     <>
-                        <table className='w-full border-0'>
-                            <thead>
-                                <tr>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Name</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Email</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Artist Name</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Track Title</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Services</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Reference</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Created At</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {orders.map(order => (
-                                    <tr key={order.id}>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{order.name}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.email}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.arlist_name}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.tarck_title}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.services}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{order.reference}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(order.created_at).toLocaleDateString()}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                                <button onClick={() => openModal(order)}><FaEye color="#4BC500" /></button>
-                                                <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button>
-                                            </div>
-                                        </td>
+                        <div className="overflow-x-auto">
+                            <table className='w-full border-0'>
+                                <thead>
+                                    <tr>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Name</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Email</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Artist Name</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Track Title</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Services</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Reference</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Created At</th>
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-
+                                </thead>
+                                <tbody>
+                                    {orders.map(order => (
+                                        <tr key={order.id}>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap line-clamp-1'>{order.name}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.email}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.arlist_name}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.tarck_title}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.services}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.reference}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{new Date(order.created_at).toLocaleDateString()}</div>
+                                            </td>
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                                <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                    <button onClick={() => openModal(order)}><FaEye color="#4BC500" /></button>
+                                                    <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
@@ -231,14 +230,12 @@ const OrderForm = () => {
                 )
             )}
 
-
             {!loading && (
-                orders.length != 0
-                && (
+                orders.length !== 0 && (
                     <div className="flex justify-center mt-6">
                         <ReactPaginate
-                            previousLabel={<FaAngleDoubleLeft pointerEvents={"none"} />}
-                            nextLabel={<FaAngleDoubleRight pointerEvents={"none"} />}
+                            previousLabel={<FaAngleDoubleLeft />}
+                            nextLabel={<FaAngleDoubleRight />}
                             breakLabel={"..."}
                             pageCount={totalPages}
                             marginPagesDisplayed={2}
@@ -250,8 +247,7 @@ const OrderForm = () => {
                         />
                     </div>
                 )
-            )
-            }
+            )}
         </section>
     );
 }

@@ -374,22 +374,22 @@ const Samples = () => {
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Samples</h1>
             </div>
 
-            <div className='flex items-center justify-between mb-6'>
+            <div className='flex flex-col md:flex-row items-center justify-between mb-6 gap-4'>
                 <div className="flex gap-4">
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
                     >
                         All Samples
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('active')}
                     >
                         Active Samples
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('inactive')}
                     >
                         Inactive Samples
@@ -414,12 +414,12 @@ const Samples = () => {
             ) : (
                 samples.length !== 0 ? (
                     samples.map((sample) => (
-                        <div key={sample.id} className="bg-[#F6F6F6] flex gap-10 items-center justify-between py-4 px-10 rounded-lg mb-4">
-                            <div className='min-w-32'>
+                        <div key={sample.id} className="bg-[#F6F6F6] flex flex-col md:flex-row gap-4 md:gap-10 items-center justify-between py-4 px-4 md:px-10 rounded-lg mb-4">
+                            <div className='min-w-32 flex flex-row items-center gap-5 md:flex-col md:gap-0 md:justify-start md:items-start'>
                                 <div className="font-THICCCBOI-Regular text-[12px] font-normal text-nowrap">Title:</div>
                                 <div className="font-THICCCBOI-SemiBold font-semibold text-base text-nowrap">{sample.name}</div>
                             </div>
-                            <div className="flex items-center gap-10 w-full">
+                            <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 w-full">
                                 <AudioPlayer
                                     type="before"
                                     sample={sample}
@@ -449,8 +449,8 @@ const Samples = () => {
                                     formatTime={formatTime}
                                 />
                             </div>
-                            <div className="flex items-center gap-6">
-                                <button className="bg-[#4BC500] p-1.5 rounded-md"><FiDownload color='white' /></button>
+                            <div className="flex gap-2 md:gap-6 items-center">
+                                {/* <button className="bg-[#4BC500] p-1.5 rounded-md"><FiDownload color='white' /></button> */}
                                 <button className="" onClick={() => openEditModal(sample)}><TiPencil color='#969696' /></button>
                                 <button className="" onClick={() => openConfirmationModal(sample)}><FaTrashAlt color="#FF0000" /></button>
                             </div>
@@ -570,7 +570,7 @@ const AudioPlayer = ({
     handleEnded,
     formatTime
 }) => (
-    <div className="flex flex-col gap-2 items-center w-1/2 justify-between">
+    <div className="flex flex-col gap-2 items-center w-full md:w-1/2 justify-between">
         <div className='w-full flex justify-between items-center'>
             <span className="mr-2 font-THICCCBOI-Regular text-[12px] font-normal">{type.charAt(0).toUpperCase() + type.slice(1)}</span>
             <span className="ml-2">{formatTime(currentTimes[`${type}_${sample.id}`] || 0)} / {formatTime(durations[`${type}_${sample.id}`] || 0)}</span>

@@ -115,7 +115,7 @@ const ContactForm = () => {
   return (
     <section className='px-5 py-10'>
       <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-        <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Contact Leads</h1>
+        <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-9">Contact Leads</h1>
       </div>
 
       <ConfirmationModal
@@ -133,15 +133,17 @@ const ContactForm = () => {
       >
         {selectedLead && (
           <div>
-            <h2 className="text-2xl mb-4 font-semibold">Lead Details</h2>
-            <p><strong>Name:</strong> {selectedLead.name}</p>
-            <p><strong>Email:</strong> {selectedLead.email}</p>
-            <p><strong>Subject:</strong> {selectedLead.subject}</p>
-            <p><strong>Message:</strong> {selectedLead.message}</p>
-            <p><strong>Created At:</strong> {new Date(selectedLead.created_at).toLocaleDateString()}</p>
+            <h2 className="text-xl text-center md:text-2xl mb-4 font-semibold">Lead Details</h2>
+            <div className='flex flex-col items-start gap-3'>
+              <p><strong>Name:</strong> {selectedLead.name}</p>
+              <p><strong>Email:</strong> {selectedLead.email}</p>
+              <p><strong>Subject:</strong> {selectedLead.subject}</p>
+              <p><strong>Message:</strong> {selectedLead.message}</p>
+              <p><strong>Received At:</strong> {new Date(selectedLead.created_at).toLocaleDateString()}</p>
+            </div>
             <button
               type="button"
-              className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded mt-4"
+              className="bg-red-500 font-semibold text-sm md:text-base text-white px-4 py-2 mx-auto block rounded mt-4"
               onClick={closeModal}
             >
               Close
@@ -157,45 +159,47 @@ const ContactForm = () => {
       ) : (
         leads.length !== 0
           ? (
-            <table className='w-full border-0'>
-              <thead>
-                <tr>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Name</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Email</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Subject</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Message</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Created At</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads.map(lead => (
-                  <tr key={lead.id}>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                      <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.name}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                      <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.email}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                      <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.subject}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                      <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.message}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                      <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                      <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                        <button onClick={() => openModal(lead)}><FaEye color="#4BC500" /></button>
-                        <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
-                      </div>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className='w-full min-w-[1100px] border-0'>
+                <thead>
+                  <tr>
+                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Name</th>
+                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Email</th>
+                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Subject</th>
+                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Message</th>
+                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Created At</th>
+                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {leads.map(lead => (
+                    <tr key={lead.id}>
+                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.name}</div>
+                      </td>
+                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                        <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.email}</div>
+                      </td>
+                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                        <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.subject}</div>
+                      </td>
+                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                        <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.message}</div>
+                      </td>
+                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
+                      </td>
+                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                          <button onClick={() => openModal(lead)}><FaEye color="#4BC500" /></button>
+                          <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
             <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
               No leads found

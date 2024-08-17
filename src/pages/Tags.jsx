@@ -204,27 +204,27 @@ const Tags = () => {
     };
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Tags</h1>
+        <section className='px-4 py-8 md:px-5 md:py-10'>
+            <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Tags</h1>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex gap-4">
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
                     >
                         All Tags
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('active')}
                     >
                         Active Tags
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('inactive')}
                     >
                         Inactive Tags
@@ -252,37 +252,39 @@ const Tags = () => {
                 </div>
             ) : (
                 tags.length !== 0 ? (
-                    <table className='w-full border-0'>
-                        <thead>
-                            <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Name</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Created At</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {tags.map(tag => (
-                                <tr key={tag.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{tag.tag_name}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(tag.created_at).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{tag.is_active == 1 ? 'Active' : 'Inactive'}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <button onClick={() => openModal(tag)}><TiPencil color="#969696" /></button>
-                                            <button onClick={() => openConfirmationModal(tag)}><FaTrashAlt color="#FF0000" /></button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {tags.map(tag => (
+                                    <tr key={tag.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{tag.tag_name}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5 text-nowrap">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(tag.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{tag.is_active == 1 ? 'Active' : 'Inactive'}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <button onClick={() => openModal(tag)}><TiPencil color="#969696" /></button>
+                                                <button onClick={() => openConfirmationModal(tag)}><FaTrashAlt color="#FF0000" /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                         No tags found

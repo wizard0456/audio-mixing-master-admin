@@ -66,10 +66,8 @@ const AddService = () => {
                 formData.append(key, serviceData[key]);
             });
 
-
             // Appending service option to formData
             formData.append('service_option', serviceOption);
-
 
             await axios({
                 method: 'post',
@@ -141,14 +139,14 @@ const AddService = () => {
     };
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Add Service</h1>
+        <section className='px-4 sm:px-5 py-8 sm:py-10'>
+            <div className="mb-8 sm:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 sm:py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold text-xl sm:text-3xl font-semibold leading-7 sm:leading-9">Add Service</h1>
             </div>
 
-            <form onSubmit={handleAddService} className="space-y-4 mx-auto">
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="service_option">Service Option</label>
+            <form onSubmit={handleAddService} className="space-y-4 sm:space-y-6 mx-auto">
+                <div className="mb-4 sm:mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="service_option">Service Option</label>
                     <select
                         name="service_option"
                         value={serviceOption}
@@ -161,9 +159,9 @@ const AddService = () => {
                     </select>
                 </div>
 
-                <div className='grid grid-cols-1 gap-4'>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="name">Service Name</label>
+                <div className='grid grid-cols-1 gap-4 sm:gap-6'>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="name">Service Name</label>
                         <input
                             type="text"
                             name="name"
@@ -176,9 +174,9 @@ const AddService = () => {
                 </div>
 
                 {(serviceOption === 'oneTime' || serviceOption === 'both') && (
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="one_time_price">One-time Price</label>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_price">One-time Price</label>
                             <input
                                 type="number"
                                 name="one_time_price"
@@ -188,8 +186,8 @@ const AddService = () => {
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="one_time_discounted_price">One-time Discounted Price</label>
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_discounted_price">One-time Discounted Price</label>
                             <input
                                 type="number"
                                 name="one_time_discounted_price"
@@ -202,9 +200,9 @@ const AddService = () => {
                 )}
 
                 {(serviceOption === 'monthly' || serviceOption === 'both') && (
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_price">Monthly Price</label>
+                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_price">Monthly Price</label>
                             <input
                                 type="number"
                                 name="monthly_price"
@@ -214,8 +212,8 @@ const AddService = () => {
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="monthly_discounted_price">Monthly Discounted Price</label>
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_discounted_price">Monthly Discounted Price</label>
                             <input
                                 type="number"
                                 name="monthly_discounted_price"
@@ -227,9 +225,9 @@ const AddService = () => {
                     </div>
                 )}
 
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="detail">Detail</label>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="detail">Detail</label>
                         <textarea
                             name="detail"
                             value={serviceData.detail}
@@ -238,8 +236,8 @@ const AddService = () => {
                             required
                         ></textarea>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="brief_detail">Brief Detail</label>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="brief_detail">Brief Detail</label>
                         <textarea
                             name="brief_detail"
                             value={serviceData.brief_detail}
@@ -247,8 +245,8 @@ const AddService = () => {
                             className="w-full px-3 py-2 border rounded-md"
                         ></textarea>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="includes">Includes</label>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="includes">Includes</label>
                         <textarea
                             name="includes"
                             value={serviceData.includes}
@@ -258,9 +256,9 @@ const AddService = () => {
                     </div>
                 </div>
 
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="description">Description</label>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="description">Description</label>
                         <textarea
                             name="description"
                             value={serviceData.description}
@@ -268,8 +266,8 @@ const AddService = () => {
                             className="w-full px-3 py-2 border rounded-md"
                         ></textarea>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="requirements">Requirements</label>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="requirements">Requirements</label>
                         <textarea
                             name="requirements"
                             value={serviceData.requirements}
@@ -277,8 +275,8 @@ const AddService = () => {
                             className="w-full px-3 py-2 border rounded-md"
                         ></textarea>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="notes">Notes</label>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="notes">Notes</label>
                         <textarea
                             name="notes"
                             value={serviceData.notes}
@@ -288,9 +286,9 @@ const AddService = () => {
                     </div>
                 </div>
 
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tags">Tags</label>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="tags">Tags</label>
                         <select
                             name="tags"
                             value={serviceData.tags}
@@ -304,8 +302,8 @@ const AddService = () => {
                             ))}
                         </select>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="label_id">Label</label>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="label_id">Label</label>
                         <select
                             name="label_id"
                             value={serviceData.label_id}
@@ -319,8 +317,8 @@ const AddService = () => {
                             ))}
                         </select>
                     </div>
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="category_id">Category</label>
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="category_id">Category</label>
                         <select
                             name="category_id"
                             value={serviceData.category_id}
@@ -336,8 +334,8 @@ const AddService = () => {
                     </div>
                 </div>
 
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Image</label>
+                <div className="mb-4 sm:mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image">Image</label>
                     <input
                         type="file"
                         name="image"
@@ -347,10 +345,10 @@ const AddService = () => {
                     />
                 </div>
 
-                <div className="flex justify-end space-x-4">
+                <div className="flex justify-between sm:justify-end space-x-4">
                     <button
                         type="button"
-                        className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                        className="bg-red-500 text-sm sm:text-base font-semibold text-white px-3 sm:px-4 py-2 rounded"
                         onClick={() => navigate('/services')}
                         disabled={adding}
                     >
@@ -358,7 +356,7 @@ const AddService = () => {
                     </button>
                     <button
                         type="submit"
-                        className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                        className="text-sm sm:text-[14px] bg-[#4BC500] text-white px-4 sm:px-5 py-2 rounded-lg"
                         disabled={adding}
                     >
                         {adding ? 'Adding...' : 'Add Service'}

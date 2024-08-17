@@ -132,30 +132,30 @@ const Services = () => {
     };
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Services</h1>
+        <section className='px-4 py-8 md:px-5 md:py-10'>
+            <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Services</h1>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex gap-4">
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
                     >
                         All Services
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('active')}
                     >
-                        Acitve Services
+                        Active Services
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('inactive')}
                     >
-                        Inacitve Services
+                        Inactive Services
                     </button>
                 </div>
                 <button
@@ -180,46 +180,48 @@ const Services = () => {
                 </div>
             ) : (
                 services.length !== 0 ? (
-                    <table className='w-full border-0'>
-                        <thead>
-                            <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Name</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Price Before</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Price After Discount</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Service Type</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Created At</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {services.map(service => (
-                                <tr key={service.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{service.name}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>${service.price || '-'}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{(Number(service.discounted_price) !== 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "$0"}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{service.service_type}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(service.created_at).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <Link to={`/service-detail/${service.id}`}><FaEye /></Link>
-                                            {/* <button onClick={() => navigate(`/edit-service/${service.id}`)}><TiPencil color="#969696" /></button> */}
-                                            <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Price Before</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Price After Discount</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Service Type</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {services.map(service => (
+                                    <tr key={service.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{service.name}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>${service.price || '-'}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{(Number(service.discounted_price) !== 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "$0"}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{service.service_type}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <Link to={`/service-detail/${service.id}`}><FaEye /></Link>
+                                                {/* <button onClick={() => navigate(`/edit-service/${service.id}`)}><TiPencil color="#969696" /></button> */}
+                                                <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                         No services found

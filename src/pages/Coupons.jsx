@@ -35,7 +35,6 @@ const Coupons = () => {
     const [couponDetails, setCouponDetails] = useState(null);
     const [viewModalIsOpen, setViewModalIsOpen] = useState(false);
 
-    // New state for coupon_type
     const [orderType, setOrderType] = useState(0);
 
     useEffect(() => {
@@ -313,10 +312,10 @@ const Coupons = () => {
     return (
         <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Coupons</h1>
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-9">Coupons</h1>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex gap-4">
                     <button
                         className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
@@ -345,65 +344,65 @@ const Coupons = () => {
                 </button>
             </div>
 
-
-
             {loading ? (
                 <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                     <Loading />
                 </div>
             ) : (
                 coupons?.length !== 0 ? (
-                    <table className='w-full border-0'>
-                        <thead>
-                            <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Code</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Discount Type</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Discount Value</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Max Uses</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Uses</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Start Date</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">End Date</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Status</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {coupons?.map(coupon => (
-                                <tr key={coupon.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{coupon.code}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_type}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_value}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.max_uses == null ? 'Unlimited' : coupon.max_uses}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.uses}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? new Date(coupon.end_date).toLocaleDateString() : 'No End Date'}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <button onClick={() => fetchCouponDetails(coupon.id)}><FaEye color="#969696" /></button>
-                                            <button onClick={() => openModal(coupon)}><TiPencil color="#969696" /></button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Code</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Discount Type</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Discount Value</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Max Uses</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Uses</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Start Date</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">End Date</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Status</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {coupons?.map(coupon => (
+                                    <tr key={coupon.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{coupon.code}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_type}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.discount_value}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.max_uses == null ? 'Unlimited' : coupon.max_uses}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.uses}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? new Date(coupon.end_date).toLocaleDateString() : 'No Expiry'}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <button onClick={() => fetchCouponDetails(coupon.id)}><FaEye color="#969696" /></button>
+                                                <button onClick={() => openModal(coupon)}><TiPencil color="#969696" /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                         No coupons found
@@ -436,7 +435,7 @@ const Coupons = () => {
                 contentLabel="Add or Update Coupon"
             >
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">{editingCoupon ? 'Update Coupon' : 'Add Coupon'}</h2>
+                    <h2 className="text-xl md:text-2xl mb-4 font-semibold">{editingCoupon ? 'Update Coupon' : 'Add Coupon'}</h2>
                     <form onSubmit={handleAddOrUpdateCoupon} className="space-y-4">
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="couponCode">Coupon Code</label>
@@ -583,7 +582,7 @@ const Coupons = () => {
                 contentLabel="View Coupon Details"
             >
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">Coupon Details</h2>
+                    <h2 className="text-xl md:text-2xl mb-4 font-semibold text-center">Coupon Details</h2>
                     {couponDetails ? (
                         <div className="space-y-4">
                             <p><strong>Code:</strong> {couponDetails.code}</p>
@@ -592,7 +591,7 @@ const Coupons = () => {
                             <p><strong>Max Uses:</strong> {couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
                             <p><strong>Uses:</strong> {couponDetails.uses}</p>
                             <p><strong>Start Date:</strong> {new Date(couponDetails.start_date).toLocaleDateString()}</p>
-                            <p><strong>End Date:</strong> {couponDetails.end_date ? new Date(couponDetails.end_date).toLocaleDateString() : 'No End Date'}</p>
+                            <p><strong>End Date:</strong> {couponDetails.end_date ? new Date(couponDetails.end_date).toLocaleDateString() : 'No Expiry'}</p>
                             <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
                             <p><strong>Products: </strong>
                                 {couponDetails.coupon_type == "1" ? (
@@ -611,7 +610,7 @@ const Coupons = () => {
                             <Loading />
                         </div>
                     )}
-                    <div className="flex justify-end space-x-4 mt-4">
+                    <div className="flex justify-center space-x-4 mt-4">
                         <button
                             type="button"
                             className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"

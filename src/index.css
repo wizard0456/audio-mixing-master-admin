@@ -344,7 +344,8 @@ body {
 
     .sidebar-logo {
         height: fit-content;
-        padding: 60px;
+        padding: 20px 30px;
+        margin-bottom: 20px;
         text-align: center;
         justify-content: space-between;
     }

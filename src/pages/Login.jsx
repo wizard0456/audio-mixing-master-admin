@@ -38,7 +38,6 @@ const Login = () => {
                 progress: undefined,
                 theme: "light",
                 transition: Slide,
-
             });
             navigate('/', { replace: true });
         } catch (error) {
@@ -60,7 +59,7 @@ const Login = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
             <div className="bg-[#091600] text-white rounded-[20px] p-8 w-full max-w-md">
                 <div className="flex justify-center mb-12">
                     <div className="text-center">
@@ -98,7 +97,7 @@ const Login = () => {
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
                     <div className='mb-5 text-right w-full font-THICCCBOI-Regular text-base leading-4 font-normal'>
-                        <Link to="/forgot-password">Forgot password?</Link>
+                        <Link to="/forgot-password" className="text-sm text-gray-300 hover:text-white">Forgot password?</Link>
                     </div>
                     <button
                         type="submit"

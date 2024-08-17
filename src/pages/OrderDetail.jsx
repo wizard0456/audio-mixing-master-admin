@@ -167,9 +167,9 @@ const OrderDetail = () => {
 
     return (
         <>
-            <section className='px-5 py-10'>
-                <div className="mb-10 bg-[#F6F6F6] py-6 rounded-lg px-5">
-                    <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9 flex items-center justify-start">
+            <section className='px-4 py-8 md:px-6 md:py-10'>
+                <div className="mb-8 md:mb-10 bg-[#F6F6F6] py-4 md:py-6 rounded-lg px-4 md:px-5">
+                    <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9 flex items-center justify-start">
                         <FaAngleDoubleLeft size={20} className="cursor-pointer mr-2" onClick={() => window.history.back()} /> Orders / {id}
                     </h1>
                 </div>
@@ -183,11 +183,11 @@ const OrderDetail = () => {
                         )
                         :
                         (
-                            <div className='flex items-stretch justify-between gap-5'>
-                                <div className='w-2/3 flex item-start justify-between gap-5'>
-                                    <div className='w-2/4 flex flex-col gap-5'>
+                            <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
+                                <div className='w-full lg:w-2/3 flex flex-col md:flex-row item-start justify-between gap-5'>
+                                    <div className='w-full md:w-2/4 flex flex-col gap-5'>
                                         <div className='p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
-                                            <p className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3'>User Details:</p>
+                                            <p className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5'>User Details:</p>
 
                                             <div className='flex flex-col gap-2'>
                                                 <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Name:</span> {order.user_name}</p>
@@ -203,8 +203,8 @@ const OrderDetail = () => {
                                         </div>
 
                                         <div className='p-5 bg-[#F6F6F6] rounded-lg flex items-center gap-5'>
-                                            <span className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3'>Order Status:</span>
-                                            <select value={orderStatus} onChange={handleStatusChange} className="font-THICCCBOI-Regular font-normal text-sm leading-3 bg-white border border-gray-300 p-2 rounded-md">
+                                            <span className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5'>Order Status:</span>
+                                            <select value={orderStatus} onChange={handleStatusChange} className="font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 bg-white border border-gray-300 p-2 rounded-md">
                                                 {Object.entries(orderStatusMapping).map(([key, value]) => (
                                                     <option key={key} value={key}>{value}</option>
                                                 ))}
@@ -212,28 +212,28 @@ const OrderDetail = () => {
                                         </div>
 
                                         <div className='p-5 bg-[#F6F6F6] rounded-lg flex gap-5'>
-                                            <span className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3'>Purchased on:</span>
-                                            <span className='font-THICCCBOI-Regular font-normal text-sm leading-3'>{new Date(order.order.created_at).toLocaleDateString()}</span>
+                                            <span className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5'>Purchased on:</span>
+                                            <span className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5'>{new Date(order.order.created_at).toLocaleDateString()}</span>
                                         </div>
                                     </div>
 
-                                    <div className='w-2/4 flex flex-col item-start gap-5'>
-                                        <h2 className='font-THICCCBOI-SemiBold font-semibold text-base leading-5 p-5 bg-[#F6F6F6] rounded-lg text-center'>Services Purchased</h2>
+                                    <div className='w-full md:w-2/4 flex flex-col item-start gap-5'>
+                                        <h2 className='font-THICCCBOI-SemiBold font-semibold text-base md:text-lg leading-5 md:leading-7 p-5 bg-[#F6F6F6] rounded-lg text-center'>Services Purchased</h2>
                                         <ul className='flex flex-col item-start justify-between gap-5'>
                                             {order.order_items.map((item) => (
                                                 <li key={item.id} className='flex justify-between items-center p-5 bg-[#F6F6F6] rounded-lg'>
-                                                    <p className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3 w-2/3'>{item.name}</p>
-                                                    <p className='font-THICCCBOI-Regular font-normal text-sm leading-3 bg-[#4BC500] text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
+                                                    <p className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5 w-2/3'>{item.name}</p>
+                                                    <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 bg-[#4BC500] text-center text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
                                                 </li>
                                             ))}
                                         </ul>
                                     </div>
                                 </div>
 
-                                <div className='w-1/3 flex flex-col gap-5'>
+                                <div className='w-full lg:w-1/3 flex flex-col gap-5'>
                                     <div className='flex items-center justify-between bg-[#F6F6F6] p-5 rounded-lg'>
-                                        <h2 className='font-THICCCBOI-SemiBold font-semibold text-base leading-5'>File Share ({files?.length ? files.length : 0})</h2>
-                                        <button onClick={openModal} className='font-THICCCBOI-SemiBold font-semibold text-sm leading-3 text-white bg-stone-900 p-4 rounded-lg'>Upload Files</button>
+                                        <h2 className='font-THICCCBOI-SemiBold font-semibold text-base md:text-lg leading-5 md:leading-7'>File Share ({files?.length ? files.length : 0})</h2>
+                                        <button onClick={openModal} className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5 text-white bg-stone-900 p-4 rounded-lg'>Upload Files</button>
                                     </div>
 
                                     <ul className='flex flex-col item-start justify-between gap-5 bg-[#E9E9E9] p-5 rounded-lg'>

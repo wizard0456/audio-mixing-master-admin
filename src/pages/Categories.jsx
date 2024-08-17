@@ -164,27 +164,27 @@ const Categories = () => {
     };
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Categories</h1>
+        <section className='px-4 sm:px-5 py-8 sm:py-10'>
+            <div className="mb-8 sm:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 sm:py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold text-xl sm:text-3xl font-semibold leading-7 sm:leading-9">Categories</h1>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
-                <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
+                <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-0">
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-3 sm:px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
                     >
                         All Categories
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-3 sm:px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('active')}
                     >
                         Active Categories
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-3 sm:px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('inactive')}
                     >
                         Inactive Categories
@@ -192,7 +192,7 @@ const Categories = () => {
                 </div>
                 <button
                     onClick={() => openModal()}
-                    className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                    className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-4 sm:px-5 py-2 rounded-lg"
                 >
                     Add Category
                 </button>
@@ -212,37 +212,39 @@ const Categories = () => {
                 </div>
             ) : (
                 categories.length !== 0 ? (
-                    <table className='w-full border-0'>
-                        <thead>
-                            <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Name</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Created At</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {categories.map(category => (
-                                <tr key={category.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{category.name}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(category.created_at).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{category.is_active == 1 ? 'Active' : 'Inactive'}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <button onClick={() => openModal(category)}><TiPencil color="#969696" /></button>
-                                            <button onClick={() => openConfirmationModal(category)}><FaTrashAlt color="#FF0000" /></button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm sm:text-base leading-6 px-3 pb-4 sm:pb-5">Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm sm:text-base leading-6 px-3 pb-4 sm:pb-5">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm sm:text-base leading-6 px-3 pb-4 sm:pb-5">Status</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm sm:text-base leading-6 px-3 pb-4 sm:pb-5">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {categories.map(category => (
+                                    <tr key={category.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
+                                            <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg line-clamp-1 text-nowrap'>{category.name}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
+                                            <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6]'>{new Date(category.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
+                                            <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6]'>{category.is_active == 1 ? 'Active' : 'Inactive'}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
+                                            <div className='flex gap-2 sm:gap-3 px-3 py-5 sm:py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <button onClick={() => openModal(category)}><TiPencil color="#969696" /></button>
+                                                <button onClick={() => openConfirmationModal(category)}><FaTrashAlt color="#FF0000" /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                         No categories found
@@ -273,9 +275,11 @@ const Categories = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Add or Update Category"
+                className="bg-white p-4 sm:p-6 rounded-lg max-w-md mx-auto"
+                overlayClassName="fixed inset-0 bg-black bg-opacity-25"
             >
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">{editingCategory ? 'Update Category' : 'Add Category'}</h2>
+                    <h2 className="text-xl sm:text-2xl mb-4 font-semibold">{editingCategory ? 'Update Category' : 'Add Category'}</h2>
                     <form onSubmit={handleAddOrUpdateCategory} className="space-y-4">
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="category">Category Name</label>
@@ -300,7 +304,7 @@ const Categories = () => {
                         <div className="flex justify-end space-x-4">
                             <button
                                 type="button"
-                                className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                                className="bg-red-500 text-sm sm:text-base font-semibold text-white px-4 py-2 rounded"
                                 onClick={closeModal}
                                 disabled={adding}
                             >

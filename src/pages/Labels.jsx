@@ -206,25 +206,25 @@ const Labels = () => {
     return (
         <section className='px-5 py-10'>
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Labels</h1>
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-9">Labels</h1>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex gap-4">
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
                     >
                         All Labels
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('active')}
                     >
                         Active Labels
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('inactive')}
                     >
                         Inactive Labels
@@ -252,37 +252,39 @@ const Labels = () => {
                 </div>
             ) : (
                 labels.length !== 0 ? (
-                    <table className='w-full border-0'>
-                        <thead>
-                            <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Name</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Created At</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {labels.map(label => (
-                                <tr key={label.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{label.name}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{label.is_active == 1 ? 'Active' : 'Inactive'}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <button onClick={() => openModal(label)}><TiPencil color="#969696" /></button>
-                                            <button onClick={() => openConfirmationModal(label)}><FaTrashAlt color="#FF0000" /></button>
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm md:text-base leading-6 px-3 pb-5">Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm md:text-base leading-6 px-3 pb-5">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm md:text-base leading-6 px-3 pb-5">Status</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-sm md:text-base leading-6 px-3 pb-5">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {labels.map(label => (
+                                    <tr key={label.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap line-clamp-1'>{label.name}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{label.is_active == 1 ? 'Active' : 'Inactive'}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
+                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <button onClick={() => openModal(label)}><TiPencil color="#969696" /></button>
+                                                <button onClick={() => openConfirmationModal(label)}><FaTrashAlt color="#FF0000" /></button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                         No labels found
@@ -315,7 +317,7 @@ const Labels = () => {
                 contentLabel="Add or Update Label"
             >
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">{labelId ? 'Update Label' : 'Add Label'}</h2>
+                    <h2 className="text-xl md:text-2xl mb-4 font-semibold">{labelId ? 'Update Label' : 'Add Label'}</h2>
                     <form onSubmit={handleAddOrUpdateLabel} className="space-y-4">
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="label">Label Name</label>

@@ -22,12 +22,12 @@ const Orders = () => {
     const [orderToDelete, setOrderToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [filter, setFilter] = useState('all');
-    const [searchQuery, setSearchQuery] = useState(''); // Added state for search query
+    const [searchQuery, setSearchQuery] = useState('');
     const user = useSelector(selectUser);
     const [dates, setDates] = useState([null, null]);
 
     useEffect(() => {
-        fetchOrders(currentPage, filter, searchQuery); // Added searchQuery as a dependency
+        fetchOrders(currentPage, filter, searchQuery);
     }, [currentPage, filter, searchQuery]);
 
     const fetchOrders = async (page, filter, searchQuery) => {
@@ -64,12 +64,12 @@ const Orders = () => {
 
     const handleFilterChange = (newFilter) => {
         setFilter(newFilter);
-        setCurrentPage(1); // Reset to first page on filter change
+        setCurrentPage(1);
     };
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1); // Reset to first page on search
+        setCurrentPage(1);
     };
 
     const closeConfirmationModal = () => {
@@ -126,13 +126,13 @@ const Orders = () => {
                 month: '2-digit',
                 year: 'numeric',
             });
-    
+
             const endDate = dates[1].toLocaleDateString('en-GB', {
                 day: '2-digit',
                 month: '2-digit',
                 year: 'numeric',
             });
-    
+
             try {
                 const response = await axios({
                     method: 'post',
@@ -144,27 +144,25 @@ const Orders = () => {
                         "date_range": [startDate, endDate],
                     },
                 });
-    
+
                 const pdfLink = response.data.link;
-    
+
                 if (pdfLink) {
-                    // Fetch the PDF file as a Blob
                     const pdfResponse = await axios.get(pdfLink, { responseType: 'blob' });
                     const pdfBlob = new Blob([pdfResponse.data], { type: 'application/pdf' });
-    
-                    // Trigger download
+
                     const link = document.createElement('a');
                     const url = window.URL.createObjectURL(pdfBlob);
                     link.href = url;
-                    link.setAttribute('download', 'report.pdf'); // You can set the filename here
+                    link.setAttribute('download', 'report.pdf');
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
-                    window.URL.revokeObjectURL(url); // Clean up the URL object
+                    window.URL.revokeObjectURL(url);
                 } else {
                     throw new Error('PDF link is missing in the response');
                 }
-    
+
             } catch (error) {
                 console.error('Error generating report:', error);
                 toast.error('Error generating report. Please try again.', {
@@ -193,62 +191,64 @@ const Orders = () => {
             });
         }
     }
-    
-
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Orders</h1>
+        <section className='px-4 py-8 md:px-6 md:py-10'>
+            <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Orders</h1>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-                <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center justify-center lg:justify-end mb-6 gap-4">
+                <div className="flex items-center gap-2 w-full md:w-auto">
+                    <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker w-full md:w-auto" />
+                    <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] text-white px-4 md:px-5 py-2 rounded-lg w-full md:w-auto" onClick={handleGenerateReport}>Generate Report</button>
+                </div>
+            </div>
+            <div className="flex flex-col lg:flex-row items-center justify-between mb-6 gap-4">
+                <div className="flex flex-wrap items-center justify-center gap-4">
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('all')}
                     >
                         All Orders
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === '0' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '0' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('0')}
                     >
                         Pending
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === '1' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '1' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('1')}
                     >
                         Processing
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === '2' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '2' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('2')}
                     >
                         Delivered
                     </button>
                     <button
-                        className={` font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === '3' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '3' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('3')}
                     >
                         Cancelled
                     </button>
                 </div>
 
-                <div className='flex items-center gap-2 max-w-[300px] w-full'>
-                    <input
-                        type="text"
-                        placeholder="Search orders by ID, name or email"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full"
-                    />
-                </div>
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full lg:w-auto">
+                    <div className='flex items-center gap-2 w-full lg:w-auto'>
+                        <input
+                            type="text"
+                            placeholder="Search orders"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
+                        />
+                    </div>
 
-                <div className="flex items-stretch gap-4">
-                    <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker" />
-                    <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-[14px] text-white px-5 py-2 rounded-lg" onClick={handleGenerateReport}>Generate Report</button>
                 </div>
             </div>
 
@@ -266,57 +266,58 @@ const Orders = () => {
                 </div>
             ) : (
                 orders.length !== 0 ? (
-                    <table className='w-full border-0'>
-                        <thead>
-                            <tr>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Order ID</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Transaction ID</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Amount</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Currency</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">User Name</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">User Email</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Payment Status</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Order At</th>
-                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orders.map(order => (
-                                <tr key={order.id}>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{order.id}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{order.transaction_id}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{order.amount}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{order.currency}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{order.username}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{order.useremail}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{order.payment_status}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(order.created_at).toLocaleDateString()}</div>
-                                    </td>
-                                    <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                            <Link to={`/order-detail/${order.id}`}><FaEye color="#4BC500" /></Link>
-                                            {/* <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button> */}
-                                        </div>
-                                    </td>
+                    <div className="overflow-x-auto">
+                        <table className='w-full border-0'>
+                            <thead>
+                                <tr>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order ID</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Transaction ID</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Amount</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Currency</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Name</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Email</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Status</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {orders.map(order => (
+                                    <tr key={order.id}>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{order.id}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.transaction_id}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.amount}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.currency}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.username}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]  text-nowrap'>{order.useremail}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.payment_status}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{new Date(order.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='flex gap-2 md:gap-3 px-3 py-5 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <Link to={`/order-detail/${order.id}`}><FaEye color="#4BC500" /></Link>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
                     <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
                         No orders found

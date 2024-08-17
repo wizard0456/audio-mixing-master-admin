@@ -181,11 +181,8 @@ const Gallery = () => {
 
     return (
         <section className='px-5 py-10'>
-
-
-
             <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Gallery</h1>
+                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-9">Gallery</h1>
             </div>
 
             <div className="flex items-center justify-end mb-6">
@@ -199,16 +196,12 @@ const Gallery = () => {
                 </div>
             </div>
 
-
-
-
-
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Upload Image Modal"
             >
-                <h2 className="text-2xl mb-4 font-semibold">Upload New Image</h2>
+                <h2 className="text-xl md:text-2xl mb-4 font-semibold">Upload New Image</h2>
                 <form onSubmit={handleImageUpload} className="space-y-4">
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Select Image</label>
@@ -222,7 +215,7 @@ const Gallery = () => {
                     </div>
                     {imagePreviewUrl && (
                         <div className="mb-4">
-                            <img src={imagePreviewUrl} alt="Image Preview" className="w-full h-full object-cover rounded-lg" />
+                            <img src={imagePreviewUrl} alt="Image Preview" className="w-full h-auto object-cover rounded-lg" />
                         </div>
                     )}
                     <div className="flex justify-end space-x-4">
@@ -259,7 +252,7 @@ const Gallery = () => {
                         <Loading />
                     </div>
                 ) : (
-                    <div className="grid grid-cols-5 items-stretch gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                         {images.length > 0 && images.map(image => (
                             <div key={image.id} className="gallery-image relative overflow-hidden">
                                 <img src={`${Asset_Endpoint}${image.image}`} alt={`Gallery ${image.id}`} className="w-full h-full object-cover rounded-lg" />

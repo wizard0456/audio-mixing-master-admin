@@ -101,9 +101,9 @@ const Newsletter = () => {
   };
 
   return (
-    <section className='px-5 py-10'>
-      <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-        <h1 className="font-THICCCBOI-SemiBold font-semibold text-3xl leading-9">Newsletter</h1>
+    <section className='px-4 py-8 md:px-6 md:py-10'>
+      <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
+        <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Newsletter</h1>
       </div>
 
       <ConfirmationModal
@@ -120,32 +120,34 @@ const Newsletter = () => {
         </div>
       ) : (
         leads.length !== 0 ? (
-          <table className='w-full border-0'>
-            <thead>
-              <tr>
-                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Email</th>
-                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Created At</th>
-                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-base leading-6 pb-5">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {leads?.map(lead => (
-                <tr key={lead.id}>
-                  <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                    <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.email}</div>
-                  </td>
-                  <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                    <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
-                  </td>
-                  <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                    <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                      <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className='w-full border-0'>
+              <thead>
+                <tr>
+                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Email</th>
+                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Created At</th>
+                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {leads?.map(lead => (
+                  <tr key={lead.id}>
+                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                      <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.email}</div>
+                    </td>
+                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                      <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
+                    </td>
+                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                      <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                        <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
             No leads found
