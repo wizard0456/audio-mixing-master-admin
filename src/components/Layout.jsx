@@ -31,6 +31,10 @@ const Layout = () => {
         }
     }, [dispatch]);
 
+    useEffect(() => {
+        document.body.style.overflow = openSidebar ? "hidden" : "auto";
+    }, [openSidebar]);
+
     if (user == null) {
         const userDataFromCookies = Cookies.get("user");
         const userDataFromLocalStorage = localStorage.getItem("user");
