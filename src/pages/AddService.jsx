@@ -13,9 +13,9 @@ const AddService = () => {
         name: '',
         image: null,
         one_time_price: '',
-        one_time_discounted_price: '',
+        one_time_discounted_price: 0,
         monthly_price: '',
-        monthly_discounted_price: '',
+        monthly_discounted_price: 0,
         brief_detail: '',
         includes: '',
         description: '',
@@ -187,7 +187,7 @@ const AddService = () => {
                             />
                         </div>
                         <div className="mb-4 sm:mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_discounted_price">One-time Discounted Price</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_discounted_price">One-time Discounted Price (If there is no discount please enter 0)</label>
                             <input
                                 type="number"
                                 name="one_time_discounted_price"
@@ -213,7 +213,7 @@ const AddService = () => {
                             />
                         </div>
                         <div className="mb-4 sm:mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_discounted_price">Monthly Discounted Price</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_discounted_price">Monthly Discounted Price (If there is no discount please enter 0)</label>
                             <input
                                 type="number"
                                 name="monthly_discounted_price"

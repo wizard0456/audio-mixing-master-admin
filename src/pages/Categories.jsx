@@ -275,8 +275,6 @@ const Categories = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Add or Update Category"
-                className="bg-white p-4 sm:p-6 rounded-lg max-w-md mx-auto"
-                overlayClassName="fixed inset-0 bg-black bg-opacity-25"
             >
                 <div>
                     <h2 className="text-xl sm:text-2xl mb-4 font-semibold">{editingCategory ? 'Update Category' : 'Add Category'}</h2>

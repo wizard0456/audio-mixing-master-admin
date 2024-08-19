@@ -25,15 +25,16 @@ const Orders = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const user = useSelector(selectUser);
     const [dates, setDates] = useState([null, null]);
+    const [orderType, setOrderType] = useState('');
 
     useEffect(() => {
         fetchOrders(currentPage, filter, searchQuery);
-    }, [currentPage, filter, searchQuery]);
+    }, [currentPage, filter, orderType ,searchQuery]);
 
     const fetchOrders = async (page, filter, searchQuery) => {
         setLoading(true);
         try {
-            let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}`;
+            let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}&order_type=${orderType}`;
             if (filter !== 'all') {
                 url += `&order_status=${filter}`;
             }
@@ -198,7 +199,17 @@ const Orders = () => {
                 <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Orders</h1>
             </div>
 
-            <div className="flex flex-wrap items-center justify-center lg:justify-end mb-6 gap-4">
+            <div className="flex flex-wrap items-center justify-center lg:justify-between mb-6 gap-4">
+                <div className='flex items-center gap-2 w-full lg:w-auto'>
+                    <input
+                        type="text"
+                        placeholder="Search orders"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
+                    />
+                </div>
+
                 <div className="flex items-center gap-2 w-full md:w-auto">
                     <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker w-full md:w-auto" />
                     <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] text-white px-4 md:px-5 py-2 rounded-lg w-full md:w-auto" onClick={handleGenerateReport}>Generate Report</button>
@@ -240,13 +251,13 @@ const Orders = () => {
 
                 <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full lg:w-auto">
                     <div className='flex items-center gap-2 w-full lg:w-auto'>
-                        <input
-                            type="text"
-                            placeholder="Search orders"
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
-                        />
+                        <select name="order_status" className='bg-[#E9E9E9] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg' value={orderType} onChange={(e) => setOrderType(e.target.value)} id="">
+                            <option value="">All</option>
+                            <option value="one_time">One Time</option>
+                            <option value="subscripton">Subscription</option>
+                            <option value="revision">Revision</option>
+
+                        </select>
                     </div>
 
                 </div>

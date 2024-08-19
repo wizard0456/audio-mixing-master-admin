@@ -182,8 +182,8 @@ const OrderForm = () => {
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Artist Name</th>
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Track Title</th>
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Services</th>
-                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Reference</th>
-                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Created At</th>
+                                        {/* <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Reference</th> */}
+                                        <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Submition Time</th>
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Actions</th>
                                     </tr>
                                 </thead>
@@ -205,9 +205,9 @@ const OrderForm = () => {
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.services}</div>
                                             </td>
-                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
+                                            {/* <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.reference}</div>
-                                            </td>
+                                            </td> */}
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{new Date(order.created_at).toLocaleDateString()}</div>
                                             </td>
