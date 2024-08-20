@@ -264,7 +264,6 @@ const CouponForm = () => {
                             value={maxUses}
                             onChange={(e) => setMaxUses(e.target.value)}
                             className="w-full px-3 py-2 border rounded-md"
-                            required
                         />
                     </div>
                 </div>
