@@ -15,7 +15,7 @@ import ServiceDetail from "./pages/ServiceDetail.jsx";
 import Newsletter from "./pages/Newsletter.jsx";
 import ContactForm from "./pages/ContactForm.jsx";
 import OrderForm from "./pages/OrderForm.jsx";
-import AddService from "./pages/AddService.jsx";
+import ServiceForm from "./pages/ServiceForm.jsx";
 import OrderDetail from "./pages/OrderDetail.jsx";
 import Tags from "./pages/Tags.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
@@ -23,6 +23,7 @@ import ForgetPassword from "./pages/ForgetPassword.jsx";
 import Coupons from "./pages/Coupons.jsx";
 import Welcome from "./pages/Welcome.jsx";
 import RestrictedRoute from "./components/RestrictedRoute";
+import CouponForm from "./pages/CouponForm.jsx";
 
 const router = createBrowserRouter([
   {
@@ -55,6 +56,14 @@ const router = createBrowserRouter([
         element: <RestrictedRoute roles={['admin']} element={Coupons} />,
       },
       {
+        path: "/add-coupons",
+        element: <RestrictedRoute roles={['admin']} element={CouponForm} />,
+      },
+      {
+        path: "/update-coupons",
+        element: <RestrictedRoute roles={['admin']} element={CouponForm} />,
+      },
+      {
         path: "/order-detail/:id",
         element: <RestrictedRoute roles={['admin', 'engineer']} element={OrderDetail} />,
       },
@@ -64,7 +73,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/add-service",
-        element: <RestrictedRoute roles={['admin']} element={AddService} />,
+        element: <RestrictedRoute roles={['admin']} element={ServiceForm} />,
       },
       {
         path: "/service-detail/:id",

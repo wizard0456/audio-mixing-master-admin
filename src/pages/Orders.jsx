@@ -29,7 +29,7 @@ const Orders = () => {
 
     useEffect(() => {
         fetchOrders(currentPage, filter, searchQuery);
-    }, [currentPage, filter, orderType ,searchQuery]);
+    }, [currentPage, filter, orderType, searchQuery]);
 
     const fetchOrders = async (page, filter, searchQuery) => {
         setLoading(true);
@@ -134,62 +134,10 @@ const Orders = () => {
                 year: 'numeric',
             });
 
-            try {
-                const response = await axios({
-                    method: 'post',
-                    url: `${API_Endpoint}generate-pdf`,
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                    },
-                    data: {
-                        "date_range": [startDate, endDate],
-                    },
-                });
+            const apiUrl = `https://music.zetdigi.com/backend/public/api/generate-pdf?start_date=${startDate}&end_date=${endDate}`;
 
-                const pdfLink = response.data.link;
-
-                if (pdfLink) {
-                    const pdfResponse = await axios.get(pdfLink, { responseType: 'blob' });
-                    const pdfBlob = new Blob([pdfResponse.data], { type: 'application/pdf' });
-
-                    const link = document.createElement('a');
-                    const url = window.URL.createObjectURL(pdfBlob);
-                    link.href = url;
-                    link.setAttribute('download', 'report.pdf');
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    window.URL.revokeObjectURL(url);
-                } else {
-                    throw new Error('PDF link is missing in the response');
-                }
-
-            } catch (error) {
-                console.error('Error generating report:', error);
-                toast.error('Error generating report. Please try again.', {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Slide,
-                });
-            }
-        } else {
-            toast.error('Please select a date range to generate the report.', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
+            // Trigger the download
+            window.open(apiUrl, '_blank');
         }
     }
 
@@ -210,10 +158,10 @@ const Orders = () => {
                     />
                 </div>
 
-                <div className="flex items-center gap-2 w-full md:w-auto">
+                <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-2 w-full md:w-auto">
                     <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker w-full md:w-auto" />
                     <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] text-white px-4 md:px-5 py-2 rounded-lg w-full md:w-auto" onClick={handleGenerateReport}>Generate Report</button>
-                </div>
+                </form>
             </div>
             <div className="flex flex-col lg:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex flex-wrap items-center justify-center gap-4">
@@ -282,13 +230,13 @@ const Orders = () => {
                             <thead>
                                 <tr>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order ID</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order At</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Transaction ID</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Amount</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Currency</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Method</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Name</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Email</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Status</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order At</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Actions</th>
                                 </tr>
                             </thead>
@@ -299,13 +247,16 @@ const Orders = () => {
                                             <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{order.id}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{new Date(order.created_at).toLocaleDateString()}</div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
                                             <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.transaction_id}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.amount}</div>
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>${order.amount}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.currency}</div>
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.payment_method ? order.payment_method : 'N/A'}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
                                             <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.username}</div>
@@ -314,13 +265,10 @@ const Orders = () => {
                                             <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]  text-nowrap'>{order.useremail}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.payment_status}</div>
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'><span className='text-sm px-2 py-1 rounded-full bg-[#4BC500] text-white'>{order.payment_status}</span></div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{new Date(order.created_at).toLocaleDateString()}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='flex gap-2 md:gap-3 px-3 py-5 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                            <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <Link to={`/order-detail/${order.id}`}><FaEye color="#4BC500" /></Link>
                                             </div>
                                         </td>

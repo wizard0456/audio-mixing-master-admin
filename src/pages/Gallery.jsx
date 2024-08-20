@@ -31,7 +31,7 @@ const Gallery = () => {
                         'Authorization': `Bearer ${user.token}`
                     }
                 });
-                setImages(response.data.data);
+                setImages(response.data);
                 setLoading(false);
             } catch (error) {
                 if (error.response.status === 401) {

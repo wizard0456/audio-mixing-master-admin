@@ -95,7 +95,7 @@ const ServiceDetail = () => {
 
                             <div className='lg:w-1/3 flex flex-col gap-5'>
                                 <div className='w-full flex justify-center items-center bg-[#F6F6F6] p-4 md:p-5 rounded-lg'>
-                                    <img src={Asset_Endpoint + service.image} alt={service.name} className="max-h-60 md:max-h-80 w-full object-contain rounded-lg" />
+                                    <img src={service.is_url == "1" ? service.image : `${Asset_Endpoint}${service.image}`} alt={service.name} className="max-h-60 md:max-h-80 w-full object-contain rounded-lg" />
                                 </div>
                             </div>
                         </div>

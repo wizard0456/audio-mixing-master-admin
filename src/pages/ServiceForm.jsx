@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { logout, selectUser } from '../reducers/authSlice';
-import { Slide, toast } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import { toast, Slide } from 'react-toastify';
+import Toggle from 'react-toggle';
 import { useNavigate } from 'react-router-dom';
 import { API_Endpoint } from '../utilities/constants';
+import { selectUser } from '../reducers/authSlice';
 
-const AddService = () => {
+const ServiceForm = () => {
     const [serviceData, setServiceData] = useState({
         category_id: '',
         label_id: '',
         name: '',
+        image_url: '',
         image: null,
         one_time_price: '',
         one_time_discounted_price: 0,
@@ -21,15 +23,16 @@ const AddService = () => {
         description: '',
         requirements: '',
         notes: '',
-        tags: ''
+        tags: '',
+        is_active: 1,
     });
     const [adding, setAdding] = useState(false);
     const [categories, setCategories] = useState([]);
     const [labels, setLabels] = useState([]);
     const [tags, setTags] = useState([]);
     const [serviceOption, setServiceOption] = useState('oneTime');
+    const [imageSource, setImageSource] = useState('1');
     const user = useSelector(selectUser);
-    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -57,28 +60,35 @@ const AddService = () => {
         }
     };
 
-    const handleAddService = async (event) => {
+    const handleSaveService = async (event) => {
         event.preventDefault();
         setAdding(true);
         try {
             const formData = new FormData();
-            Object.keys({ ...serviceData }).forEach(key => {
-                formData.append(key, serviceData[key]);
-            });
 
-            // Appending service option to formData
+            if (imageSource === '1') {
+                formData.append('image', serviceData.image_url);
+            } else {
+                formData.append('image', serviceData.image);
+            }
+
+            formData.append('is_url', imageSource);
             formData.append('service_option', serviceOption);
 
-            await axios({
-                method: 'post',
-                url: `${API_Endpoint}admin/services`,
+            Object.keys(serviceData).forEach(key => {
+                if (key !== 'image' && key !== 'image_url') {
+                    formData.append(key, serviceData[key]);
+                }
+            });
+
+            await axios.post(`${API_Endpoint}admin/services`, formData, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'multipart/form-data'
-                },
-                data: formData
+                }
             });
-            toast.success("Service added successfully!", {
+
+            toast.success('Service added successfully!', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -89,15 +99,12 @@ const AddService = () => {
                 theme: "light",
                 transition: Slide,
             });
+
             setAdding(false);
             navigate('/services');
         } catch (error) {
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
-            }
-            console.error('Error adding service:', error);
-            setAdding(false);
-            toast.error("Error adding service.", {
+            const message = error.response?.data?.message || 'Error occurred';
+            toast.error(`Error adding service: ${message}`, {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -108,6 +115,7 @@ const AddService = () => {
                 theme: "light",
                 transition: Slide,
             });
+            setAdding(false);
         }
     };
 
@@ -124,7 +132,6 @@ const AddService = () => {
         const selectedOption = e.target.value;
         setServiceOption(selectedOption);
 
-        // Update serviceData based on the selected service option
         setServiceData(prevData => {
             let updatedData = { ...prevData };
             if (selectedOption === 'oneTime') {
@@ -138,13 +145,19 @@ const AddService = () => {
         });
     };
 
+    const handleToggleChange = () => {
+        setServiceData(prevData => ({ ...prevData, is_active: prevData.is_active === 1 ? 0 : 1 }));
+    };
+
     return (
         <section className='px-4 sm:px-5 py-8 sm:py-10'>
             <div className="mb-8 sm:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 sm:py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold text-xl sm:text-3xl font-semibold leading-7 sm:leading-9">Add Service</h1>
+                <h1 className="font-THICCCBOI-SemiBold text-xl sm:text-3xl font-semibold leading-7 sm:leading-9">
+                    Add Service
+                </h1>
             </div>
 
-            <form onSubmit={handleAddService} className="space-y-4 sm:space-y-6 mx-auto">
+            <form onSubmit={handleSaveService} className="space-y-4 sm:space-y-6 mx-auto">
                 <div className="mb-4 sm:mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="service_option">Service Option</label>
                     <select
@@ -155,7 +168,6 @@ const AddService = () => {
                     >
                         <option value="oneTime">One-time</option>
                         <option value="monthly">Subscription</option>
-                        <option value="both">Both</option>
                     </select>
                 </div>
 
@@ -173,7 +185,7 @@ const AddService = () => {
                     </div>
                 </div>
 
-                {(serviceOption === 'oneTime' || serviceOption === 'both') && (
+                {(serviceOption === 'oneTime') && (
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
                         <div className="mb-4 sm:mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_price">One-time Price</label>
@@ -199,7 +211,7 @@ const AddService = () => {
                     </div>
                 )}
 
-                {(serviceOption === 'monthly' || serviceOption === 'both') && (
+                {(serviceOption === 'monthly') && (
                     <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
                         <div className="mb-4 sm:mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_price">Monthly Price</label>
@@ -335,15 +347,64 @@ const AddService = () => {
                 </div>
 
                 <div className="mb-4 sm:mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image">Image</label>
-                    <input
-                        type="file"
-                        name="image"
-                        onChange={handleFileChange}
-                        className="w-full px-3 py-2 border rounded-md"
-                        required
+                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Active Status</label>
+                    <Toggle
+                        checked={serviceData.is_active === 1}
+                        onChange={handleToggleChange}
+                        icons={false}
                     />
                 </div>
+
+                <div className="mb-4 sm:mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Image Source</label>
+                    <div className="flex space-x-4">
+                        <label>
+                            <input
+                                type="radio"
+                                name="image_source"
+                                value="1"
+                                checked={imageSource === '1'}
+                                onChange={() => setImageSource('1')}
+                            />{' '}
+                            Image Link
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name="image_source"
+                                value="0"
+                                checked={imageSource === '0'}
+                                onChange={() => setImageSource('0')}
+                            />{' '}
+                            File Upload
+                        </label>
+                    </div>
+                </div>
+
+                {imageSource === '1' ? (
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image_url">Image Link</label>
+                        <input
+                            type="text"
+                            name="image_url"
+                            value={serviceData.image_url}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border rounded-md"
+                            required
+                        />
+                    </div>
+                ) : (
+                    <div className="mb-4 sm:mb-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image">Image</label>
+                        <input
+                            type="file"
+                            name="image"
+                            onChange={handleFileChange}
+                            className="w-full px-3 py-2 border rounded-md"
+                            required
+                        />
+                    </div>
+                )}
 
                 <div className="flex justify-between sm:justify-end space-x-4">
                     <button
@@ -367,4 +428,4 @@ const AddService = () => {
     );
 };
 
-export default AddService;
+export default ServiceForm;

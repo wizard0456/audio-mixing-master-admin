@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { toast, Slide } from 'react-toastify';
 import { Link, useNavigate } from 'react-router-dom';
+import Toggle from 'react-toggle';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import Loading from '../components/Loading';
@@ -131,6 +132,45 @@ const Services = () => {
         }
     };
 
+    const handleStatusToggle = async (serviceId, currentStatus) => {
+        try {
+            const newStatus = currentStatus === "1" ? "0" : "1";
+            await axios({
+                method: 'post',
+                url: `${API_Endpoint}admin/services/${serviceId}/status?status=${newStatus}`,
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+
+            toast.success(`Service status updated to ${newStatus === "1" ? "Active" : "Inactive"}!`, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            fetchServices(currentPage, filter);
+        } catch (error) {
+            console.error('Error updating service status:', error);
+            toast.error("Error updating service status.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        }
+    };
+
     return (
         <section className='px-4 py-8 md:px-5 md:py-10'>
             <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
@@ -189,6 +229,7 @@ const Services = () => {
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Price After Discount</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Service Type</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Created At</th>
+                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Active</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Actions</th>
                                 </tr>
                             </thead>
@@ -202,7 +243,7 @@ const Services = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>${service.price || '-'}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{(Number(service.discounted_price) !== 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "$0"}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{(Number(service.discounted_price) != 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "-"}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{service.service_type}</div>
@@ -211,9 +252,17 @@ const Services = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.created_at).toLocaleDateString()}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
+                                            <div className='px-3 py-4 bg-[#F6F6F6] text-nowrap'>
+                                                <Toggle
+                                                    checked={service.is_active === "1"}
+                                                    onChange={() => handleStatusToggle(service.id, service.is_active)}
+                                                    icons={false}
+                                                />
+                                            </div>
+                                        </td>
+                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <Link to={`/service-detail/${service.id}`}><FaEye /></Link>
-                                                {/* <button onClick={() => navigate(`/edit-service/${service.id}`)}><TiPencil color="#969696" /></button> */}
                                                 <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button>
                                             </div>
                                         </td>

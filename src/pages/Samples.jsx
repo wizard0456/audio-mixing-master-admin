@@ -415,9 +415,9 @@ const Samples = () => {
                 samples.length !== 0 ? (
                     samples.map((sample) => (
                         <div key={sample.id} className="bg-[#F6F6F6] flex flex-col md:flex-row gap-4 md:gap-10 items-center justify-between py-4 px-4 md:px-10 rounded-lg mb-4">
-                            <div className='min-w-32 flex flex-row items-center gap-5 md:flex-col md:gap-0 md:justify-start md:items-start'>
+                            <div className='w-40 flex flex-row items-center gap-5 md:flex-col md:gap-0 md:justify-start md:items-start'>
                                 <div className="font-THICCCBOI-Regular text-[12px] font-normal text-nowrap">Title:</div>
-                                <div className="font-THICCCBOI-SemiBold font-semibold text-base text-nowrap">{sample.name}</div>
+                                <div className="font-THICCCBOI-SemiBold font-semibold text-base text-wrap">{sample.name}</div>
                             </div>
                             <div className="flex flex-col md:flex-row items-center gap-4 md:gap-10 w-full">
                                 <AudioPlayer
@@ -498,29 +498,29 @@ const Samples = () => {
                                 className="w-full px-3 py-2 border rounded-md"
                                 value={newSample.name}
                                 onChange={(e) => setNewSample({ ...newSample, name: e.target.value })}
-                                required
+                                required={selectedSample ? false : true}
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="before_audio">Before Audio</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="before_audio">Before Audio {selectedSample ? '(if do not want to change then leave it blank)' : ''}</label>
                             <input
                                 type="file"
                                 name="before_audio"
                                 accept="audio/*"
                                 className="w-full px-3 py-2 border rounded-md"
                                 onChange={handleFileChange}
-                                required
+                                required={selectedSample ? false : true}
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="after_audio">After Audio</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="after_audio">After Audio {selectedSample ? '(if do not want to change then leave it blank)' : ''}</label>
                             <input
                                 type="file"
                                 name="after_audio"
                                 accept="audio/*"
                                 className="w-full px-3 py-2 border rounded-md"
                                 onChange={handleFileChange}
-                                required
+                                required={selectedSample ? false : true}
                             />
                         </div>
                         <div className="flex items-center gap-2">
