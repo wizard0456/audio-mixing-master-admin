@@ -157,11 +157,15 @@ const Orders = () => {
                         className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
                     />
                 </div>
-
-                <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-2 w-full md:w-auto">
-                    <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker w-full md:w-auto" />
-                    <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] text-white px-4 md:px-5 py-2 rounded-lg w-full md:w-auto" onClick={handleGenerateReport}>Generate Report</button>
-                </form>
+                {
+                    user.role === 'admin' &&
+                    (
+                        <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-2 w-full md:w-auto">
+                            <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker w-full md:w-auto" />
+                            <button className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] text-white px-4 md:px-5 py-2 rounded-lg w-full md:w-auto" onClick={handleGenerateReport}>Generate Report</button>
+                        </form>
+                    )
+                }
             </div>
             <div className="flex flex-col lg:flex-row items-center justify-between mb-6 gap-4">
                 <div className="flex flex-wrap items-center justify-center gap-4">
@@ -231,12 +235,18 @@ const Orders = () => {
                                 <tr>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order ID</th>
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order At</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Transaction ID</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Amount</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Method</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Name</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Email</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Status</th>
+                                    {user.role !== 'admin' ?
+                                        (<th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Order Type</th>)
+                                        : (
+                                            <>
+                                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Transaction ID</th>
+                                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Amount</th>
+                                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Method</th>
+                                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Name</th>
+                                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">User Email</th>
+                                                <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Payment Status</th>
+                                            </>
+                                        )}
                                     <th className="font-THICCCBOI-SemiBold font-semibold text-left px-2 md:px-3 text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">Actions</th>
                                 </tr>
                             </thead>
@@ -249,24 +259,33 @@ const Orders = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
                                             <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{new Date(order.created_at).toLocaleDateString()}</div>
                                         </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.transaction_id}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>${order.amount}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.payment_method ? order.payment_method : 'N/A'}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.username}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]  text-nowrap'>{order.useremail}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'><span className='text-sm px-2 py-1 rounded-full bg-[#4BC500] text-white'>{order.payment_status}</span></div>
-                                        </td>
+                                        {user.role !== 'admin' ?
+                                            <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.order_type}</div>
+                                            </td>
+                                            : (
+                                                <>
+                                                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.transaction_id}</div>
+                                                    </td>
+                                                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>${order.amount}</div>
+                                                    </td>
+                                                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.payment_method ? order.payment_method : 'N/A'}</div>
+                                                    </td>
+                                                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.username}</div>
+                                                    </td>
+                                                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]  text-nowrap'>{order.useremail}</div>
+                                                    </td>
+                                                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'><span className='text-sm px-2 py-1 rounded-full bg-[#4BC500] text-white'>{order.payment_status}</span></div>
+                                                    </td>
+                                                </>
+                                            )
+                                        }
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
                                             <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <Link to={`/order-detail/${order.id}`}><FaEye color="#4BC500" /></Link>

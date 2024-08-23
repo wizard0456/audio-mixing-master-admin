@@ -186,21 +186,23 @@ const OrderDetail = () => {
                             <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
                                 <div className='w-full lg:w-2/3 flex flex-col md:flex-row item-start justify-between gap-5'>
                                     <div className='w-full md:w-2/4 flex flex-col gap-5'>
-                                        <div className='p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
-                                            <p className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5'>User Details:</p>
+                                        {user && user.role === 'admin' && (
+                                            <div className='p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
+                                                <p className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5'>User Details:</p>
 
-                                            <div className='flex flex-col gap-2'>
-                                                <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Name:</span> {order.user_name}</p>
-                                                <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Email:</span> {order.user_email}</p>
+                                                <div className='flex flex-col gap-2'>
+                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Name:</span> {order.user_name}</p>
+                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Email:</span> {order.user_email}</p>
+                                                </div>
+
+                                                <hr />
+
+                                                <div className='flex flex-col gap-2'>
+                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Payer Name:</span> {order.order.payer_name}</p>
+                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Payer Email:</span> {order.order.payer_email}</p>
+                                                </div>
                                             </div>
-
-                                            <hr />
-
-                                            <div className='flex flex-col gap-2'>
-                                                <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Payer Name:</span> {order.order.payer_name}</p>
-                                                <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Payer Email:</span> {order.order.payer_email}</p>
-                                            </div>
-                                        </div>
+                                        )}
 
                                         <div className='p-5 bg-[#F6F6F6] rounded-lg flex items-center gap-5'>
                                             <span className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5'>Order Status:</span>
@@ -222,8 +224,10 @@ const OrderDetail = () => {
                                         <ul className='flex flex-col item-start justify-between gap-5'>
                                             {order.order_items.map((item) => (
                                                 <li key={item.id} className='flex justify-between items-center p-5 bg-[#F6F6F6] rounded-lg'>
-                                                    <p className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5 w-2/3'>{item.name}</p>
-                                                    <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 bg-[#4BC500] text-center text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
+                                                    <p className={`font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5 ${(user && user.role === 'admin') ? 'w-2/3' : "w-full"}`}>{item.name}</p>
+                                                    {user && user.role === 'admin' && (
+                                                        <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 bg-[#4BC500] text-center text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
+                                                    )}
                                                 </li>
                                             ))}
                                         </ul>
