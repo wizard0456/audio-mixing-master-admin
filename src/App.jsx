@@ -24,6 +24,7 @@ import Coupons from "./pages/Coupons.jsx";
 import Welcome from "./pages/Welcome.jsx";
 import RestrictedRoute from "./components/RestrictedRoute";
 import CouponForm from "./pages/CouponForm.jsx";
+import Engineers from "./pages/Engineers.jsx";
 
 const router = createBrowserRouter([
   {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
       {
         path: "/users",
         element: <RestrictedRoute roles={['admin']} element={Users} />,
+      },
+      {
+        path: "/engineers",
+        element: <RestrictedRoute roles={['admin']} element={Engineers} />,
       },
       {
         path: "/orders",

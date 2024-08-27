@@ -244,7 +244,7 @@ const OrderDetail = () => {
                                         {files?.length > 0 ? (
                                             files.map((file, index) => (
                                                 <li key={index} className='flex justify-between items-center p-5 bg-[#F6F6F6] rounded-lg'>
-                                                    <p>{file.split('/').pop()}</p>
+                                                    <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p>
                                                     <a href={`${Asset_Endpoint}${file}`} className='bg-[#4BC500] text-white p-2 rounded-full'><FaDownload /></a>
                                                 </li>
                                             ))
