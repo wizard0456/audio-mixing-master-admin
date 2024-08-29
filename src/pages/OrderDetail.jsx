@@ -269,25 +269,29 @@ const OrderDetail = () => {
                             <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
                                 {/* Accordion for User Details */}
                                 <div className='w-full lg:w-2/3'>
-                                    <div className='bg-gray-100 rounded-lg mb-5'>
-                                        <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('userDetails')}>
-                                            <h2 className='font-semibold text-base md:text-lg'>User Details</h2>
-                                            <span className='text-2xl'>{activeAccordions.includes('userDetails') ? '-' : '+'}</span>
-                                        </div>
-                                        {activeAccordions.includes('userDetails') && (
-                                            <div className='p-5'>
-                                                <div className='flex flex-col gap-2'>
-                                                    <p className='text-base'><span className='font-bold'>Name:</span> {order.user_name}</p>
-                                                    <p className='text-base'><span className='font-bold'>Email:</span> {order.user_email}</p>
-                                                </div>
-                                                <hr className='my-4' />
-                                                <div className='flex flex-col gap-2'>
-                                                    <p className='text-base'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
-                                                    <p className='text-base'><span className='font-bold '>Payer Email:</span> {order.order.payer_email}</p>
-                                                </div>
+                                    {user && user.role === 'admin' && (
+                                        <div className='bg-gray-100 rounded-lg mb-5'>
+                                            <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('userDetails')}>
+                                                <h2 className='font-semibold text-base md:text-lg'>User Details</h2>
+                                                <span className='text-2xl'>{activeAccordions.includes('userDetails') ? '-' : '+'}</span>
                                             </div>
-                                        )}
-                                    </div>
+                                            {activeAccordions.includes('userDetails') && (
+                                                <div className='p-5'>
+                                                    <div className='flex flex-col gap-2'>
+                                                        <p className='text-base'><span className='font-bold'>Name:</span> {order.user_name}</p>
+                                                        <p className='text-base'><span className='font-bold'>Email:</span> {order.user_email}</p>
+                                                    </div>
+                                                    <hr className='my-4' />
+                                                    <div className='flex flex-col gap-2'>
+                                                        <p className='text-base'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
+                                                        <p className='text-base'><span className='font-bold '>Payer Email:</span> {order.order.payer_email}</p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+
 
                                     {/* Accordion for Order Status */}
                                     <div className='bg-gray-100 rounded-lg mb-5'>
@@ -338,7 +342,7 @@ const OrderDetail = () => {
                                                                             Upload Files
                                                                         </button>
                                                                     </div>
-                                                                    <p className='text-sm md:text-base px-2 py-4 bg-gray-100 rounded-lg mb-5'>
+                                                                    <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
                                                                         <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
                                                                     </p>
 
@@ -350,9 +354,6 @@ const OrderDetail = () => {
                                                                             <ul className='mt-3'>
                                                                                 {JSON.parse(revision.files).map((file, index) => (
                                                                                     <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
-                                                                                        {/* <p className='text-sm md:text-base w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p> */}
-                                                                                        {/* <a href={`${Asset_Endpoint}${file}`} download className='bg-green-600 text-white p-2 rounded-full'><FaDownload /></a> */}
-
                                                                                         <audio controls className='w-full'>
                                                                                             <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
                                                                                         </audio>
@@ -369,6 +370,7 @@ const OrderDetail = () => {
                                         )}
                                     </div>
                                 </div>
+
 
                                 {/* Accordion for File Share */}
                                 <div className='w-full lg:w-1/3'>
@@ -389,9 +391,6 @@ const OrderDetail = () => {
                                                         {files?.length > 0 ? (
                                                             files.map((file, index) => (
                                                                 <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
-                                                                    {/* <p className='text-sm md:text-base w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p>
-                                                                <a href={`${Asset_Endpoint}${file}`} className='bg-green-600 text-white p-2 rounded-full'><FaDownload /></a> */}
-
                                                                     <audio controls className='w-full'>
                                                                         <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
                                                                     </audio>
