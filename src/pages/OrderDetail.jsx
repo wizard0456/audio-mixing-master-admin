@@ -417,8 +417,6 @@ const OrderDetail = () => {
                 isOpen={generalModalIsOpen}
                 onRequestClose={closeGeneralModal}
                 contentLabel="Upload Files"
-                className="modal-content"
-                overlayClassName="modal-overlay"
             >
                 <div>
                     <h2 className="text-2xl mb-4 font-semibold">Upload Files</h2>
@@ -459,8 +457,6 @@ const OrderDetail = () => {
                 isOpen={revisionModalIsOpen}
                 onRequestClose={closeRevisionModal}
                 contentLabel="Upload Revision Files"
-                className="modal-content"
-                overlayClassName="modal-overlay"
             >
                 <div>
                     <h2 className="text-2xl mb-4 font-semibold">Upload Revision Files</h2>
