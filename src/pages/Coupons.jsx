@@ -229,10 +229,10 @@ const Coupons = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.uses}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString()}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? new Date(coupon.end_date).toLocaleDateString() : 'No Expiry'}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? new Date(coupon.end_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' }) : 'No Expiry'}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
@@ -290,8 +290,8 @@ const Coupons = () => {
                             <p><strong>Discount Value:</strong> {couponDetails.discount_value}</p>
                             <p><strong>Max Uses:</strong> {couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
                             <p><strong>Uses:</strong> {couponDetails.uses}</p>
-                            <p><strong>Start Date:</strong> {new Date(couponDetails.start_date).toLocaleDateString()}</p>
-                            <p><strong>End Date:</strong> {couponDetails.end_date ? new Date(couponDetails.end_date).toLocaleDateString() : 'No Expiry'}</p>
+                            <p><strong>Start Date:</strong> {new Date(couponDetails.start_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                            <p><strong>End Date:</strong> {couponDetails.end_date ? new Date(couponDetails.end_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' }) : 'No Expiry'}</p>
                             <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
                             <p><strong>Products: </strong>
                                 {couponDetails.coupon_type == "1" ? (

@@ -136,7 +136,7 @@ const Newsletter = () => {
                       <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.email}</div>
                     </td>
                     <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
-                      <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString()}</div>
+                      <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                     </td>
                     <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                       <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>

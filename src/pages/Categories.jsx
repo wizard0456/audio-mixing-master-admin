@@ -229,7 +229,7 @@ const Categories = () => {
                                             <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg line-clamp-1 text-nowrap'>{category.name}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
-                                            <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6]'>{new Date(category.created_at).toLocaleDateString()}</div>
+                                            <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6]'>{new Date(category.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
                                             <div className='px-3 py-4 sm:py-5 bg-[#F6F6F6]'>{category.is_active == 1 ? 'Active' : 'Inactive'}</div>

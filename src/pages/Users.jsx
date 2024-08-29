@@ -271,7 +271,7 @@ const Users = () => {
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Joined Date</label>
-                                <p>{new Date(selectedUser.created_at).toLocaleDateString()}</p>
+                                <p>{new Date(selectedUser.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
                             </div>
                             <div className="mb-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Current Status</label>

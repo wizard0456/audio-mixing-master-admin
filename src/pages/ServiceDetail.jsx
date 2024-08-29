@@ -87,8 +87,8 @@ const ServiceDetail = () => {
                                         <p><strong>Requirements:</strong> {service.requirements || '-'}</p>
                                         <p><strong>Notes:</strong> {service.notes || '-'}</p>
                                         <p><strong>Tags:</strong> {service.tags || '-'}</p>
-                                        <p><strong>Created At:</strong> {new Date(service.created_at).toLocaleDateString()}</p>
-                                        <p><strong>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString()}</p>
+                                        <p><strong>Created At:</strong> {new Date(service.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
+                                        <p><strong>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
                                     </div>
                                 </div>
                             </div>

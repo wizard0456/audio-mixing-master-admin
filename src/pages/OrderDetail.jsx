@@ -364,7 +364,7 @@ const OrderDetail = () => {
                                                                     )}
 
                                                                     <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
-                                                                        <span className='font-medium'>Open At:</span> {revision.created_at || 'No message provided'}
+                                                                        <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})) || 'No message provided'}
                                                                     </p>
                                                                 </div>
                                                             ))}

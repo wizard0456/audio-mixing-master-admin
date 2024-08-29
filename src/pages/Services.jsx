@@ -249,7 +249,7 @@ const Services = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{service.service_type}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.created_at).toLocaleDateString()}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-4 bg-[#F6F6F6] text-nowrap'>

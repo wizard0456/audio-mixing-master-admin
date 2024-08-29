@@ -269,7 +269,7 @@ const Tags = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{tag.tag_name}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5 text-nowrap">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(tag.created_at).toLocaleDateString()}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(tag.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{tag.is_active == 1 ? 'Active' : 'Inactive'}</div>
