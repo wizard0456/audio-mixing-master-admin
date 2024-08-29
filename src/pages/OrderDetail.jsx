@@ -323,7 +323,7 @@ const OrderDetail = () => {
                                                         <div className='flex justify-between items-center'>
                                                             <p className={`font-semibold text-sm md:text-base ${(user && user.role === 'admin') ? 'w-2/3' : "w-full"}`}>{item.name}</p>
                                                             {user && user.role === 'admin' && (
-                                                                <p className='text-sm md:text-base bg-green-600 text-center text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
+                                                                <p className='text-sm md:text-base bg-green-600 text-center text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
                                                             )}
                                                         </div>
 
@@ -333,13 +333,13 @@ const OrderDetail = () => {
                                                             .map((revision) => (
                                                                 <div key={revision.id} className='mt-4 p-4 bg-gray-200 rounded-lg'>
                                                                     <div className='flex justify-between items-center mb-5'>
-                                                                        <h2 className='font-semibold text-base md:text-lg'>Revision </h2>
+                                                                        <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
 
                                                                         <button
                                                                             onClick={() => openRevisionModal(revision.id)}
                                                                             className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
                                                                         >
-                                                                            Upload Files
+                                                                            Upload Revision Files
                                                                         </button>
                                                                     </div>
                                                                     <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
@@ -362,6 +362,10 @@ const OrderDetail = () => {
                                                                             </ul>
                                                                         </>
                                                                     )}
+
+                                                                    <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
+                                                                        <span className='font-medium'>Open At:</span> {revision.created_at || 'No message provided'}
+                                                                    </p>
                                                                 </div>
                                                             ))}
                                                     </li>
@@ -397,8 +401,8 @@ const OrderDetail = () => {
                                                                 </li>
                                                             ))
                                                         ) : (
-                                                            <li className='flex justify-between items-center p-5 bg-gray-200 rounded-lg'>
-                                                                <p>No files uploaded yet</p>
+                                                            <li className='flex justify-between items-center p-1 bg-gray-200 rounded-lg'>
+                                                                <p className='text-sm md:text-base'>No files uploaded yet</p>
                                                             </li>
                                                         )}
                                                     </ul>
