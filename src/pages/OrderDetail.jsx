@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaAngleDoubleLeft, FaDownload } from "react-icons/fa";
+import { FaAngleDoubleLeft } from "react-icons/fa";
 import axios from 'axios';
 import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
@@ -20,6 +20,7 @@ const OrderDetail = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [activeAccordions, setActiveAccordions] = useState(["userDetails", "orderStatus"]);
     const [currentRevisionId, setCurrentRevisionId] = useState(null);
+    const [revisions, setRevisions] = useState([]);
     const { id } = useParams();
     const user = useSelector(selectUser);
 
@@ -35,6 +36,7 @@ const OrderDetail = () => {
                 setOrder(response.data);
                 setOrderStatus(response.data.order.Order_status);
                 setFiles(JSON.parse(response.data.order.order_files));
+                setRevisions(response.data.revision)
             } catch (error) {
                 console.error("Error fetching order details", error);
             }
@@ -124,7 +126,7 @@ const OrderDetail = () => {
         Array.from(selectedFiles).forEach((file) => {
             formData.append('file[]', file);
         });
-        
+
         formData.append('order_status', orderStatus);
 
         setIsUploading(true);
@@ -138,6 +140,7 @@ const OrderDetail = () => {
             });
 
             setFiles(JSON.parse(response.data.order_files));
+            setOrderStatus(response.data.Order_status.toString());
 
             toast.success("Files uploaded successfully", {
                 position: "top-right",
@@ -191,18 +194,21 @@ const OrderDetail = () => {
 
         const formData = new FormData();
         Array.from(selectedFiles).forEach((file) => {
-            formData.append('file[]', file);
+            formData.append('files[]', file);
         });
 
         setIsUploading(true);
-        
+
         try {
-            await axios.post(`${API_Endpoint}revision-update/${currentRevisionId}`, formData, {
+            const response = await axios.post(`${API_Endpoint}revision-update/${currentRevisionId}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
+
+            setRevisions(response.data.revision)
+            setOrderStatus(response.data.order_status.toString())
 
             toast.success("Revision files uploaded successfully", {
                 position: "top-right",
@@ -245,8 +251,8 @@ const OrderDetail = () => {
     return (
         <>
             <section className='px-4 py-8 md:px-6 md:py-10'>
-                <div className="mb-8 md:mb-10 bg-[#F6F6F6] py-4 md:py-6 rounded-lg px-4 md:px-5">
-                    <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9 flex items-center justify-start">
+                <div className="mb-8 md:mb-10 bg-gray-100 py-4 md:py-6 rounded-lg px-4 md:px-5">
+                    <h1 className="font-semibold text-2xl md:text-3xl flex items-center">
                         <FaAngleDoubleLeft size={20} className="cursor-pointer mr-2" onClick={() => window.history.back()} /> Orders / {id}
                     </h1>
                 </div>
@@ -254,7 +260,7 @@ const OrderDetail = () => {
                 {
                     !order ?
                         (
-                            <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                            <div className="flex justify-center items-center font-semibold text-base">
                                 <Loading />
                             </div>
                         )
@@ -263,35 +269,35 @@ const OrderDetail = () => {
                             <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
                                 {/* Accordion for User Details */}
                                 <div className='w-full lg:w-2/3'>
-                                    <div className='bg-[#F6F6F6] rounded-lg mb-5'>
+                                    <div className='bg-gray-100 rounded-lg mb-5'>
                                         <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('userDetails')}>
-                                            <h2 className='font-THICCCBOI-SemiBold font-semibold text-base md:text-lg leading-5 md:leading-7'>User Details</h2>
-                                            <span>{activeAccordions.includes('userDetails') ? '-' : '+'}</span>
+                                            <h2 className='font-semibold text-base md:text-lg'>User Details</h2>
+                                            <span className='text-2xl'>{activeAccordions.includes('userDetails') ? '-' : '+'}</span>
                                         </div>
                                         {activeAccordions.includes('userDetails') && (
                                             <div className='p-5'>
                                                 <div className='flex flex-col gap-2'>
-                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Name:</span> {order.user_name}</p>
-                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Email:</span> {order.user_email}</p>
+                                                    <p className='text-base'><span className='font-bold'>Name:</span> {order.user_name}</p>
+                                                    <p className='text-base'><span className='font-bold'>Email:</span> {order.user_email}</p>
                                                 </div>
                                                 <hr className='my-4' />
                                                 <div className='flex flex-col gap-2'>
-                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold font-bold'>Payer Name:</span> {order.order.payer_name}</p>
-                                                    <p className='font-THICCCBOI-Regular font-normal text-base leading-5'><span className='font-THICCCBOI-Bold '>Payer Email:</span> {order.order.payer_email}</p>
+                                                    <p className='text-base'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
+                                                    <p className='text-base'><span className='font-bold '>Payer Email:</span> {order.order.payer_email}</p>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
 
                                     {/* Accordion for Order Status */}
-                                    <div className='bg-[#F6F6F6] rounded-lg mb-5'>
+                                    <div className='bg-gray-100 rounded-lg mb-5'>
                                         <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('orderStatus')}>
-                                            <h2 className='font-THICCCBOI-SemiBold font-semibold text-base md:text-lg leading-5 md:leading-7'>Order Status</h2>
-                                            <span>{activeAccordions.includes('orderStatus') ? '-' : '+'}</span>
+                                            <h2 className='font-semibold text-base md:text-lg'>Order Status</h2>
+                                            <span className='text-2xl'>{activeAccordions.includes('orderStatus') ? '-' : '+'}</span>
                                         </div>
                                         {activeAccordions.includes('orderStatus') && (
                                             <div className='p-5 flex items-center gap-5'>
-                                                <select value={orderStatus} onChange={handleStatusChange} className="font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 bg-white border border-gray-300 p-2 rounded-md">
+                                                <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base bg-white border border-gray-300 p-2 rounded-md">
                                                     {Object.entries(orderStatusMapping).map(([key, value]) => (
                                                         <option key={key} value={key}>{value}</option>
                                                     ))}
@@ -301,50 +307,60 @@ const OrderDetail = () => {
                                     </div>
 
                                     {/* Accordion for Services Purchased with Revisions */}
-                                    <div className='bg-[#F6F6F6] rounded-lg mb-5'>
+                                    <div className='bg-gray-100 rounded-lg mb-5'>
                                         <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('servicesPurchased')}>
-                                            <h2 className='font-THICCCBOI-SemiBold font-semibold text-base md:text-lg leading-5 md:leading-7'>Services Purchased</h2>
-                                            <span>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
+                                            <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
+                                            <span className='text-2xl'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
                                         </div>
                                         {activeAccordions.includes('servicesPurchased') && (
-                                            <ul className='p-5 flex flex-col item-start justify-between gap-5'>
+                                            <ul className='p-5 flex flex-col gap-5'>
                                                 {order.order_items.map((item) => (
-                                                    <li key={item.id} className='bg-[#F6F6F6] rounded-lg'>
+                                                    <li key={item.id} className='bg-gray-100 rounded-lg'>
                                                         <div className='flex justify-between items-center'>
-                                                            <p className={`font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5 ${(user && user.role === 'admin') ? 'w-2/3' : "w-full"}`}>{item.name}</p>
+                                                            <p className={`font-semibold text-sm md:text-base ${(user && user.role === 'admin') ? 'w-2/3' : "w-full"}`}>{item.name}</p>
                                                             {user && user.role === 'admin' && (
-                                                                <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 bg-[#4BC500] text-center text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
+                                                                <p className='text-sm md:text-base bg-green-600 text-center text-white p-2 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
                                                             )}
                                                         </div>
 
                                                         {/* Display Revisions for this Service */}
-                                                        {order.revision
+                                                        {revisions.length > 0 && revisions
                                                             .filter(rev => rev.service_id === item.service_id)
                                                             .map((revision) => (
-                                                                <div key={revision.id} className='mt-4 p-4 bg-[#E9E9E9] rounded-lg'>
-                                                                    <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5'>
-                                                                        <span className='font-THICCCBOI-Bold font-bold'>Revision Message:</span> {revision.message || 'No message provided'}
-                                                                    </p>
-                                                                    {revision.files && JSON.parse(revision.files).length > 0 && (
-                                                                        <ul className='mt-3'>
-                                                                            {JSON.parse(revision.files).map((file, index) => (
-                                                                                <li key={index} className='flex justify-between items-center p-2 bg-[#F6F6F6] rounded-lg mb-2'>
-                                                                                    <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p>
-                                                                                    <a href={`${Asset_Endpoint}${file}`} className='bg-[#4BC500] text-white p-2 rounded-full'><FaDownload /></a>
-                                                                                </li>
-                                                                            ))}
-                                                                        </ul>
-                                                                    )}
+                                                                <div key={revision.id} className='mt-4 p-4 bg-gray-200 rounded-lg'>
+                                                                    <div className='flex justify-between items-center mb-5'>
+                                                                        <h2 className='font-semibold text-base md:text-lg'>Revision </h2>
 
-                                                                    {/* File Upload Button for Revision */}
-                                                                    <div className='mt-3'>
                                                                         <button
                                                                             onClick={() => openRevisionModal(revision.id)}
-                                                                            className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                                                                            className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
                                                                         >
                                                                             Upload Files
                                                                         </button>
                                                                     </div>
+                                                                    <p className='text-sm md:text-base px-2 py-4 bg-gray-100 rounded-lg mb-5'>
+                                                                        <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
+                                                                    </p>
+
+
+                                                                    {revision.files && JSON.parse(revision.files).length > 0 && (
+                                                                        <>
+                                                                            <h2 className='font-semibold text-sm md:text-base'>Uploaded Files</h2>
+
+                                                                            <ul className='mt-3'>
+                                                                                {JSON.parse(revision.files).map((file, index) => (
+                                                                                    <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
+                                                                                        {/* <p className='text-sm md:text-base w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p> */}
+                                                                                        {/* <a href={`${Asset_Endpoint}${file}`} download className='bg-green-600 text-white p-2 rounded-full'><FaDownload /></a> */}
+
+                                                                                        <audio controls className='w-full'>
+                                                                                            <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                                                        </audio>
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </>
+                                                                    )}
                                                                 </div>
                                                             ))}
                                                     </li>
@@ -356,32 +372,39 @@ const OrderDetail = () => {
 
                                 {/* Accordion for File Share */}
                                 <div className='w-full lg:w-1/3'>
-                                    <div className='bg-[#F6F6F6] rounded-lg'>
+                                    <div className='bg-gray-100 rounded-lg'>
                                         <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('fileShare')}>
-                                            <h2 className='font-THICCCBOI-SemiBold font-semibold text-base md:text-lg leading-5 md:leading-7'>File Share ({files?.length ? files.length : 0})</h2>
-                                            <span>{activeAccordions.includes('fileShare') ? '-' : '+'}</span>
+                                            <h2 className='font-semibold text-base md:text-lg'>Deliverable Files</h2>
+                                            <span className='text-2xl'>{activeAccordions.includes('fileShare') ? '-' : '+'}</span>
                                         </div>
                                         {activeAccordions.includes('fileShare') && (
-                                            <div className='p-5'>
-                                                <div className='flex items-center justify-between mb-5'>
-                                                    <button onClick={openGeneralModal} className='font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-3 md:leading-5 text-white bg-stone-900 p-4 rounded-lg'>Upload Files</button>
-                                                </div>
+                                            <>
+                                                <div className='p-5'>
+                                                    <div className='flex justify-between items-center mb-5'>
+                                                        <h2 className='font-semibold text-sm md:text-base'>Uploaded Files ({files?.length ? files.length : 0})</h2>
+                                                        <button onClick={openGeneralModal} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Files</button>
+                                                    </div>
 
-                                                <ul className='flex flex-col item-start justify-between gap-5 bg-[#E9E9E9] p-5 rounded-lg'>
-                                                    {files?.length > 0 ? (
-                                                        files.map((file, index) => (
-                                                            <li key={index} className='flex justify-between items-center p-5 bg-[#F6F6F6] rounded-lg'>
-                                                                <p className='font-THICCCBOI-Regular font-normal text-sm md:text-base leading-3 md:leading-5 w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p>
-                                                                <a href={`${Asset_Endpoint}${file}`} className='bg-[#4BC500] text-white p-2 rounded-full'><FaDownload /></a>
+                                                    <ul className='flex flex-col gap-5 p-5 bg-gray-200 rounded-lg'>
+                                                        {files?.length > 0 ? (
+                                                            files.map((file, index) => (
+                                                                <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
+                                                                    {/* <p className='text-sm md:text-base w-10/12 text-nowrap line-clamp-2'>{file.split('/').pop()}</p>
+                                                                <a href={`${Asset_Endpoint}${file}`} className='bg-green-600 text-white p-2 rounded-full'><FaDownload /></a> */}
+
+                                                                    <audio controls className='w-full'>
+                                                                        <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                                    </audio>
+                                                                </li>
+                                                            ))
+                                                        ) : (
+                                                            <li className='flex justify-between items-center p-5 bg-gray-200 rounded-lg'>
+                                                                <p>No files uploaded yet</p>
                                                             </li>
-                                                        ))
-                                                    ) : (
-                                                        <li className='flex justify-between items-center p-5 bg-[#F6F6F6] rounded-lg'>
-                                                            <p>No files uploaded yet</p>
-                                                        </li>
-                                                    )}
-                                                </ul>
-                                            </div>
+                                                        )}
+                                                    </ul>
+                                                </div>
+                                            </>
                                         )}
                                     </div>
                                 </div>
@@ -395,6 +418,8 @@ const OrderDetail = () => {
                 isOpen={generalModalIsOpen}
                 onRequestClose={closeGeneralModal}
                 contentLabel="Upload Files"
+                className="modal-content"
+                overlayClassName="modal-overlay"
             >
                 <div>
                     <h2 className="text-2xl mb-4 font-semibold">Upload Files</h2>
@@ -420,7 +445,7 @@ const OrderDetail = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                                className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
                                 disabled={isUploading}
                             >
                                 {isUploading ? 'Uploading...' : 'Upload'}
@@ -435,6 +460,8 @@ const OrderDetail = () => {
                 isOpen={revisionModalIsOpen}
                 onRequestClose={closeRevisionModal}
                 contentLabel="Upload Revision Files"
+                className="modal-content"
+                overlayClassName="modal-overlay"
             >
                 <div>
                     <h2 className="text-2xl mb-4 font-semibold">Upload Revision Files</h2>
@@ -460,7 +487,7 @@ const OrderDetail = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                                className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
                                 disabled={isUploading}
                             >
                                 {isUploading ? 'Uploading...' : 'Upload'}
