@@ -64,7 +64,7 @@ const OrderDetail = () => {
             await axios(`${API_Endpoint}order/update-status/${id}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                    'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'multipart/form-data'
                 },
                 data: formData,

@@ -81,6 +81,10 @@ const router = createBrowserRouter([
         element: <RestrictedRoute roles={['admin']} element={ServiceForm} />,
       },
       {
+        path: "/edit-service/:id",
+        element: <RestrictedRoute roles={['admin']} element={ServiceForm} />,
+      },
+      {
         path: "/service-detail/:id",
         element: <RestrictedRoute roles={['admin']} element={ServiceDetail} />,
       },

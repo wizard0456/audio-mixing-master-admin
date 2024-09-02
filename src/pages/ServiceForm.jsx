@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { toast, Slide } from 'react-toastify';
 import Toggle from 'react-toggle';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { API_Endpoint } from '../utilities/constants';
-import { selectUser } from '../reducers/authSlice';
+import { selectUser, logout } from '../reducers/authSlice';
+import Loading from '../components/Loading';
 
 const ServiceForm = () => {
+    const { id } = useParams();
+    const [loading, setLoading] = useState(false);
     const [serviceData, setServiceData] = useState({
         category_id: '',
         label_id: '',
@@ -33,11 +36,18 @@ const ServiceForm = () => {
     const [serviceOption, setServiceOption] = useState('oneTime');
     const [imageSource, setImageSource] = useState('1');
     const user = useSelector(selectUser);
+    const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const isEditMode = Boolean(id);
 
     useEffect(() => {
         fetchCategoriesLabelsAndTags();
-    }, []);
+
+        if (isEditMode) {
+            fetchServiceDetail(id);
+        }
+    }, [id, isEditMode]);
 
     const fetchCategoriesLabelsAndTags = async () => {
         try {
@@ -60,15 +70,65 @@ const ServiceForm = () => {
         }
     };
 
+    const fetchServiceDetail = async (serviceId) => {
+        setLoading(true);
+        try {
+            const response = await axios({
+                method: "get",
+                url: `${API_Endpoint}admin/services/${serviceId}`,
+                headers: {
+                    "Authorization": `Bearer ${user.token}`
+                }
+            });
+
+            const data = response.data;
+
+            const serviceOption = data.service_type === 'subscription' ? 'monthly' : 'oneTime';
+            setServiceOption(serviceOption);
+
+            const updatedServiceData = {
+                ...data,
+                one_time_price: serviceOption === 'oneTime' ? data.price : '',
+                one_time_discounted_price: serviceOption === 'oneTime' ? data.discounted_price : 0,
+                monthly_price: serviceOption === 'monthly' ? data.price : '',
+                monthly_discounted_price: serviceOption === 'monthly' ? data.discounted_price : 0,
+                image_url: '', // Set image_url to empty string by default
+                image: null,   // Set image to null by default
+                // is_active: data.is_active === "1" ? 1 : 0,
+            };
+
+            setServiceData(updatedServiceData);
+            setImageSource('1'); // Reset the image source to the default state (image URL)
+        } catch (error) {
+            console.error("Error fetching service detail", error);
+            if (error.response && error.response.status === 401) {
+                dispatch(logout());
+            }
+            toast.error("Error fetching service detail.", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleSaveService = async (event) => {
         event.preventDefault();
         setAdding(true);
         try {
             const formData = new FormData();
 
-            if (imageSource === '1') {
+            if (imageSource === '1' && serviceData.image_url) {
                 formData.append('image', serviceData.image_url);
-            } else {
+            } else if (imageSource === '0' && serviceData.image) {
                 formData.append('image', serviceData.image);
             }
 
@@ -81,14 +141,21 @@ const ServiceForm = () => {
                 }
             });
 
-            await axios.post(`${API_Endpoint}admin/services`, formData, {
+            const url = isEditMode
+                ? `${API_Endpoint}admin/services-update/${id}`
+                : `${API_Endpoint}admin/services`;
+
+            await axios({
+                method: "post",
+                url,
+                data: formData,
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
 
-            toast.success('Service added successfully!', {
+            toast.success(`Service ${isEditMode ? 'updated' : 'added'} successfully!`, {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -104,7 +171,7 @@ const ServiceForm = () => {
             navigate('/services');
         } catch (error) {
             const message = error.response?.data?.message || 'Error occurred';
-            toast.error(`Error adding service: ${message}`, {
+            toast.error(`Error ${isEditMode ? 'updating' : 'adding'} service: ${message}`, {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -135,10 +202,10 @@ const ServiceForm = () => {
         setServiceData(prevData => {
             let updatedData = { ...prevData };
             if (selectedOption === 'oneTime') {
-                updatedData.monthly_price = 0;
+                updatedData.monthly_price = '';
                 updatedData.monthly_discounted_price = 0;
             } else if (selectedOption === 'monthly') {
-                updatedData.one_time_price = 0;
+                updatedData.one_time_price = '';
                 updatedData.one_time_discounted_price = 0;
             }
             return updatedData;
@@ -149,281 +216,304 @@ const ServiceForm = () => {
         setServiceData(prevData => ({ ...prevData, is_active: prevData.is_active === 1 ? 0 : 1 }));
     };
 
+    const handleImageSourceChange = (source) => {
+        setImageSource(source);
+        setServiceData(prevData => ({
+            ...prevData,
+            image_url: source === '1' ? '' : prevData.image_url,
+            image: source === '0' ? null : prevData.image,
+        }));
+    };
+
     return (
         <section className='px-4 sm:px-5 py-8 sm:py-10'>
             <div className="mb-8 sm:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 sm:py-6 rounded-lg">
                 <h1 className="font-THICCCBOI-SemiBold text-xl sm:text-3xl font-semibold leading-7 sm:leading-9">
-                    Add Service
+                    {isEditMode ? 'Edit Service' : 'Add Service'}
                 </h1>
             </div>
 
-            <form onSubmit={handleSaveService} className="space-y-4 sm:space-y-6 mx-auto">
-                <div className="mb-4 sm:mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="service_option">Service Option</label>
-                    <select
-                        name="service_option"
-                        value={serviceOption}
-                        onChange={handleServiceOptionChange}
-                        className="w-full px-3 py-2 border rounded-md"
-                    >
-                        <option value="oneTime">One-time</option>
-                        <option value="monthly">Subscription</option>
-                    </select>
-                </div>
-
-                <div className='grid grid-cols-1 gap-4 sm:gap-6'>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="name">Service Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            value={serviceData.name}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        />
-                    </div>
-                </div>
-
-                {(serviceOption === 'oneTime') && (
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
-                        <div className="mb-4 sm:mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_price">One-time Price</label>
-                            <input
-                                type="number"
-                                name="one_time_price"
-                                value={serviceData.one_time_price}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded-md"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4 sm:mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_discounted_price">One-time Discounted Price (If there is no discount please enter 0)</label>
-                            <input
-                                type="number"
-                                name="one_time_discounted_price"
-                                value={serviceData.one_time_discounted_price}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded-md"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {(serviceOption === 'monthly') && (
-                    <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
-                        <div className="mb-4 sm:mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_price">Monthly Price</label>
-                            <input
-                                type="number"
-                                name="monthly_price"
-                                value={serviceData.monthly_price}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded-md"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4 sm:mb-6">
-                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_discounted_price">Monthly Discounted Price (If there is no discount please enter 0)</label>
-                            <input
-                                type="number"
-                                name="monthly_discounted_price"
-                                value={serviceData.monthly_discounted_price}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded-md"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="detail">Detail</label>
-                        <textarea
-                            name="detail"
-                            value={serviceData.detail}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        ></textarea>
-                    </div>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="brief_detail">Brief Detail</label>
-                        <textarea
-                            name="brief_detail"
-                            value={serviceData.brief_detail}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        ></textarea>
-                    </div>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="includes">Includes</label>
-                        <textarea
-                            name="includes"
-                            value={serviceData.includes}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        ></textarea>
-                    </div>
-                </div>
-
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="description">Description</label>
-                        <textarea
-                            name="description"
-                            value={serviceData.description}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        ></textarea>
-                    </div>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="requirements">Requirements</label>
-                        <textarea
-                            name="requirements"
-                            value={serviceData.requirements}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        ></textarea>
-                    </div>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="notes">Notes</label>
-                        <textarea
-                            name="notes"
-                            value={serviceData.notes}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                        ></textarea>
-                    </div>
-                </div>
-
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="tags">Tags</label>
-                        <select
-                            name="tags"
-                            value={serviceData.tags}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        >
-                            <option value="">Select Tag</option>
-                            {tags.length > 0 && tags.map(tag => (
-                                <option key={tag.id} value={tag.tag_name}>{tag.tag_name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="label_id">Label</label>
-                        <select
-                            name="label_id"
-                            value={serviceData.label_id}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        >
-                            <option value="">Select Label</option>
-                            {labels.length > 0 && labels.map(label => (
-                                <option key={label.id} value={label.id}>{label.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="category_id">Category</label>
-                        <select
-                            name="category_id"
-                            value={serviceData.category_id}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        >
-                            <option value="">Select Category</option>
-                            {categories.length > 0 && categories.map(category => (
-                                <option key={category.id} value={category.id}>{category.name}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                <div className="mb-4 sm:mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Active Status</label>
-                    <Toggle
-                        checked={serviceData.is_active === 1}
-                        onChange={handleToggleChange}
-                        icons={false}
-                    />
-                </div>
-
-                <div className="mb-4 sm:mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Image Source</label>
-                    <div className="flex space-x-4">
-                        <label>
-                            <input
-                                type="radio"
-                                name="image_source"
-                                value="1"
-                                checked={imageSource === '1'}
-                                onChange={() => setImageSource('1')}
-                            />{' '}
-                            Image Link
-                        </label>
-                        <label>
-                            <input
-                                type="radio"
-                                name="image_source"
-                                value="0"
-                                checked={imageSource === '0'}
-                                onChange={() => setImageSource('0')}
-                            />{' '}
-                            File Upload
-                        </label>
-                    </div>
-                </div>
-
-                {imageSource === '1' ? (
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image_url">Image Link</label>
-                        <input
-                            type="text"
-                            name="image_url"
-                            value={serviceData.image_url}
-                            onChange={handleInputChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        />
+            {
+                loading ? (
+                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                        <Loading />
                     </div>
                 ) : (
-                    <div className="mb-4 sm:mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image">Image</label>
-                        <input
-                            type="file"
-                            name="image"
-                            onChange={handleFileChange}
-                            className="w-full px-3 py-2 border rounded-md"
-                            required
-                        />
-                    </div>
-                )}
+                    <form onSubmit={handleSaveService} className="space-y-4 sm:space-y-6 mx-auto">
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="service_option">Service Option</label>
+                            <select
+                                name="service_option"
+                                value={serviceOption}
+                                onChange={handleServiceOptionChange}
+                                className="w-full px-3 py-2 border rounded-md"
+                            >
+                                <option value="oneTime">One-time</option>
+                                <option value="monthly">Subscription</option>
+                            </select>
+                        </div>
 
-                <div className="flex justify-between sm:justify-end space-x-4">
-                    <button
-                        type="button"
-                        className="bg-red-500 text-sm sm:text-base font-semibold text-white px-3 sm:px-4 py-2 rounded"
-                        onClick={() => navigate('/services')}
-                        disabled={adding}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="text-sm sm:text-[14px] bg-[#4BC500] text-white px-4 sm:px-5 py-2 rounded-lg"
-                        disabled={adding}
-                    >
-                        {adding ? 'Adding...' : 'Add Service'}
-                    </button>
-                </div>
-            </form>
+                        <div className='grid grid-cols-1 gap-4 sm:gap-6'>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="name">Service Name</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={serviceData.name}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required
+                                />
+                            </div>
+                        </div>
+
+                        {(serviceOption === 'oneTime') && (
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
+                                <div className="mb-4 sm:mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_price">One-time Price</label>
+                                    <input
+                                        type="number"
+                                        name="one_time_price"
+                                        value={serviceData.one_time_price}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border rounded-md"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4 sm:mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="one_time_discounted_price">One-time Discounted Price (If there is no discount please enter 0)</label>
+                                    <input
+                                        type="number"
+                                        name="one_time_discounted_price"
+                                        value={serviceData.one_time_discounted_price}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border rounded-md"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {(serviceOption === 'monthly') && (
+                            <div className='grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6'>
+                                <div className="mb-4 sm:mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_price">Monthly Price</label>
+                                    <input
+                                        type="number"
+                                        name="monthly_price"
+                                        value={serviceData.monthly_price}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border rounded-md"
+                                        required
+                                    />
+                                </div>
+                                <div className="mb-4 sm:mb-6">
+                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="monthly_discounted_price">Monthly Discounted Price (If there is no discount please enter 0)</label>
+                                    <input
+                                        type="number"
+                                        name="monthly_discounted_price"
+                                        value={serviceData.monthly_discounted_price}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border rounded-md"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="detail">Detail</label>
+                                <textarea
+                                    name="detail"
+                                    value={serviceData.detail}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required
+                                ></textarea>
+                            </div>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="brief_detail">Brief Detail</label>
+                                <textarea
+                                    name="brief_detail"
+                                    value={serviceData.brief_detail}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                ></textarea>
+                            </div>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="includes">Includes</label>
+                                <textarea
+                                    name="includes"
+                                    value={serviceData.includes}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="description">Description</label>
+                                <textarea
+                                    name="description"
+                                    value={serviceData.description}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                ></textarea>
+                            </div>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="requirements">Requirements</label>
+                                <textarea
+                                    name="requirements"
+                                    value={serviceData.requirements}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                ></textarea>
+                            </div>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="notes">Notes</label>
+                                <textarea
+                                    name="notes"
+                                    value={serviceData.notes}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="tags">Tags</label>
+                                <select
+                                    name="tags"
+                                    value={serviceData.tags}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required
+                                >
+                                    <option value="">Select Tag</option>
+                                    {tags.length > 0 && tags.map(tag => (
+                                        <option key={tag.id} value={tag.tag_name}>{tag.tag_name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="label_id">Label</label>
+                                <select
+                                    name="label_id"
+                                    value={serviceData.label_id}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required
+                                >
+                                    <option value="">Select Label</option>
+                                    {labels.length > 0 && labels.map(label => (
+                                        <option key={label.id} value={label.id}>{label.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="category_id">Category</label>
+                                <select
+                                    name="category_id"
+                                    value={serviceData.category_id}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required
+                                >
+                                    <option value="">Select Category</option>
+                                    {categories.length > 0 && categories.map(category => (
+                                        <option key={category.id} value={category.id}>{category.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Active Status</label>
+                            <Toggle
+                                checked={serviceData.is_active === 1}
+                                onChange={handleToggleChange}
+                                icons={false}
+                            />
+                        </div>
+
+                        {isEditMode && (
+                            <div className="mb-4 bg-[#f8d7da] p-4 rounded">
+                                <p className="text-red-500 text-sm">Upload a new image to update, or leave blank to keep the current one.</p>
+                            </div>
+                        )}
+
+                        <div className="mb-4 sm:mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Image Source</label>
+                            <div className="flex space-x-4">
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="image_source"
+                                        value="1"
+                                        checked={imageSource === '1'}
+                                        onChange={() => handleImageSourceChange('1')}
+                                    />{' '}
+                                    Image Link
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="image_source"
+                                        value="0"
+                                        checked={imageSource === '0'}
+                                        onChange={() => handleImageSourceChange('0')}
+                                    />{' '}
+                                    File Upload
+                                </label>
+                            </div>
+                        </div>
+
+                        {imageSource === '1' ? (
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image_url">Image Link</label>
+                                <input
+                                    type="text"
+                                    name="image_url"
+                                    value={serviceData.image_url}
+                                    onChange={handleInputChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required={!isEditMode}
+                                />
+                            </div>
+                        ) : (
+                            <div className="mb-4 sm:mb-6">
+                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image">Image</label>
+                                <input
+                                    type="file"
+                                    name="image"
+                                    onChange={handleFileChange}
+                                    className="w-full px-3 py-2 border rounded-md"
+                                    required={!isEditMode}
+                                />
+                            </div>
+                        )}
+
+                        <div className="flex justify-between sm:justify-end space-x-4">
+                            <button
+                                type="button"
+                                className="bg-red-500 text-sm sm:text-base font-semibold text-white px-3 sm:px-4 py-2 rounded"
+                                onClick={() => navigate('/services')}
+                                disabled={adding}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="text-sm sm:text-[14px] bg-[#4BC500] text-white px-4 sm:px-5 py-2 rounded-lg"
+                                disabled={adding}
+                            >
+                                {adding ? (isEditMode ? 'Updating...' : 'Adding...') : (isEditMode ? 'Update Service' : 'Add Service')}
+                            </button>
+                        </div>
+                    </form>
+                )
+            }
         </section>
     );
 };

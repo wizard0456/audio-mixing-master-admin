@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEdit, FaEye, FaTrashAlt } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
@@ -262,6 +262,7 @@ const Services = () => {
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
+                                                <Link to={`/edit-service/${service.id}`}><FaEdit /></Link>
                                                 <Link to={`/service-detail/${service.id}`}><FaEye /></Link>
                                                 <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button>
                                             </div>
