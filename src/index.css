@@ -272,7 +272,6 @@ body {
     color: white;
 }
 
-
 @media screen and (max-width: 1200px) {
     .sidebar>div {
         left: -100%;
@@ -330,7 +329,6 @@ body {
         font-size: 30px;
     }
 }
-
 
 @media screen and (max-width: 768px) {
     .sidebar-list-item a {

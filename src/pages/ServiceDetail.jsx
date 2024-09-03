@@ -53,9 +53,9 @@ const ServiceDetail = () => {
     }, [id, dispatch, user.token]);
 
     return (
-        <section className='px-4 py-8 md:px-5 md:py-10'>
+        <section className='px-4 py-8 md:px-5 md:py-10 font-THICCCBOI-Regular'>
             <div className="mb-8 md:mb-10 bg-[#F6F6F6] py-4 md:py-6 rounded-lg px-4 md:px-5">
-                <h1 className="font-semibold text-2xl md:text-3xl leading-7 md:leading-9 flex items-center">
+                <h1 className="font-THICCCBOI-SemiBold text-2xl md:text-3xl leading-7 md:leading-9 flex items-center">
                     <FaAngleDoubleLeft size={20} className="cursor-pointer mr-2" onClick={() => window.history.back()} /> Service Details / {id}
                 </h1>
             </div>
@@ -63,7 +63,7 @@ const ServiceDetail = () => {
             {
                 loading ?
                     (
-                        <div className="flex justify-center items-center font-semibold text-base">
+                        <div className="flex justify-center items-center font-THICCCBOI-Medium text-base">
                             <Loading />
                         </div>
                     )
@@ -71,24 +71,24 @@ const ServiceDetail = () => {
                     (
                         <div className='flex flex-col lg:flex-row lg:items-stretch lg:justify-between gap-5'>
                             <div className='lg:w-2/3 flex flex-col gap-5'>
-                                <div className='p-4 md:p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5'>
+                                <div className='p-4 md:p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5 font-THICCCBOI-Light'>
                                     <div className='flex flex-col gap-2'>
-                                        <p><strong>Name:</strong> {service?.name || '-'}</p>
-                                        <p><strong>Category:</strong> {service.category?.name || '-'}</p>
-                                        <p><strong>Label:</strong> {service.label?.name || '-'}</p>
-                                        <p><strong>Price Before:</strong> ${service.price || '-'}</p>
-                                        <p><strong>Price After:</strong> ${service.discounted_price || '-'}</p>
-                                        <p><strong>Discount:</strong> {service.discounted_price ? `${((1 - service.discounted_price / service.price) * 100).toFixed(0)}%` : '-'}</p>
-                                        <p><strong>Service Type:</strong> {service.service_type || '-'}</p>
-                                        <p><strong>Detail:</strong> {service.detail || '-'}</p>
-                                        <p><strong>Brief Detail:</strong> {service.brief_detail || '-'}</p>
-                                        <p><strong>Includes:</strong> {service.includes || '-'}</p>
-                                        <p><strong>Description:</strong> {service.description || '-'}</p>
-                                        <p><strong>Requirements:</strong> {service.requirements || '-'}</p>
-                                        <p><strong>Notes:</strong> {service.notes || '-'}</p>
-                                        <p><strong>Tags:</strong> {service.tags || '-'}</p>
-                                        <p><strong>Created At:</strong> {new Date(service.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
-                                        <p><strong>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Name:</strong> {service?.name || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Category:</strong> {service.category?.name || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Label:</strong> {service.label?.name || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Price Before:</strong> ${service.price || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Price After:</strong> ${service.discounted_price || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Discount:</strong> {service.discounted_price ? `${((1 - service.discounted_price / service.price) * 100).toFixed(0)}%` : '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Service Type:</strong> {service.service_type || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Detail:</strong> {service.detail || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Brief Detail:</strong> <span dangerouslySetInnerHTML={{ __html: service.brief_detail || '-' }} /></p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Includes:</strong> <span dangerouslySetInnerHTML={{ __html: service.includes || '-' }} /></p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Description:</strong> <span dangerouslySetInnerHTML={{ __html: service.description || '-' }} /></p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Requirements:</strong> <span dangerouslySetInnerHTML={{ __html: service.requirements || '-' }} /></p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Notes:</strong> <span dangerouslySetInnerHTML={{ __html: service.notes || '-' }} /></p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Tags:</strong> {service.tags || '-'}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Created At:</strong> {new Date(service.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
                                     </div>
                                 </div>
                             </div>

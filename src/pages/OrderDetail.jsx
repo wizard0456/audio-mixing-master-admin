@@ -23,6 +23,7 @@ const OrderDetail = () => {
     const [revisions, setRevisions] = useState([]);
     const { id } = useParams();
     const user = useSelector(selectUser);
+    const [isRevisionReaded, setIsRevisionReaded] = useState(false);
 
     useEffect(() => {
         const fetchOrderDetails = async () => {
@@ -248,6 +249,41 @@ const OrderDetail = () => {
         }
     };
 
+    useEffect(() => {
+        if (revisions.length > 0) {
+            revisions.map((revision) => {
+                console.log("hel")
+                if (revision.admin_is_read === "0") {
+                    setIsRevisionReaded(true)
+                }
+            })
+        }
+    }, [revisions])
+
+    async function handleRevisionReaded() {
+        toggleAccordion('servicesPurchased')
+        if (!isRevisionReaded) return;
+
+        try {
+            await axios({
+                method: "post",
+                url: `${API_Endpoint}admin/admin-flag/${id}`,
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                },
+                data: {
+                    admin_is_read: "1",
+                    type: "revision"
+                }
+            });
+
+            setRevisions(revisions.map((item) => item.admin_is_read === "0" ? { ...item, admin_is_read: "1" } : item))
+            setIsRevisionReaded(false)
+        } catch (error) {
+            console.error("Error reading revision", error);
+        }
+    }
+
     return (
         <>
             <section className='px-4 py-8 md:px-6 md:py-10'>
@@ -291,8 +327,6 @@ const OrderDetail = () => {
                                         </div>
                                     )}
 
-
-
                                     {/* Accordion for Order Status */}
                                     <div className='bg-gray-100 rounded-lg mb-5'>
                                         <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('orderStatus')}>
@@ -312,7 +346,8 @@ const OrderDetail = () => {
 
                                     {/* Accordion for Services Purchased with Revisions */}
                                     <div className='bg-gray-100 rounded-lg mb-5'>
-                                        <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('servicesPurchased')}>
+                                        <div className={`cursor-pointer p-5 flex justify-between items-center rounded-lg relative`} onClick={() => handleRevisionReaded()}>
+                                            {isRevisionReaded ? <span className='absolute -top-2 -left-3 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span> : null}
                                             <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
                                             <span className='text-2xl'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
                                         </div>
@@ -364,7 +399,7 @@ const OrderDetail = () => {
                                                                     )}
 
                                                                     <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
-                                                                        <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})) || 'No message provided'}
+                                                                        <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
                                                                     </p>
                                                                 </div>
                                                             ))}

@@ -7,6 +7,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { API_Endpoint } from '../utilities/constants';
 import { selectUser, logout } from '../reducers/authSlice';
 import Loading from '../components/Loading';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // Import Quill's CSS
 
 const ServiceForm = () => {
     const { id } = useParams();
@@ -94,7 +96,7 @@ const ServiceForm = () => {
                 monthly_discounted_price: serviceOption === 'monthly' ? data.discounted_price : 0,
                 image_url: '', // Set image_url to empty string by default
                 image: null,   // Set image to null by default
-                // is_active: data.is_active === "1" ? 1 : 0,
+                is_active: data.is_active === "1" ? 1 : 0,
             };
 
             setServiceData(updatedServiceData);
@@ -188,6 +190,10 @@ const ServiceForm = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        setServiceData(prevData => ({ ...prevData, [name]: value }));
+    };
+
+    const handleEditorChange = (name, value) => {
         setServiceData(prevData => ({ ...prevData, [name]: value }));
     };
 
@@ -326,57 +332,52 @@ const ServiceForm = () => {
                                     name="detail"
                                     value={serviceData.detail}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="w-full px-3 py-2 border rounded-md h-52 resize-none"
                                     required
                                 ></textarea>
                             </div>
                             <div className="mb-4 sm:mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="brief_detail">Brief Detail</label>
-                                <textarea
-                                    name="brief_detail"
+                                <ReactQuill
                                     value={serviceData.brief_detail}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                ></textarea>
+                                    onChange={(value) => handleEditorChange('brief_detail', value)}
+                                    className="bg-white h-40"
+                                />
                             </div>
                             <div className="mb-4 sm:mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="includes">Includes</label>
-                                <textarea
-                                    name="includes"
+                                <ReactQuill
                                     value={serviceData.includes}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                ></textarea>
+                                    onChange={(value) => handleEditorChange('includes', value)}
+                                    className="bg-white h-40"
+                                />
                             </div>
                         </div>
 
                         <div className='grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6'>
                             <div className="mb-4 sm:mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="description">Description</label>
-                                <textarea
-                                    name="description"
+                                <ReactQuill
                                     value={serviceData.description}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                ></textarea>
+                                    onChange={(value) => handleEditorChange('description', value)}
+                                    className="bg-white h-40"
+                                />
                             </div>
                             <div className="mb-4 sm:mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="requirements">Requirements</label>
-                                <textarea
-                                    name="requirements"
+                                <ReactQuill
                                     value={serviceData.requirements}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                ></textarea>
+                                    onChange={(value) => handleEditorChange('requirements', value)}
+                                    className="bg-white h-40"
+                                />
                             </div>
                             <div className="mb-4 sm:mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="notes">Notes</label>
-                                <textarea
-                                    name="notes"
+                                <ReactQuill
                                     value={serviceData.notes}
-                                    onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
-                                ></textarea>
+                                    onChange={(value) => handleEditorChange('notes', value)}
+                                    className="bg-white h-40"
+                                />
                             </div>
                         </div>
 

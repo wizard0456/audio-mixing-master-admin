@@ -252,12 +252,14 @@ const Orders = () => {
                             </thead>
                             <tbody>
                                 {orders.map(order => (
-                                    <tr key={order.id}>
+                                    <tr key={order.id} className='relative'>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
+                                            {Number(order?.notify) === 1 ? <span className='absolute -top-2 -left-0 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span> : null}
+
                                             <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{order.id}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{new Date(order.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
+                                            <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{new Date(order.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</div>
                                         </td>
                                         {user.role !== 'admin' ?
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
