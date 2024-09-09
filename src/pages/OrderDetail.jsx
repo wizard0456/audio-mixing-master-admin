@@ -61,6 +61,9 @@ const OrderDetail = () => {
         const formData = new FormData();
         formData.append('order_status', newStatus);
 
+        // Display loading toast
+        const toastId = toast.loading("Updating order status...");
+
         try {
             await axios(`${API_Endpoint}order/update-status/${id}`, {
                 method: 'POST',
@@ -79,8 +82,11 @@ const OrderDetail = () => {
                 }
             }));
 
-            toast.success("Order status updated successfully", {
-                position: "top-right",
+            // Update the toast to success
+            toast.update(toastId, {
+                render: "Order status updated successfully",
+                type: "success",
+                isLoading: false,
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
@@ -92,8 +98,12 @@ const OrderDetail = () => {
             });
         } catch (error) {
             console.error("Error updating order status", error);
-            toast.error("Error updating order status", {
-                position: "top-right",
+
+            // Update the toast to show error
+            toast.update(toastId, {
+                render: "Error updating order status",
+                type: "error",
+                isLoading: false,
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
