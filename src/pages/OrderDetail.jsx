@@ -12,7 +12,7 @@ import Loading from '../components/Loading';
 
 const OrderDetail = () => {
     const [order, setOrder] = useState(null);
-    const [files, setFiles] = useState([]);
+    const [selectedService, setSelectedService] = useState(null);
     const [generalModalIsOpen, setGeneralModalIsOpen] = useState(false);
     const [revisionModalIsOpen, setRevisionModalIsOpen] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState([]);
@@ -23,7 +23,6 @@ const OrderDetail = () => {
     const [revisions, setRevisions] = useState([]);
     const { id } = useParams();
     const user = useSelector(selectUser);
-    const [isRevisionReaded, setIsRevisionReaded] = useState(false);
 
     useEffect(() => {
         const fetchOrderDetails = async () => {
@@ -36,7 +35,6 @@ const OrderDetail = () => {
                 });
                 setOrder(response.data);
                 setOrderStatus(response.data.order.Order_status);
-                setFiles(JSON.parse(response.data.order.order_files));
                 setRevisions(response.data.revision)
             } catch (error) {
                 console.error("Error fetching order details", error);
@@ -123,10 +121,12 @@ const OrderDetail = () => {
 
     const closeGeneralModal = () => {
         setGeneralModalIsOpen(false);
-        setSelectedFiles([]);
+        setSelectedService(null);
+        setSelectedFiles([])
     };
 
     const handleGeneralFileUpload = (event) => {
+        console.log(event.target.files);
         setSelectedFiles(event.target.files);
     };
 
@@ -138,20 +138,26 @@ const OrderDetail = () => {
             formData.append('file[]', file);
         });
 
-        formData.append('order_status', orderStatus);
-
+        formData.append('order_item_id', selectedService);
         setIsUploading(true);
 
         try {
-            const response = await axios.post(`${API_Endpoint}order/update-status/${id}`, formData, {
+            const response = await axios.post(`${API_Endpoint}order/update-file/${id}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
 
-            setFiles(JSON.parse(response.data.order_files));
             setOrderStatus(response.data.Order_status.toString());
+            setOrder({
+                ...order, order_items: order.order_items.map((item) => {
+                    if (item.id === selectedService) {
+                        return response.data.order_item;
+                    }
+                    return item;
+                })
+            })
 
             toast.success("Files uploaded successfully", {
                 position: "top-right",
@@ -165,6 +171,7 @@ const OrderDetail = () => {
                 transition: Slide,
             });
             closeGeneralModal();
+            setSelectedService(null);
         } catch (error) {
             console.error("Error uploading files", error);
             toast.error("Error uploading files", {
@@ -196,12 +203,19 @@ const OrderDetail = () => {
     };
 
     const handleRevisionFileUpload = (event) => {
+        console.log(event.target.files);
         setSelectedFiles(event.target.files);
     };
 
     const handleRevisionFileSubmit = async (event) => {
         event.preventDefault();
-        if (!currentRevisionId) return;
+
+        if (!currentRevisionId || selectedFiles.length === 0) {
+            toast.error("Please select files before submitting");
+            return;
+        }
+
+        console.log(selectedFiles); // Add this to check if files are present
 
         const formData = new FormData();
         Array.from(selectedFiles).forEach((file) => {
@@ -209,7 +223,6 @@ const OrderDetail = () => {
         });
 
         setIsUploading(true);
-
         try {
             const response = await axios.post(`${API_Endpoint}revision-update/${currentRevisionId}`, formData, {
                 headers: {
@@ -218,8 +231,8 @@ const OrderDetail = () => {
                 },
             });
 
-            setRevisions(response.data.revision)
-            setOrderStatus(response.data.order_status.toString())
+            setRevisions(response.data.revision);
+            setOrderStatus(response.data.order_status.toString());
 
             toast.success("Revision files uploaded successfully", {
                 position: "top-right",
@@ -259,23 +272,9 @@ const OrderDetail = () => {
         }
     };
 
-    useEffect(() => {
-        if (revisions.length > 0) {
-            revisions.map((revision) => {
-                console.log("hel")
-                if (revision.admin_is_read === "0") {
-                    setIsRevisionReaded(true)
-                }
-            })
-        }
-    }, [revisions])
-
-    async function handleRevisionReaded() {
-        toggleAccordion('servicesPurchased')
-        if (!isRevisionReaded) return;
-
+    async function handleRevisionReaded(itemId) {
         try {
-            await axios({
+            const response = await axios({
                 method: "post",
                 url: `${API_Endpoint}admin/admin-flag/${id}`,
                 headers: {
@@ -283,16 +282,22 @@ const OrderDetail = () => {
                 },
                 data: {
                     admin_is_read: "1",
-                    type: "revision"
+                    type: "revision",
+                    order_item_id: itemId
+
                 }
             });
 
-            setRevisions(revisions.map((item) => item.admin_is_read === "0" ? { ...item, admin_is_read: "1" } : item))
-            setIsRevisionReaded(false)
+            setRevisions(response.data)
         } catch (error) {
             console.error("Error reading revision", error);
         }
     }
+
+
+    const getRevisionsForItem = (itemId) => {
+        return revisions.filter(revision => revision.service_id === itemId).sort((a, b) => a.id - b.id);
+    };
 
     return (
         <>
@@ -314,7 +319,7 @@ const OrderDetail = () => {
                         (
                             <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
                                 {/* Accordion for User Details */}
-                                <div className='w-full lg:w-2/3'>
+                                <div className='w-full'>
                                     {user && user.role === 'admin' && (
                                         <div className='bg-gray-100 rounded-lg mb-5'>
                                             <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('userDetails')}>
@@ -332,87 +337,132 @@ const OrderDetail = () => {
                                                         <p className='text-base'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
                                                         <p className='text-base'><span className='font-bold '>Payer Email:</span> {order.order.payer_email}</p>
                                                     </div>
+                                                    <hr className='my-4' />
+                                                    <p className='text-base'><span className='font-bold mr-2'>Payer Name:</span>
+                                                        <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base bg-white border border-gray-300 p-2 rounded-md">
+                                                            {Object.entries(orderStatusMapping).map(([key, value]) => (
+                                                                <option key={key} value={key}>{value}</option>
+                                                            ))}
+                                                        </select>
+                                                    </p>
                                                 </div>
                                             )}
                                         </div>
                                     )}
 
-                                    {/* Accordion for Order Status */}
-                                    <div className='bg-gray-100 rounded-lg mb-5'>
-                                        <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('orderStatus')}>
-                                            <h2 className='font-semibold text-base md:text-lg'>Order Status</h2>
-                                            <span className='text-2xl'>{activeAccordions.includes('orderStatus') ? '-' : '+'}</span>
-                                        </div>
-                                        {activeAccordions.includes('orderStatus') && (
-                                            <div className='p-5 flex items-center gap-5'>
-                                                <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base bg-white border border-gray-300 p-2 rounded-md">
-                                                    {Object.entries(orderStatusMapping).map(([key, value]) => (
-                                                        <option key={key} value={key}>{value}</option>
-                                                    ))}
-                                                </select>
-                                            </div>
-                                        )}
-                                    </div>
-
                                     {/* Accordion for Services Purchased with Revisions */}
-                                    <div className='bg-gray-100 rounded-lg mb-5'>
-                                        <div className={`cursor-pointer p-5 flex justify-between items-center rounded-lg relative`} onClick={() => handleRevisionReaded()}>
-                                            {isRevisionReaded ? <span className='absolute -top-2 -left-3 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span> : null}
+                                    <div className='mb-5'>
+                                        <div className={`p-5 flex justify-between items-center rounded-lg relative bg-gray-100 mb-5`} onClick={() => toggleAccordion('servicesPurchased')}>
                                             <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
                                             <span className='text-2xl'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
                                         </div>
                                         {activeAccordions.includes('servicesPurchased') && (
-                                            <ul className='p-5 flex flex-col gap-5'>
+                                            <ul className='flex flex-col gap-5'>
                                                 {order.order_items.map((item) => (
-                                                    <li key={item.id} className='bg-gray-100 rounded-lg'>
+                                                    <li key={item.id} className={`bg-gray-100 rounded-lg p-5 flex flex-col gap-5 ${(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? "cursor-pointer relative" : ""}`}
+                                                        onClick={() => {
+                                                            if (getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) {
+                                                                handleRevisionReaded(item.id)
+                                                            }
+                                                        }}>
+                                                        {(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? <span className='absolute -top-2 -left-3 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span> : null}
                                                         <div className='flex justify-between items-center'>
-                                                            <p className={`font-semibold text-sm md:text-base ${(user && user.role === 'admin') ? 'w-2/3' : "w-full"}`}>{item.name}</p>
+                                                            <h3 className={`text-xl font-bold`}>{item.name}</h3>
+                                                            <div className='flex gap-2'>
+                                                                <button onClick={() => {
+                                                                    openGeneralModal()
+                                                                    setSelectedService(item.id)
+                                                                }} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Deliverable Files</button>
+                                                            </div>
+                                                        </div>
+                                                        <div className='flex justify-between items-center bg-gray-200 rounded-lg p-5'>
+                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
+                                                                <span className='text-base font-bold'>Service Type</span>{item.service_type}
+                                                            </p>
+                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
+                                                                <span className='text-base font-bold'>Max Revisions</span>{item.max_revision}
+                                                            </p>
                                                             {user && user.role === 'admin' && (
-                                                                <p className='text-sm md:text-base bg-green-600 text-center text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</p>
+                                                                <>
+                                                                    <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
+                                                                        <span className='text-base font-bold'>Price</span>
+                                                                        <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.price} / {item.service_type.replace('_', ' ')}</span>
+                                                                    </p>
+                                                                </>
+                                                            )}
+                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
+                                                                <span className='text-base font-bold'>Quantity</span>{item.quantity}
+                                                            </p>
+                                                            {user && user.role === 'admin' && (
+                                                                <>
+                                                                    <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
+                                                                        <span className='text-base font-bold'>Total Price</span>
+                                                                        <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</span>
+                                                                    </p>
+                                                                </>
                                                             )}
                                                         </div>
 
-                                                        {/* Display Revisions for this Service */}
-                                                        {revisions.length > 0 && revisions
-                                                            .filter(rev => rev.service_id === item.service_id)
-                                                            .map((revision) => (
-                                                                <div key={revision.id} className='mt-4 p-4 bg-gray-200 rounded-lg'>
-                                                                    <div className='flex justify-between items-center mb-5'>
-                                                                        <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
+                                                        <div className={`flex ${JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 ? "justify-between" : "justify-end"} gap-5 items-start`}>
+                                                            {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && (
+                                                                <div className='p-4 bg-gray-200 rounded-lg w-full lg:w-1/2'>
+                                                                    {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4'>Deliverables Files {JSON.parse(item.deliverable_files)?.length}</p>}
 
-                                                                        <button
-                                                                            onClick={() => openRevisionModal(revision.id)}
-                                                                            className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
-                                                                        >
-                                                                            Upload Revision Files
-                                                                        </button>
-                                                                    </div>
-                                                                    <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
-                                                                        <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
-                                                                    </p>
-
-
-                                                                    {revision.files && JSON.parse(revision.files).length > 0 && (
-                                                                        <>
-                                                                            <h2 className='font-semibold text-sm md:text-base'>Uploaded Files</h2>
-
-                                                                            <ul className='mt-3'>
-                                                                                {JSON.parse(revision.files).map((file, index) => (
-                                                                                    <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
-                                                                                        <audio controls className='w-full'>
-                                                                                            <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
-                                                                                        </audio>
-                                                                                    </li>
-                                                                                ))}
-                                                                            </ul>
-                                                                        </>
-                                                                    )}
-
-                                                                    <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
-                                                                        <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
-                                                                    </p>
+                                                                    <ul className='flex flex-col gap-3'>
+                                                                        {JSON.parse(item.deliverable_files).map((file, index) => (
+                                                                            <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
+                                                                                <audio controls className='w-full'>
+                                                                                    <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                                                </audio>
+                                                                            </li>
+                                                                        ))}
+                                                                    </ul>
                                                                 </div>
-                                                            ))}
+
+                                                            )}
+
+                                                            <div className='flex flex-col gap-4 w-full lg:w-1/2'>
+                                                                {getRevisionsForItem(item.service_id)
+                                                                    .reverse()
+                                                                    .map((revision) => (
+                                                                        <div key={revision.id} className='p-4 bg-gray-200 rounded-lg'>
+                                                                            <div className='flex justify-between items-center mb-5'>
+                                                                                <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
+
+                                                                                <button
+                                                                                    onClick={() => openRevisionModal(revision.id)}
+                                                                                    className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
+                                                                                >
+                                                                                    Upload Revision Files
+                                                                                </button>
+                                                                            </div>
+                                                                            <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
+                                                                                <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
+                                                                            </p>
+
+                                                                            {revision.files && JSON.parse(revision.files).length > 0 && (
+                                                                                <>
+                                                                                    <h2 className='font-semibold text-sm md:text-base'>Uploaded Files</h2>
+                                                                                    <ul className='mt-3'>
+                                                                                        {JSON.parse(revision.files).map((file, index) => (
+                                                                                            <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
+                                                                                                <audio controls className='w-full'>
+                                                                                                    <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                                                                </audio>
+                                                                                            </li>
+                                                                                        ))}
+                                                                                    </ul>
+                                                                                </>
+                                                                            )}
+
+                                                                            <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg'>
+                                                                                <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
+                                                                            </p>
+                                                                        </div>
+                                                                    ))
+                                                                }
+                                                            </div>
+                                                        </div>
                                                     </li>
                                                 ))}
                                             </ul>
@@ -420,42 +470,6 @@ const OrderDetail = () => {
                                     </div>
                                 </div>
 
-
-                                {/* Accordion for File Share */}
-                                <div className='w-full lg:w-1/3'>
-                                    <div className='bg-gray-100 rounded-lg'>
-                                        <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('fileShare')}>
-                                            <h2 className='font-semibold text-base md:text-lg'>Deliverable Files</h2>
-                                            <span className='text-2xl'>{activeAccordions.includes('fileShare') ? '-' : '+'}</span>
-                                        </div>
-                                        {activeAccordions.includes('fileShare') && (
-                                            <>
-                                                <div className='p-5'>
-                                                    <div className='flex justify-between items-center mb-5'>
-                                                        <h2 className='font-semibold text-sm md:text-base'>Uploaded Files ({files?.length ? files.length : 0})</h2>
-                                                        <button onClick={openGeneralModal} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Files</button>
-                                                    </div>
-
-                                                    <ul className='flex flex-col gap-5 p-5 bg-gray-200 rounded-lg'>
-                                                        {files?.length > 0 ? (
-                                                            files.map((file, index) => (
-                                                                <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
-                                                                    <audio controls className='w-full'>
-                                                                        <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
-                                                                    </audio>
-                                                                </li>
-                                                            ))
-                                                        ) : (
-                                                            <li className='flex justify-between items-center p-1 bg-gray-200 rounded-lg'>
-                                                                <p className='text-sm md:text-base'>No files uploaded yet</p>
-                                                            </li>
-                                                        )}
-                                                    </ul>
-                                                </div>
-                                            </>
-                                        )}
-                                    </div>
-                                </div>
                             </div>
                         )
                 }

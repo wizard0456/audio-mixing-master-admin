@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../reducers/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectUser } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { Slide, toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
@@ -24,37 +24,58 @@ const Orders = () => {
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const user = useSelector(selectUser);
+    const dispatch = useDispatch();
+    const abortController = useRef(null); // Reference for AbortController
+
+    // State for handling date range
     const [dates, setDates] = useState([null, null]);
     const [orderType, setOrderType] = useState('');
 
     useEffect(() => {
+        
         fetchOrders(currentPage, filter, searchQuery);
     }, [currentPage, filter, orderType, searchQuery]);
 
     const fetchOrders = async (page, filter, searchQuery) => {
+        if (abortController.current) {
+            abortController.current.abort();
+        }
+
+        abortController.current = new AbortController();
+        
         setLoading(true);
+        let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}&order_type=${orderType}`;
+        if (filter !== 'all') {
+            url += `&order_status=${filter}`;
+        }
+        if (searchQuery) {
+            url += `&search=${searchQuery}`;
+        }
+
         try {
-            let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}&order_type=${orderType}`;
-            if (filter !== 'all') {
-                url += `&order_status=${filter}`;
-            }
-            if (searchQuery) {
-                url += `&search=${searchQuery}`;
-            }
             const response = await axios({
                 method: "get",
                 url: url,
                 headers: {
                     "Authorization": `Bearer ${user.token}`
-                }
+                },
+                signal: abortController.current.signal, // Pass the abort signal to axios
             });
             setOrders(response.data.data || []);
             setTotalPages(response.data.last_page || 1);
-        } catch (error) {
-            console.error("Error fetching orders", error);
-            setOrders([]);
-        } finally {
+            setCurrentPage(response.data.current_page);
             setLoading(false);
+        } catch (error) {
+            if (axios.isCancel(error)) {
+                console.log('Fetch aborted');
+            } else {
+                console.error("Error fetching orders", error);
+                setOrders([]);
+                setLoading(false);
+                if (error.response && error.response.status === 401) {
+                    dispatch(logout());
+                }
+            }
         }
     };
 
