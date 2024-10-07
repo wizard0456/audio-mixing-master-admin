@@ -18,7 +18,7 @@ const OrderDetail = () => {
     const [selectedFiles, setSelectedFiles] = useState([]);
     const [orderStatus, setOrderStatus] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
-    const [activeAccordions, setActiveAccordions] = useState(["userDetails", "orderStatus"]);
+    const [activeAccordions, setActiveAccordions] = useState(["userDetails", "servicesPurchased"]);
     const [currentRevisionId, setCurrentRevisionId] = useState(null);
     const [revisions, setRevisions] = useState([]);
     const { id } = useParams();
