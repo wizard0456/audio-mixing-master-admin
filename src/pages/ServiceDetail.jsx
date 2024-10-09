@@ -87,8 +87,8 @@ const ServiceDetail = () => {
                                         <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Requirements:</strong> <span dangerouslySetInnerHTML={{ __html: service.requirements || '-' }} /></p>
                                         <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Notes:</strong> <span dangerouslySetInnerHTML={{ __html: service.notes || '-' }} /></p>
                                         <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Tags:</strong> {service.tags || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Created At:</strong> {new Date(service.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Created At:</strong> {new Date(service.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                     </div>
                                 </div>
                             </div>
@@ -97,6 +97,18 @@ const ServiceDetail = () => {
                                 <div className='w-full flex justify-center items-center bg-[#F6F6F6] p-4 md:p-5 rounded-lg'>
                                     <img src={service.is_url == "1" ? service.image : `${Asset_Endpoint}${service.image}`} alt={service.name} className="max-h-60 md:max-h-80 w-full object-contain rounded-lg" />
                                 </div>
+
+                                <div key={service.id} className='p-4 md:p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5 font-THICCCBOI-Light'>
+                                    <h2 className='font-THICCCBOI-SemiBold text-xl md:text-2xl text-[#000000] text-center font-bold'>Variation</h2>
+                                </div>
+
+                                {service?.variation && service?.variation?.length > 0 &&
+                                    service?.variation?.map((service) => (
+                                        <div key={service?.id} className='flex flex-col gap-2 p-4 md:p-5 bg-[#F6F6F6] rounded-lg '>
+                                            <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Name:</strong> {service?.name || '-'}</p>
+                                            <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Price Before:</strong> ${service?.price || '-'}</p>
+                                        </div>
+                                    ))}
                             </div>
                         </div>
                     )
