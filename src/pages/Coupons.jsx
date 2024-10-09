@@ -295,7 +295,7 @@ const Coupons = () => {
                             <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
                             <p><strong>Products: </strong>
                                 {couponDetails.coupon_type == "1" ? (
-                                    (JSON.parse(JSON.parse(couponDetails.product_ids))).map(item => (
+                                    (JSON.parse(couponDetails.product_ids)).map(item => (
                                         <span key={item} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
                                             {services[services.findIndex(service => service.value == item)]?.label || 'Unknown Service/Product'}
                                         </span>

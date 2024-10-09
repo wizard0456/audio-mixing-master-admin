@@ -28,7 +28,7 @@ const CouponForm = () => {
     useEffect(() => {
         if (coupon && coupon.product_ids && services.length > 0) {
             // Parse and set selected services based on coupon data
-            const parsedServices = JSON.parse(JSON.parse(coupon.product_ids)).map(id => 
+            const parsedServices = JSON.parse(coupon.product_ids).map(id => 
                 services.find(service => service.value === id)
             );
             setSelectedServices(parsedServices);
@@ -136,7 +136,7 @@ const CouponForm = () => {
                         start_date: startDate,
                         end_date: endDate || null, // Send null if end date is not provided
                         is_active: isActive ? 1 : 0,
-                        product_ids: productIds.length > 0 ? JSON.stringify(productIds) : null,
+                        product_ids: productIds.length > 0 ? productIds : null,
                         coupon_type: orderType,
                     }
                 });
@@ -168,7 +168,7 @@ const CouponForm = () => {
                         start_date: startDate,
                         end_date: endDate || null, // Send null if end date is not provided
                         is_active: isActive ? 1 : 0,
-                        product_ids: productIds.length > 0 ? JSON.stringify(productIds) : null,
+                        product_ids: productIds.length > 0 ? productIds : null,
                         coupon_type: orderType,
                     }
                 });
@@ -187,7 +187,7 @@ const CouponForm = () => {
             navigate('/coupons'); // Navigate back to the coupons list
         } catch (error) {
             console.error(`Error ${coupon ? 'updating' : 'adding'} coupon`, error);
-            toast.error(`Error ${coupon ? 'updating' : 'adding'} coupon`, {
+            toast.error(error.response.data.error, {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
