@@ -316,6 +316,9 @@ const OrderDetail = () => {
                             </div>
                         )
                         :
+
+
+
                         (
                             <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
                                 {/* Accordion for User Details */}
@@ -337,141 +340,179 @@ const OrderDetail = () => {
                                                         <p className='text-base'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
                                                         <p className='text-base'><span className='font-bold '>Payer Email:</span> {order.order.payer_email}</p>
                                                     </div>
-                                                    <hr className='my-4' />
-                                                    <p className='text-base'><span className='font-bold mr-2'>Payer Name:</span>
-                                                        <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base bg-white border border-gray-300 p-2 rounded-md">
-                                                            {Object.entries(orderStatusMapping).map(([key, value]) => (
-                                                                <option key={key} value={key}>{value}</option>
-                                                            ))}
-                                                        </select>
-                                                    </p>
+
+                                                    {
+                                                        Number(order?.is_giftcard) != 1 && (
+                                                            <>
+                                                                <hr className='my-4' />
+                                                                <p className='text-base'><span className='font-bold mr-2'>Order Status:</span>
+                                                                    <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base bg-white border border-gray-300 p-2 rounded-md">
+                                                                        {Object.entries(orderStatusMapping).map(([key, value]) => (
+                                                                            <option key={key} value={key}>{value}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </p>
+                                                            </>
+                                                        )
+                                                    }
+
+
                                                 </div>
                                             )}
                                         </div>
                                     )}
 
-                                    {/* Accordion for Services Purchased with Revisions */}
-                                    <div className='mb-5'>
-                                        <div className={`p-5 flex justify-between items-center rounded-lg relative bg-gray-100 mb-5`} onClick={() => toggleAccordion('servicesPurchased')}>
-                                            <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
-                                            <span className='text-2xl'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
-                                        </div>
-                                        {activeAccordions.includes('servicesPurchased') && (
-                                            <ul className='flex flex-col gap-5'>
-                                                {order.order_items.map((item) => (
-                                                    <li key={item.id} className={`bg-gray-100 rounded-lg p-5 flex flex-col gap-5 ${(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? "cursor-pointer relative" : ""}`}
-                                                        onClick={() => {
-                                                            if (getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) {
-                                                                handleRevisionReaded(item.id)
-                                                            }
-                                                        }}>
-                                                        {(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? <span className='absolute -top-2 -left-3 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span> : null}
-                                                        <div className='flex justify-between items-center'>
-                                                            <h3 className={`text-xl font-bold`}>{item.name}</h3>
-                                                            <div className='flex gap-2'>
-                                                                <button onClick={() => {
-                                                                    openGeneralModal()
-                                                                    setSelectedService(item.id)
-                                                                }} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Deliverable Files</button>
+
+
+                                    {Number(order?.is_giftcard) == 1 ?
+                                        <div className='bg-gray-100 rounded-lg mb-5'>
+                                            <div className='p-5 flex justify-between items-center'>
+                                                <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
+                                            </div>
+
+                                            <ul>
+                                                {
+                                                    order.order_items.map((item) => (
+                                                        <li key={item.id} className='bg-gray-100 rounded-lg p-5 flex flex-col gap-5 '>
+                                                            <div className='flex justify-evenly gap-2'>
+                                                                <p className='text-base flex flex-col items-center'><span className='font-bold'>Name</span> {item.name}</p>
+                                                                <p className='text-base flex flex-col items-center'><span className='font-bold'>Price</span> {item.price}</p>
+                                                                <p className='text-base flex flex-col items-center'><span className='font-bold'>Quantity</span> {item.quantity}</p>
+                                                                <p className='text-base flex flex-col items-center'><span className='font-bold'>Total</span> {item.total_price}</p>
                                                             </div>
-                                                        </div>
-                                                        <div className='flex justify-between items-center bg-gray-200 rounded-lg p-5'>
-                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
-                                                                <span className='text-base font-bold'>Service Type</span>{item.service_type}
-                                                            </p>
-                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
-                                                                <span className='text-base font-bold'>Max Revisions</span>{item.max_revision}
-                                                            </p>
-                                                            {user && user.role === 'admin' && (
-                                                                <>
-                                                                    <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
-                                                                        <span className='text-base font-bold'>Price</span>
-                                                                        <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.price} / {item.service_type.replace('_', ' ')}</span>
-                                                                    </p>
-                                                                </>
-                                                            )}
-                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
-                                                                <span className='text-base font-bold'>Quantity</span>{item.quantity}
-                                                            </p>
-                                                            {user && user.role === 'admin' && (
-                                                                <>
-                                                                    <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
-                                                                        <span className='text-base font-bold'>Total Price</span>
-                                                                        <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</span>
-                                                                    </p>
-                                                                </>
-                                                            )}
-                                                        </div>
-
-                                                        <div className={`flex ${JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 ? "justify-between" : "justify-end"} gap-5 items-start`}>
-                                                            {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && (
-                                                                <div className='p-4 bg-gray-200 rounded-lg w-full lg:w-1/2'>
-                                                                    {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4'>Deliverables Files {JSON.parse(item.deliverable_files)?.length}</p>}
-
-                                                                    <ul className='flex flex-col gap-3'>
-                                                                        {JSON.parse(item.deliverable_files).map((file, index) => (
-                                                                            <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
-                                                                                <audio controls className='w-full'>
-                                                                                    <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
-                                                                                </audio>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
-
-                                                            )}
-
-                                                            <div className='flex flex-col gap-4 w-full lg:w-1/2'>
-                                                                {getRevisionsForItem(item.service_id)
-                                                                    .reverse()
-                                                                    .map((revision) => (
-                                                                        <div key={revision.id} className='p-4 bg-gray-200 rounded-lg'>
-                                                                            <div className='flex justify-between items-center mb-5'>
-                                                                                <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
-
-                                                                                <button
-                                                                                    onClick={() => openRevisionModal(revision.id)}
-                                                                                    className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
-                                                                                >
-                                                                                    Upload Revision Files
-                                                                                </button>
-                                                                            </div>
-                                                                            <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
-                                                                                <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
-                                                                            </p>
-
-                                                                            {revision.files && JSON.parse(revision.files).length > 0 && (
-                                                                                <>
-                                                                                    <h2 className='font-semibold text-sm md:text-base'>Uploaded Files</h2>
-                                                                                    <ul className='mt-3'>
-                                                                                        {JSON.parse(revision.files).map((file, index) => (
-                                                                                            <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
-                                                                                                <audio controls className='w-full'>
-                                                                                                    <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
-                                                                                                </audio>
-                                                                                            </li>
-                                                                                        ))}
-                                                                                    </ul>
-                                                                                </>
-                                                                            )}
-
-                                                                            <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg'>
-                                                                                <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
-                                                                            </p>
-                                                                        </div>
-                                                                    ))
-                                                                }
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                ))}
+                                                        </li>
+                                                    ))
+                                                }
                                             </ul>
-                                        )}
-                                    </div>
+
+                                        </div>
+                                        :
+                                        <div className='mb-5'>
+                                            <div className={`p-5 flex justify-between items-center rounded-lg relative bg-gray-100 mb-5`} onClick={() => toggleAccordion('servicesPurchased')}>
+                                                <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
+                                                <span className='text-2xl'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
+                                            </div>
+                                            {activeAccordions.includes('servicesPurchased') && (
+                                                <ul className='flex flex-col gap-5'>
+                                                    {order.order_items.map((item) => (
+                                                        <li key={item.id} className={`bg-gray-100 rounded-lg p-5 flex flex-col gap-5 ${(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? "cursor-pointer relative" : ""}`}
+                                                            onClick={() => {
+                                                                if (getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) {
+                                                                    handleRevisionReaded(item.id)
+                                                                }
+                                                            }}>
+                                                            {(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? <span className='absolute -top-2 -left-3 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span> : null}
+                                                            <div className='flex justify-between items-center'>
+                                                                <h3 className={`text-xl font-bold`}>{item.name}</h3>
+                                                                <div className='flex gap-2'>
+                                                                    <button onClick={() => {
+                                                                        openGeneralModal()
+                                                                        setSelectedService(item.id)
+                                                                    }} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Deliverable Files</button>
+                                                                </div>
+                                                            </div>
+                                                            <div className='flex justify-between items-center bg-gray-200 rounded-lg p-5'>
+                                                                <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
+                                                                    <span className='text-base font-bold'>Service Type</span>{item.service_type}
+                                                                </p>
+                                                                <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
+                                                                    <span className='text-base font-bold'>Max Revisions</span>{item.max_revision}
+                                                                </p>
+                                                                {user && user.role === 'admin' && (
+                                                                    <>
+                                                                        <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
+                                                                            <span className='text-base font-bold'>Price</span>
+                                                                            <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.price} / {item.service_type.replace('_', ' ')}</span>
+                                                                        </p>
+                                                                    </>
+                                                                )}
+                                                                <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
+                                                                    <span className='text-base font-bold'>Quantity</span>{item.quantity}
+                                                                </p>
+                                                                {user && user.role === 'admin' && (
+                                                                    <>
+                                                                        <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
+                                                                            <span className='text-base font-bold'>Total Price</span>
+                                                                            <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</span>
+                                                                        </p>
+                                                                    </>
+                                                                )}
+                                                            </div>
+
+                                                            <div className={`flex ${JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 ? "justify-between" : "justify-end"} gap-5 items-start`}>
+                                                                {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && (
+                                                                    <div className='p-4 bg-gray-200 rounded-lg w-full lg:w-1/2'>
+                                                                        {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4'>Deliverables Files {JSON.parse(item.deliverable_files)?.length}</p>}
+
+                                                                        <ul className='flex flex-col gap-3'>
+                                                                            {JSON.parse(item.deliverable_files).map((file, index) => (
+                                                                                <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
+                                                                                    <audio controls className='w-full'>
+                                                                                        <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                                                    </audio>
+                                                                                </li>
+                                                                            ))}
+                                                                        </ul>
+                                                                    </div>
+
+                                                                )}
+
+                                                                <div className='flex flex-col gap-4 w-full lg:w-1/2'>
+                                                                    {getRevisionsForItem(item.service_id)
+                                                                        .reverse()
+                                                                        .map((revision) => (
+                                                                            <div key={revision.id} className='p-4 bg-gray-200 rounded-lg'>
+                                                                                <div className='flex justify-between items-center mb-5'>
+                                                                                    <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
+
+                                                                                    <button
+                                                                                        onClick={() => openRevisionModal(revision.id)}
+                                                                                        className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg"
+                                                                                    >
+                                                                                        Upload Revision Files
+                                                                                    </button>
+                                                                                </div>
+                                                                                <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
+                                                                                    <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
+                                                                                </p>
+
+                                                                                {revision.files && JSON.parse(revision.files).length > 0 && (
+                                                                                    <>
+                                                                                        <h2 className='font-semibold text-sm md:text-base'>Uploaded Files</h2>
+                                                                                        <ul className='mt-3'>
+                                                                                            {JSON.parse(revision.files).map((file, index) => (
+                                                                                                <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
+                                                                                                    <audio controls className='w-full'>
+                                                                                                        <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                                                                    </audio>
+                                                                                                </li>
+                                                                                            ))}
+                                                                                        </ul>
+                                                                                    </>
+                                                                                )}
+
+                                                                                <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg'>
+                                                                                    <span className='font-medium'>Open At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
+                                                                                </p>
+                                                                            </div>
+                                                                        ))
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </div>
+                                    }
+
                                 </div>
 
                             </div>
                         )
+
+
+
                 }
             </section>
 

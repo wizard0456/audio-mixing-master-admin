@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaTrashAlt, FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
 import ReactPaginate from 'react-paginate';
@@ -21,6 +21,7 @@ const OrderForm = () => {
     const [orderToDelete, setOrderToDelete] = useState(null); // State to manage the order to be deleted
     const [isDeleting, setIsDeleting] = useState(false); // State to manage deletion loading
     const user = useSelector(selectUser);
+    const currentAudioRef = useRef(null); // Reference to keep track of the currently playing audio
 
     useEffect(() => {
         fetchOrders(currentPage + 1); // fetchOrders expects a 1-based page number
@@ -112,6 +113,15 @@ const OrderForm = () => {
         }
     };
 
+    const handleAudioPlay = (event) => {
+        // Pause any currently playing audio
+        if (currentAudioRef.current && currentAudioRef.current !== event.target) {
+            currentAudioRef.current.pause();
+        }
+        // Set the current audio to the one being played
+        currentAudioRef.current = event.target;
+    };
+
     return (
         <section className='px-4 py-8 md:px-6 md:py-10'>
             <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
@@ -144,10 +154,21 @@ const OrderForm = () => {
                         {selectedOrder.file_type == 1 ? (
                             <div className="my-4">
                                 <p><strong>Media File:</strong></p>
-                                <audio controls>
-                                    <source src={`${Asset_Endpoint}${selectedOrder.image}`} type="audio/mpeg" />
-                                    Your browser does not support the audio element.
-                                </audio>
+                                {
+                                    JSON.parse(selectedOrder.image).map((file, index) => (
+                                        <div key={index} className="my-4 w-full">
+                                            <audio
+                                                controls
+                                                className='w-full rounded'
+                                                onPlay={handleAudioPlay}
+                                            >
+                                                <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        </div>
+
+                                    ))
+                                }
                             </div>
                         ) : (
                             <div className="my-4">
@@ -182,7 +203,6 @@ const OrderForm = () => {
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Artist Name</th>
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Track Title</th>
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Services</th>
-                                        {/* <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Reference</th> */}
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Submition Time</th>
                                         <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Actions</th>
                                     </tr>
@@ -205,9 +225,6 @@ const OrderForm = () => {
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.services}</div>
                                             </td>
-                                            {/* <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
-                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.reference}</div>
-                                            </td> */}
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{new Date(order.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                                             </td>
