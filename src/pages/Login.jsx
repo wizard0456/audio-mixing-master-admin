@@ -7,12 +7,18 @@ import { addUser } from '../reducers/authSlice';
 import Logo from "../assets/images/logo.png";
 import { API_Endpoint } from '../utilities/constants';
 import { Slide, toast } from 'react-toastify';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importing eye icons
 
 const Login = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [loading, setLoading] = useState(false);
+    const [passwordShown, setPasswordShown] = useState(false); // State for showing/hiding password
+
+    const togglePasswordVisibility = () => {
+        setPasswordShown(!passwordShown);
+    };
 
     const handleLogin = async (data) => {
         setLoading(true);
@@ -87,13 +93,18 @@ const Login = () => {
                         <label className="block font-THICCCBOI-SemiBold text-[12px] leading-[14px] font-semibold mb-3" htmlFor="password">
                             Password
                         </label>
-                        <input
-                            type="password"
-                            id="password"
-                            {...register('password', { required: 'Password is required' })}
-                            className="font-normal font-THICCCBOI-Regular text-base leading-4 w-full px-5 py-4 bg-[#0F2005] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                            placeholder="Enter Password"
-                        />
+                        <div className="relative">
+                            <input
+                                type={passwordShown ? 'text' : 'password'}
+                                id="password"
+                                {...register('password', { required: 'Password is required' })}
+                                className="font-normal font-THICCCBOI-Regular text-base leading-4 w-full px-5 py-4 bg-[#0F2005] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                placeholder="Enter Password"
+                            />
+                            <button type="button" onClick={togglePasswordVisibility} className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5">
+                                {passwordShown ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
                     <div className='mb-5 text-right w-full font-THICCCBOI-Regular text-base leading-4 font-normal'>
