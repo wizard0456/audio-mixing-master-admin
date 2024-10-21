@@ -77,7 +77,7 @@ const OrderForm = () => {
         try {
             await axios({
                 method: 'delete',
-                url: `${API_Endpoint}upload/lead/generation/${orderToDelete.id}`,
+                url: `${API_Endpoint}upload/lead/gen/${orderToDelete.id}`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 }
@@ -150,7 +150,7 @@ const OrderForm = () => {
                         <p className='py-1'><strong>Track Title:</strong> {selectedOrder.tarck_title}</p>
                         <p className='py-1'><strong>Services:</strong> {selectedOrder.services}</p>
                         <p className='py-1'><strong>Reference:</strong> {selectedOrder.reference}</p>
-                        <p className='py-1'><strong>Received At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
+                        <p className='py-1'><strong>Received At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                         {selectedOrder.file_type == 1 ? (
                             <div className="my-4">
                                 <p><strong>Media File:</strong></p>
@@ -171,10 +171,12 @@ const OrderForm = () => {
                                 }
                             </div>
                         ) : (
-                            <div className="my-4">
-                                <p><strong>Media Link:</strong></p>
-                                <a href={selectedOrder.image} className='text-blue-500 underline hover:no-underline hover:text-blue-700' target="_blank" rel="noopener noreferrer">{selectedOrder.image}</a>
-                            </div>
+                            JSON.parse(selectedOrder.image).map((file,index) => (
+                                <div key={index} className="my-4">
+                                    <p><strong>Media Link:</strong></p>
+                                    <a href={file} className='text-blue-500 underline hover:no-underline hover:text-blue-700' target="_blank" rel="noopener noreferrer">{file}</a>
+                                </div>
+                            ))
                         )}
                         <button
                             type="button"
@@ -226,7 +228,7 @@ const OrderForm = () => {
                                                 <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{order.services}</div>
                                             </td>
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
-                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{new Date(order.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
+                                                <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap line-clamp-1'>{new Date(order.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</div>
                                             </td>
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>

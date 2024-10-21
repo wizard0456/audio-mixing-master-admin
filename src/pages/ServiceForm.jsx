@@ -103,8 +103,6 @@ const ServiceForm = () => {
                 one_time_discounted_price: serviceOption === 'oneTime' ? data.discounted_price : 0,
                 monthly_price: serviceOption === 'monthly' ? data.price : '',
                 monthly_discounted_price: serviceOption === 'monthly' ? data.discounted_price : 0,
-                image_url: '',
-                image: null,
                 is_active: data.is_active === "1" ? 1 : 0,
                 has_variation: data.is_variation === 1 || data.is_variation === '1',
             };
@@ -112,7 +110,7 @@ const ServiceForm = () => {
             delete updatedServiceData.is_variation;
 
             setServiceData(updatedServiceData);
-            setImageSource('1'); // Reset the image source to the default state (image URL)
+            setImageSource(data.is_url); // Reset the image source to the default state (image URL)
 
             // Set variations if they exist
             if (data.variation && data.variation.length > 0) {
@@ -159,20 +157,21 @@ const ServiceForm = () => {
             } else if (imageSource === '0' && serviceData.image) {
                 formData.append('image', serviceData.image);
             }
-            formData.append('is_url', imageSource);
+            formData.append('is_url', imageSource); // Append the is_url field
 
-            // Append other service data
+            // Append other service data, excluding image, image_url, is_url, and has_variation
             Object.keys(serviceData).forEach(key => {
-                if (key !== 'image' && key !== 'image_url' && key !== 'has_variation') {
+                if (key !== 'image' && key !== 'image_url' && key !== 'is_url' && key !== 'has_variation') {
                     formData.append(key, serviceData[key]);
                 }
             });
             formData.append('service_option', serviceOption);
-            formData.append('is_variation', serviceData.has_variation ? 1 : 0);
+
+            // Automatically set has_variation to false if service option is subscription
+            formData.append('is_variation', serviceOption === 'oneTime' ? (serviceData.has_variation ? 1 : 0) : 0);
 
             // Prepare variations data
-            if (serviceData.has_variation) {
-                // Independent variation pricing, no link to the product price
+            if (serviceOption === 'oneTime' && serviceData.has_variation) {
                 const formattedVariations = variations.map(variation => ({
                     id: variation.id, // This could be null for new variations
                     name: variation.name,
@@ -232,6 +231,7 @@ const ServiceForm = () => {
         }
     };
 
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setServiceData(prevData => ({ ...prevData, [name]: value }));
@@ -257,6 +257,7 @@ const ServiceForm = () => {
             } else if (selectedOption === 'monthly') {
                 updatedData.one_time_price = '';
                 updatedData.one_time_discounted_price = 0;
+                updatedData.has_variation = false; // Automatically disable variation for subscription services
             }
             return updatedData;
         });
@@ -402,71 +403,79 @@ const ServiceForm = () => {
                             </div>
                         )}
 
-                        <div className='w-full flex justify-between items-center mb-4 sm:mb-6'>
-                            {/* Toggle for Has Variations */}
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Has Variation?</label>
-                                <Toggle
-                                    checked={serviceData.has_variation}
-                                    onChange={handleVariationToggleChange}
-                                    icons={false}
-                                />
-                            </div>
-                            <button
-                                type="button"
-                                className="bg-blue-500 text-sm sm:text-base font-semibold text-white px-3 sm:px-4 py-2 rounded"
-                                onClick={addNewVariation}
-                            >
-                                Add New Variation
-                            </button>
-                        </div>
-                        {serviceData.has_variation && (
-                            <div className="mb-4 sm:mb-6">
-                                <h2 className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Product Variations</h2>
-                                {variations.map((variation, index) => (
-                                    <div key={index} className="flex justify-between gap-4 sm:gap-6 items-end">
-                                        <div className='flex-1'>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Name</label>
-                                            <input
-                                                type="text"
-                                                value={variation.name}
-                                                onChange={(e) => handleVariationChange(index, 'name', e.target.value)}
-                                                className="w-full px-3 py-2 border rounded-md"
-                                                required
-                                            />
-                                        </div>
-                                        <div className='flex-1'>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Price</label>
-                                            <input
-                                                type="number"
-                                                value={variation.price}
-                                                onChange={(e) => handleVariationChange(index, 'price', e.target.value)}
-                                                className="w-full px-3 py-2 border rounded-md"
-                                                required
-                                            />
-                                        </div>
-                                        <div className='flex-1'>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Discounted Price</label>
-                                            <input
-                                                type="number"
-                                                value={variation.discounted_price}
-                                                onChange={(e) => handleVariationChange(index, 'discounted_price', e.target.value)}
-                                                className="w-full px-3 py-2 border rounded-md"
-                                            />
-                                        </div>
-                                        <div className="flex items-center">
-                                            <button
-                                                type="button"
-                                                className="bg-red-500 text-sm sm:text-base font-semibold text-white px-3 py-3 rounded"
-                                                onClick={() => removeVariation(index)}
-                                            >
-                                                <FaTrashAlt size={20} />
-                                            </button>
-                                        </div>
+                        {/* Hide Variation Section for Subscription */}
+                        {serviceOption === 'oneTime' && (
+                            <>
+                                <div className='w-full flex justify-between items-center mb-4 sm:mb-6'>
+                                    {/* Toggle for Has Variations */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Has Variation?</label>
+                                        <Toggle
+                                            checked={serviceData.has_variation}
+                                            onChange={handleVariationToggleChange}
+                                            icons={false}
+                                        />
                                     </div>
-                                ))}
-                            </div>
+
+                                    {serviceData.has_variation && (
+                                        <button
+                                            type="button"
+                                            className="bg-blue-500 text-sm sm:text-base font-semibold text-white px-3 sm:px-4 py-2 rounded"
+                                            onClick={addNewVariation}
+                                        >
+                                            Add New Variation
+                                        </button>
+                                    )}
+                                </div>
+
+                                {serviceData.has_variation && (
+                                    <div className="mb-4 sm:mb-6">
+                                        <h2 className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Product Variations</h2>
+                                        {variations.map((variation, index) => (
+                                            <div key={index} className="flex justify-between gap-4 sm:gap-6 items-end">
+                                                <div className='flex-1'>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Name</label>
+                                                    <input
+                                                        type="text"
+                                                        value={variation.name}
+                                                        onChange={(e) => handleVariationChange(index, 'name', e.target.value)}
+                                                        className="w-full px-3 py-2 border rounded-md"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className='flex-1'>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Price</label>
+                                                    <input
+                                                        type="number"
+                                                        value={variation.price}
+                                                        onChange={(e) => handleVariationChange(index, 'price', e.target.value)}
+                                                        className="w-full px-3 py-2 border rounded-md"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div className='flex-1'>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Discounted Price</label>
+                                                    <input
+                                                        type="number"
+                                                        value={variation.discounted_price}
+                                                        onChange={(e) => handleVariationChange(index, 'discounted_price', e.target.value)}
+                                                        className="w-full px-3 py-2 border rounded-md"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center">
+                                                    <button
+                                                        type="button"
+                                                        className="bg-red-500 text-sm sm:text-base font-semibold text-white px-3 py-3 rounded"
+                                                        onClick={() => removeVariation(index)}
+                                                    >
+                                                        <FaTrashAlt size={20} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
                         )}
 
                         {/* Text Editors */}
