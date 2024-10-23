@@ -8,7 +8,6 @@ import { API_Endpoint } from '../utilities/constants';
 import { selectUser, logout } from '../reducers/authSlice';
 import Loading from '../components/Loading';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import Quill's CSS
 import { FaTrashAlt } from 'react-icons/fa';
 
 const ServiceForm = () => {

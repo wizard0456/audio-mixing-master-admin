@@ -9,7 +9,6 @@ import { logout, selectUser } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Toggle from 'react-toggle';
 import { Slide, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Loading from '../components/Loading';
 
 const Users = () => {

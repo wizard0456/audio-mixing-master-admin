@@ -122,6 +122,17 @@ const OrderForm = () => {
         currentAudioRef.current = event.target;
     };
 
+
+    async function handleDownloadAll(id) {
+        try {
+            const response = await axios.get(API_Endpoint + "download/zip/lead/" + id);
+
+            window.open(response.data.url, '_blank');
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    
     return (
         <section className='px-4 py-8 md:px-6 md:py-10'>
             <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
@@ -153,25 +164,36 @@ const OrderForm = () => {
                         <p className='py-1'><strong>Received At:</strong> {new Date(selectedOrder.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                         {selectedOrder.file_type == 1 ? (
                             <div className="my-4">
-                                <p><strong>Media File:</strong></p>
-                                {
-                                    JSON.parse(selectedOrder.image).map((file, index) => (
-                                        <div key={index} className="my-4 w-full">
+                                <div className='flex items-center justify-between'>
+                                    <p><strong>Media File:</strong></p>
+                                    <button
+                                        onClick={() => handleDownloadAll(selectedOrder.id)}
+                                        className="mr-2 bg-green-500 text-white px-2 py-1 rounded"
+                                    >Download All</button>
+                                </div>
+                                {JSON.parse(selectedOrder.image).map((file, index) => (
+                                    <div key={index} className="my-4 w-full">
+                                        <div className="flex items-center">
                                             <audio
                                                 controls
-                                                className='w-full rounded'
+                                                className='w-full rounded bg-transparent'
                                                 onPlay={handleAudioPlay}
                                             >
                                                 <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
                                                 Your browser does not support the audio element.
                                             </audio>
-                                        </div>
 
-                                    ))
-                                }
+                                            {/*
+                                            <button onClick={() => handleDownloadFile(file)} className="mr-2 bg-blue-500 text-white px-2 py-1 rounded">
+                                                Download
+                                            </button> 
+                                            */}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
-                            JSON.parse(selectedOrder.image).map((file,index) => (
+                            JSON.parse(selectedOrder.image).map((file, index) => (
                                 <div key={index} className="my-4">
                                     <p><strong>Media Link:</strong></p>
                                     <a href={file} className='text-blue-500 underline hover:no-underline hover:text-blue-700' target="_blank" rel="noopener noreferrer">{file}</a>

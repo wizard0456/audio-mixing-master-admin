@@ -5,7 +5,6 @@ import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Loading from '../components/Loading';
 import { FaAngleDoubleLeft } from "react-icons/fa";
 
