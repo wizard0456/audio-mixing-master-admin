@@ -160,7 +160,7 @@ const Users = () => {
     };
 
     const handleToggleActivation = async (userId, currentStatus) => {
-        const newStatus = currentStatus === '1' ? 0 : 1;
+        const newStatus = currentStatus == '1' ? 0 : 1;
         const id = toast.info('Updating status...', {
             position: "top-right",
             autoClose: 3000,
@@ -319,7 +319,7 @@ const Users = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-4 bg-[#F6F6F6]'>
                                                 <Toggle
-                                                    checked={user.is_active === '1'}
+                                                    checked={user.is_active == '1'}
                                                     onChange={() => handleToggleActivation(user.id, user.is_active)}
                                                     icons={false}
                                                     aria-label="User status"
@@ -331,7 +331,7 @@ const Users = () => {
                                                 <button onClick={() => openUserDetailsModal(user)} >
                                                     <FaEye />
                                                 </button>
-                                                <button onClick={() => openConfirmationModal(user)}><FaTrashAlt color="#FF0000" /></button>
+                                                {/* <button onClick={() => openConfirmationModal(user)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
                                     </tr>

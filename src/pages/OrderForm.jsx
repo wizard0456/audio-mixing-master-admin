@@ -255,7 +255,7 @@ const OrderForm = () => {
                                             <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
                                                 <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                     <button onClick={() => openModal(order)}><FaEye color="#4BC500" /></button>
-                                                    <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button>
+                                                    {/* <button onClick={() => openConfirmationModal(order)}><FaTrashAlt color="#FF0000" /></button> */}
                                                 </div>
                                             </td>
                                         </tr>

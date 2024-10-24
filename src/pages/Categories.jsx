@@ -81,7 +81,7 @@ const Categories = () => {
     const openModal = (category = null) => {
         if (category) {
             setCategoryName(category.name);
-            setIsActive(category.is_active === "1");
+            setIsActive(category.is_active == "1");
             setEditingCategory(category);
         } else {
             setCategoryName('');
@@ -237,7 +237,7 @@ const Categories = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm sm:text-base leading-6 pb-4 sm:pb-5">
                                             <div className='flex gap-2 sm:gap-3 px-3 py-5 sm:py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <button onClick={() => openModal(category)}><TiPencil color="#969696" /></button>
-                                                <button onClick={() => openConfirmationModal(category)}><FaTrashAlt color="#FF0000" /></button>
+                                                {/* <button onClick={() => openConfirmationModal(category)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
                                     </tr>

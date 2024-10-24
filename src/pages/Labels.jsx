@@ -86,7 +86,7 @@ const Labels = () => {
         if (label) {
             setLabelName(label.name);
             setLabelId(label.id);
-            setIsActive(label.is_active === "1");
+            setIsActive(label.is_active == "1");
         } else {
             setLabelName('');
             setLabelId(null);
@@ -277,7 +277,7 @@ const Labels = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <button onClick={() => openModal(label)}><TiPencil color="#969696" /></button>
-                                                <button onClick={() => openConfirmationModal(label)}><FaTrashAlt color="#FF0000" /></button>
+                                                {/* <button onClick={() => openConfirmationModal(label)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
                                     </tr>

@@ -222,7 +222,7 @@ const Samples = () => {
             name: sample ? sample.name : '',
             before_audio: sample ? sample.before_audio : null,
             after_audio: sample ? sample.after_audio : null,
-            is_active: sample ? sample.is_active === "1" : true
+            is_active: sample ? sample.is_active == "1" : true
         });
         setEditModalIsOpen(true);
     };

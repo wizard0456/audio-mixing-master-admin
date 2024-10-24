@@ -19,7 +19,7 @@ const CouponForm = () => {
     const [maxUses, setMaxUses] = useState(coupon ? coupon.max_uses : '');
     const [startDate, setStartDate] = useState(coupon ? coupon.start_date : new Date().toISOString().split('T')[0]);
     const [endDate, setEndDate] = useState(coupon ? coupon.end_date || '' : '');
-    const [isActive, setIsActive] = useState(coupon ? coupon.is_active === '1' : true);
+    const [isActive, setIsActive] = useState(coupon ? coupon.is_active == '1' : true);
     const [orderType, setOrderType] = useState(coupon ? Number(coupon.coupon_type) : 0);
     const [services, setServices] = useState([]);
     const [selectedServices, setSelectedServices] = useState([]);

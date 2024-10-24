@@ -256,7 +256,7 @@ const Engineers = () => {
     };
 
     const handleToggleActivation = async (engineerId, currentStatus) => {
-        const newStatus = currentStatus === '1' ? 0 : 1;
+        const newStatus = currentStatus == '1' ? 0 : 1;
         const id = toast.info('Updating status...', {
             position: "top-right",
             autoClose: 3000,
@@ -520,7 +520,7 @@ const Engineers = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-4 bg-[#F6F6F6]'>
                                                 <Toggle
-                                                    checked={engineer.is_active === '1'}
+                                                    checked={engineer.is_active == '1'}
                                                     onChange={() => handleToggleActivation(engineer.id, engineer.is_active)}
                                                     icons={false}
                                                     aria-label="Engineer status"
@@ -532,7 +532,7 @@ const Engineers = () => {
                                                 <button onClick={() => openEngineerDetailsModal(engineer)} >
                                                     <FaEye />
                                                 </button>
-                                                <button onClick={() => openConfirmationModal(engineer)}><FaTrashAlt color="#FF0000" /></button>
+                                                {/* <button onClick={() => openConfirmationModal(engineer)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
                                     </tr>

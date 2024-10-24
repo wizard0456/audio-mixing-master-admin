@@ -192,7 +192,7 @@ const ContactForm = () => {
                       <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
                         <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                           <button onClick={() => openModal(lead)}><FaEye color="#4BC500" /></button>
-                          <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
+                          {/* <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button> */}
                         </div>
                       </td>
                     </tr>

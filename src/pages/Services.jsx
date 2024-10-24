@@ -134,7 +134,7 @@ const Services = () => {
 
     const handleStatusToggle = async (serviceId, currentStatus) => {
         try {
-            const newStatus = currentStatus === "1" ? "0" : "1";
+            const newStatus = currentStatus == "1" ? "0" : "1";
             await axios({
                 method: 'post',
                 url: `${API_Endpoint}admin/services/${serviceId}/status?status=${newStatus}`,
@@ -254,7 +254,7 @@ const Services = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-4 bg-[#F6F6F6] text-nowrap'>
                                                 <Toggle
-                                                    checked={service.is_active === "1"}
+                                                    checked={service.is_active == "1"}
                                                     onChange={() => handleStatusToggle(service.id, service.is_active)}
                                                     icons={false}
                                                 />
@@ -264,7 +264,7 @@ const Services = () => {
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <Link to={`/edit-service/${service.id}`}><FaEdit /></Link>
                                                 <Link to={`/service-detail/${service.id}`}><FaEye /></Link>
-                                                <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button>
+                                                {/* <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
                                     </tr>

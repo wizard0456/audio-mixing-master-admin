@@ -197,25 +197,25 @@ const Orders = () => {
                         All Orders
                     </button>
                     <button
-                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '0' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter == '0' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('0')}
                     >
                         Pending
                     </button>
                     <button
-                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '1' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter == '1' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('1')}
                     >
                         Processing
                     </button>
                     <button
-                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '2' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter == '2' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('2')}
                     >
                         Delivered
                     </button>
                     <button
-                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter === '3' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
+                        className={`font-THICCCBOI-Medium font-medium text-sm md:text-[14px] px-4 md:px-5 py-2 rounded-lg ${filter == '3' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
                         onClick={() => handleFilterChange('3')}
                     >
                         Cancelled

@@ -86,7 +86,7 @@ const Tags = () => {
         if (tag) {
             setTagName(tag.tag_name);
             setTagId(tag.id);
-            setIsActive(tag.is_active === "1");
+            setIsActive(tag.is_active == "1");
         } else {
             setTagName('');
             setTagId(null);
@@ -277,7 +277,7 @@ const Tags = () => {
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
                                                 <button onClick={() => openModal(tag)}><TiPencil color="#969696" /></button>
-                                                <button onClick={() => openConfirmationModal(tag)}><FaTrashAlt color="#FF0000" /></button>
+                                                {/* <button onClick={() => openConfirmationModal(tag)}><FaTrashAlt color="#FF0000" /></button> */}
                                             </div>
                                         </td>
                                     </tr>

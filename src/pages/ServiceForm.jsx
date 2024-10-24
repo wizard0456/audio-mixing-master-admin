@@ -9,6 +9,7 @@ import { selectUser, logout } from '../reducers/authSlice';
 import Loading from '../components/Loading';
 import ReactQuill from 'react-quill';
 import { FaTrashAlt } from 'react-icons/fa';
+import 'react-quill/dist/quill.snow.css'; 
 
 const ServiceForm = () => {
     const { id } = useParams();
@@ -102,8 +103,8 @@ const ServiceForm = () => {
                 one_time_discounted_price: serviceOption === 'oneTime' ? data.discounted_price : 0,
                 monthly_price: serviceOption === 'monthly' ? data.price : '',
                 monthly_discounted_price: serviceOption === 'monthly' ? data.discounted_price : 0,
-                is_active: data.is_active === "1" ? 1 : 0,
-                has_variation: data.is_variation === 1 || data.is_variation === '1',
+                is_active: data.is_active == "1" ? 1 : 0,
+                has_variation: data.is_variation == 1 || data.is_variation == '1',
             };
 
             delete updatedServiceData.is_variation;
@@ -151,7 +152,7 @@ const ServiceForm = () => {
             const formData = new FormData();
 
             // Handle image
-            if (imageSource === '1' && serviceData.image_url) {
+            if (imageSource == '1' && serviceData.image_url) {
                 formData.append('image', serviceData.image_url);
             } else if (imageSource === '0' && serviceData.image) {
                 formData.append('image', serviceData.image);
@@ -263,14 +264,14 @@ const ServiceForm = () => {
     };
 
     const handleToggleChange = () => {
-        setServiceData(prevData => ({ ...prevData, is_active: prevData.is_active === 1 ? 0 : 1 }));
+        setServiceData(prevData => ({ ...prevData, is_active: prevData.is_active == 1 ? 0 : 1 }));
     };
 
     const handleImageSourceChange = (source) => {
         setImageSource(source);
         setServiceData(prevData => ({
             ...prevData,
-            image_url: source === '1' ? '' : prevData.image_url,
+            image_url: source == '1' ? '' : prevData.image_url,
             image: source === '0' ? null : prevData.image,
         }));
     };
@@ -588,7 +589,7 @@ const ServiceForm = () => {
                         <div className="mb-4 sm:mb-6">
                             <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2">Active Status</label>
                             <Toggle
-                                checked={serviceData.is_active === 1}
+                                checked={serviceData.is_active == 1}
                                 onChange={handleToggleChange}
                                 icons={false}
                             />
@@ -609,7 +610,7 @@ const ServiceForm = () => {
                                         type="radio"
                                         name="image_source"
                                         value="1"
-                                        checked={imageSource === '1'}
+                                        checked={imageSource == '1'}
                                         onChange={() => handleImageSourceChange('1')}
                                     />{' '}
                                     Image Link
@@ -627,7 +628,7 @@ const ServiceForm = () => {
                             </div>
                         </div>
 
-                        {imageSource === '1' ? (
+                        {imageSource == '1' ? (
                             <div className="mb-4 sm:mb-6">
                                 <label className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2" htmlFor="image_url">Image Link</label>
                                 <input
