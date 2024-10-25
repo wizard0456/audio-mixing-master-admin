@@ -5,7 +5,8 @@ import { Slide, toast } from 'react-toastify';
 import { useParams } from 'react-router-dom'; 
 import Logo from "../assets/images/logo.png";
 import { API_Endpoint } from '../utilities/constants';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Importing eye icons
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import BG from "../assets/images/home-banner-shadows-bg.webp";
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -63,8 +64,9 @@ const ResetPassword = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
-            <div className="bg-[#091600] text-white rounded-[20px] p-8 w-full max-w-md">
+        <div className="flex items-center justify-center min-h-screen bg-[#091600] px-4 relative">
+            <img src={BG} alt="Background" className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-full object-cover" />
+            <div className="bg-[#091600] text-white rounded-[20px] p-8 w-full max-w-md relative z-30">
                 <div className="flex justify-center mb-12">
                     <div className="text-center">
                         <div className="flex items-center justify-center mb-4">
