@@ -128,7 +128,26 @@ const OrderDetail = () => {
     };
 
     const handleGeneralFileUpload = (event) => {
-        setSelectedFiles(event.target.files);
+        const files = Array.from(event.target.files);
+        const invalidFiles = files.filter(file => !file.type.startsWith('audio/'));
+        
+        if (invalidFiles.length > 0) {
+            toast.error("Please upload audio files only", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            event.target.value = ''; // Clear the file input
+            return;
+        }
+        
+        setSelectedFiles(files);
     };
 
     const handleGeneralFileSubmit = async (event) => {
@@ -201,7 +220,26 @@ const OrderDetail = () => {
     };
 
     const handleRevisionFileUpload = (event) => {
-        setSelectedFiles(event.target.files);
+        const files = Array.from(event.target.files);
+        const invalidFiles = files.filter(file => !file.type.startsWith('audio/'));
+        
+        if (invalidFiles.length > 0) {
+            toast.error("Please upload audio files only", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            event.target.value = ''; // Clear the file input
+            return;
+        }
+        
+        setSelectedFiles(files);
     };
 
     const handleRevisionFileSubmit = async (event) => {
@@ -490,7 +528,7 @@ const OrderDetail = () => {
                     <form onSubmit={handleGeneralFileSubmit} className="space-y-4">
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="files">Select Files</label>
-                            <input type="file" name="files" className="w-full px-3 py-2 border rounded-md" multiple onChange={handleGeneralFileUpload} required />
+                            <input type="file" name="files" className="w-full px-3 py-2 border rounded-md" multiple accept="audio/*" onChange={handleGeneralFileUpload} required />
                         </div>
                         <div className="flex justify-end space-x-4">
                             <button type="button" className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded" onClick={closeGeneralModal}>
