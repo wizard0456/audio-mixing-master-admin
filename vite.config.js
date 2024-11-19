@@ -10,6 +10,15 @@ export default defineConfig({
     include: ["@wojtekmaj/react-daterange-picker"]
   },
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://backend.zetdigitesting.online/api/',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
   resolve: {
     alias: [
       {
