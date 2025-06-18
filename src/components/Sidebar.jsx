@@ -29,7 +29,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
           </div>
         </div>
 
-        <ul className="sidebar-list flex flex-col gap-5 pr-2 mx-5 overflow-auto">
+        <ul className="sidebar-list flex flex-col gap-2 pr-2 mx-5 overflow-auto">
           {user.role == 'admin' && (
             <li className="block w-full">
               <NavLink to="/users" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}>
