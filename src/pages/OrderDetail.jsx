@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { FaAngleDoubleLeft } from "react-icons/fa";
 import axios from 'axios';
 import Modal from 'react-modal';
 import { useParams } from 'react-router-dom';
-import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
+import { API_Endpoint } from '../utilities/constants';
 import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ const OrderDetail = () => {
     const [selectedService, setSelectedService] = useState(null);
     const [generalModalIsOpen, setGeneralModalIsOpen] = useState(false);
     const [revisionModalIsOpen, setRevisionModalIsOpen] = useState(false);
-    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [selectedLinks, setSelectedLinks] = useState(['']);
     const [orderStatus, setOrderStatus] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [activeAccordions, setActiveAccordions] = useState(["userDetails", "servicesPurchased"]);
@@ -23,7 +23,6 @@ const OrderDetail = () => {
     const [revisions, setRevisions] = useState([]);
     const { id } = useParams();
     const user = useSelector(selectUser);
-    const currentAudioRef = useRef(null); // Ref to store the current playing audio
 
     useEffect(() => {
         const fetchOrderDetails = async () => {
@@ -44,13 +43,6 @@ const OrderDetail = () => {
 
         fetchOrderDetails();
     }, [id]);
-
-    const handleAudioPlay = (audio) => {
-        if (currentAudioRef.current && currentAudioRef.current !== audio) {
-            currentAudioRef.current.pause(); // Pause previously playing audio
-        }
-        currentAudioRef.current = audio; // Set new audio as current
-    };
 
     const orderStatusMapping = {
         0: "Pending",
@@ -124,15 +116,40 @@ const OrderDetail = () => {
     const closeGeneralModal = () => {
         setGeneralModalIsOpen(false);
         setSelectedService(null);
-        setSelectedFiles([]);
+        setSelectedLinks(['']);
     };
 
-    const handleGeneralFileUpload = (event) => {
-        const files = Array.from(event.target.files);
-        const invalidFiles = files.filter(file => !file.type.startsWith('audio/'));
-        
-        if (invalidFiles.length > 0) {
-            toast.error("Please upload audio files only", {
+    const handleLinkChange = (index, value) => {
+        const newLinks = [...selectedLinks];
+        newLinks[index] = value;
+        setSelectedLinks(newLinks);
+    };
+
+    const addLinkField = () => {
+        setSelectedLinks([...selectedLinks, '']);
+    };
+
+    const removeLinkField = (index) => {
+        const newLinks = selectedLinks.filter((_, i) => i !== index);
+        setSelectedLinks(newLinks.length > 0 ? newLinks : ['']);
+    };
+
+    const validateUrl = (url) => {
+        try {
+            new URL(url);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    const handleGeneralLinkSubmit = async (event) => {
+        event.preventDefault();
+
+        const validLinks = selectedLinks.filter(link => link.trim() !== '');
+
+        if (validLinks.length === 0) {
+            toast.error("Please provide at least one valid link", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -143,29 +160,34 @@ const OrderDetail = () => {
                 theme: "light",
                 transition: Slide,
             });
-            event.target.value = ''; // Clear the file input
             return;
         }
-        
-        setSelectedFiles(files);
-    };
 
-    const handleGeneralFileSubmit = async (event) => {
-        event.preventDefault();
+        const invalidLinks = validLinks.filter(link => !validateUrl(link));
+        if (invalidLinks.length > 0) {
+            toast.error("Please provide valid URLs only", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            return;
+        }
 
-        const formData = new FormData();
-        Array.from(selectedFiles).forEach((file) => {
-            formData.append('file[]', file);
-        });
-
-        formData.append('order_item_id', selectedService);
         setIsUploading(true);
 
         try {
-            const response = await axios.post(`${API_Endpoint}order/update-file/${id}`, formData, {
+            const response = await axios.post(`${API_Endpoint}order/deliverable/${id}`, {
+                links: validLinks,
+                order_item_id: selectedService,
+            }, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
-                    'Content-Type': 'multipart/form-data',
                 },
             });
 
@@ -179,7 +201,7 @@ const OrderDetail = () => {
                 })
             });
 
-            toast.success("Files uploaded successfully", {
+            toast.success("Links uploaded successfully", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -192,7 +214,7 @@ const OrderDetail = () => {
             });
             closeGeneralModal();
         } catch (error) {
-            toast.error("Error uploading files", {
+            toast.error("Error uploading links", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -215,16 +237,21 @@ const OrderDetail = () => {
 
     const closeRevisionModal = () => {
         setRevisionModalIsOpen(false);
-        setSelectedFiles([]);
+        setSelectedLinks(['']);
         setCurrentRevisionId(null);
     };
 
-    const handleRevisionFileUpload = (event) => {
-        const files = Array.from(event.target.files);
-        const invalidFiles = files.filter(file => !file.type.startsWith('audio/'));
-        
-        if (invalidFiles.length > 0) {
-            toast.error("Please upload audio files only", {
+    const handleRevisionLinkSubmit = async (event) => {
+        event.preventDefault();
+
+        if (!currentRevisionId) {
+            toast.error("Revision ID not found");
+            return;
+        }
+        const validLinks = selectedLinks.filter(link => link.trim() !== '');
+
+        if (validLinks.length === 0) {
+            toast.error("Please provide at least one valid link", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -235,39 +262,37 @@ const OrderDetail = () => {
                 theme: "light",
                 transition: Slide,
             });
-            event.target.value = ''; // Clear the file input
-            return;
-        }
-        
-        setSelectedFiles(files);
-    };
-
-    const handleRevisionFileSubmit = async (event) => {
-        event.preventDefault();
-
-        if (!currentRevisionId || selectedFiles.length === 0) {
-            toast.error("Please select files before submitting");
             return;
         }
 
-        const formData = new FormData();
-        Array.from(selectedFiles).forEach((file) => {
-            formData.append('files[]', file);
-        });
+        const invalidLinks = validLinks.filter(link => !validateUrl(link));
+        if (invalidLinks.length > 0) {
+            toast.error("Please provide valid URLs only", {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            return;
+        }
 
         setIsUploading(true);
         try {
-            const response = await axios.post(`${API_Endpoint}revision-update/${currentRevisionId}`, formData, {
+            const response = await axios.post(`${API_Endpoint}revision/deliverable/${currentRevisionId}`, { links: validLinks }, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
-                    'Content-Type': 'multipart/form-data',
                 },
             });
 
             setRevisions(response.data.revision);
             setOrderStatus(response.data.order_status.toString());
 
-            toast.success("Revision files uploaded successfully", {
+            toast.success("Revision links uploaded successfully", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -280,7 +305,7 @@ const OrderDetail = () => {
             });
             closeRevisionModal();
         } catch (error) {
-            toast.error("Error uploading revision files", {
+            toast.error("Error uploading revision links", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -424,7 +449,7 @@ const OrderDetail = () => {
                                                                 <button onClick={() => {
                                                                     openGeneralModal();
                                                                     setSelectedService(item.id);
-                                                                }} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Deliverable Files</button>
+                                                                }} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Deliverable Links</button>
                                                             </div>
                                                         </div>
                                                         <div className='flex justify-between items-center bg-gray-200 rounded-lg p-5'>
@@ -458,14 +483,26 @@ const OrderDetail = () => {
                                                         <div className={`flex ${JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 ? "justify-between" : "justify-end"} gap-5 items-start`}>
                                                             {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && (
                                                                 <div className='p-4 bg-gray-200 rounded-lg w-full lg:w-1/2'>
-                                                                    {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4'>Deliverables Files {JSON.parse(item.deliverable_files)?.length}</p>}
+                                                                    {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4'>Deliverable Links ({JSON.parse(item.deliverable_files)?.length})</p>}
 
                                                                     <ul className='flex flex-col gap-3'>
-                                                                        {JSON.parse(item.deliverable_files).map((file, index) => (
-                                                                            <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg'>
-                                                                                <audio controls className='w-full' onPlay={(e) => handleAudioPlay(e.target)}>
-                                                                                    <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
-                                                                                </audio>
+                                                                        {JSON.parse(item.deliverable_files).map((link, index) => (
+                                                                            <li key={index} className='flex justify-between items-center p-3 bg-gray-100 rounded-lg'>
+                                                                                <a
+                                                                                    href={link}
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    className='text-blue-600 hover:text-blue-800 underline break-all'
+                                                                                >
+                                                                                    {link.length > 50 ? `${link.substring(0, 50)}...` : link}
+                                                                                </a>
+                                                                                <button
+                                                                                    onClick={() => navigator.clipboard.writeText(link)}
+                                                                                    className='ml-2 text-sm bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600'
+                                                                                    title="Copy link"
+                                                                                >
+                                                                                    Copy
+                                                                                </button>
                                                                             </li>
                                                                         ))}
                                                                     </ul>
@@ -481,7 +518,7 @@ const OrderDetail = () => {
                                                                                 <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
 
                                                                                 <button onClick={() => openRevisionModal(revision.id)} className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg">
-                                                                                    Upload Revision Files
+                                                                                    Upload Revision Links
                                                                                 </button>
                                                                             </div>
                                                                             <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
@@ -490,13 +527,25 @@ const OrderDetail = () => {
 
                                                                             {revision.files && JSON.parse(revision.files).length > 0 && (
                                                                                 <>
-                                                                                    <h2 className='font-semibold text-sm md:text-base'>Uploaded Files</h2>
+                                                                                    <h2 className='font-semibold text-sm md:text-base'>Uploaded Links</h2>
                                                                                     <ul className='mt-3'>
-                                                                                        {JSON.parse(revision.files).map((file, index) => (
-                                                                                            <li key={index} className='flex justify-between items-center p-2 bg-gray-100 rounded-lg mb-2'>
-                                                                                                <audio controls className='w-full' onPlay={(e) => handleAudioPlay(e.target)}>
-                                                                                                    <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
-                                                                                                </audio>
+                                                                                        {JSON.parse(revision.files).map((link, index) => (
+                                                                                            <li key={index} className='flex justify-between items-center p-3 bg-gray-100 rounded-lg mb-2'>
+                                                                                                <a
+                                                                                                    href={link}
+                                                                                                    target="_blank"
+                                                                                                    rel="noopener noreferrer"
+                                                                                                    className='text-blue-600 hover:text-blue-800 underline break-all'
+                                                                                                >
+                                                                                                    {link.length > 50 ? `${link.substring(0, 50)}...` : link}
+                                                                                                </a>
+                                                                                                <button
+                                                                                                    onClick={() => navigator.clipboard.writeText(link)}
+                                                                                                    className='ml-2 text-sm bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600'
+                                                                                                    title="Copy link"
+                                                                                                >
+                                                                                                    Copy
+                                                                                                </button>
                                                                                             </li>
                                                                                         ))}
                                                                                     </ul>
@@ -521,42 +570,96 @@ const OrderDetail = () => {
                     )}
             </section>
 
-            {/* General File Upload Modal */}
-            <Modal isOpen={generalModalIsOpen} onRequestClose={closeGeneralModal} contentLabel="Upload Files">
+            {/* General Link Upload Modal */}
+            <Modal isOpen={generalModalIsOpen} onRequestClose={closeGeneralModal} contentLabel="Upload Links">
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">Upload Files</h2>
-                    <form onSubmit={handleGeneralFileSubmit} className="space-y-4">
+                    <h2 className="text-2xl mb-4 font-semibold">Upload Deliverable Links</h2>
+                    <form onSubmit={handleGeneralLinkSubmit} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="files">Select Files</label>
-                            <input type="file" name="files" className="w-full px-3 py-2 border rounded-md" multiple accept="audio/*" onChange={handleGeneralFileUpload} required />
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Deliverable Links</label>
+                            {selectedLinks.map((link, index) => (
+                                <div key={index} className="flex gap-2 mb-2">
+                                    <input
+                                        type="url"
+                                        value={link}
+                                        onChange={(e) => handleLinkChange(index, e.target.value)}
+                                        placeholder="https://example.com/your-deliverable-link"
+                                        className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        required={index === 0 || link.trim() !== ''}
+                                    />
+                                    {selectedLinks.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeLinkField(index)}
+                                            className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={addLinkField}
+                                className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 mt-2"
+                            >
+                                Add Another Link
+                            </button>
                         </div>
                         <div className="flex justify-end space-x-4">
                             <button type="button" className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded" onClick={closeGeneralModal}>
                                 Close
                             </button>
                             <button type="submit" className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg" disabled={isUploading}>
-                                {isUploading ? 'Uploading...' : 'Upload'}
+                                {isUploading ? 'Uploading...' : 'Upload Links'}
                             </button>
                         </div>
                     </form>
                 </div>
             </Modal>
 
-            {/* Revision File Upload Modal */}
-            <Modal isOpen={revisionModalIsOpen} onRequestClose={closeRevisionModal} contentLabel="Upload Revision Files">
+            {/* Revision Link Upload Modal */}
+            <Modal isOpen={revisionModalIsOpen} onRequestClose={closeRevisionModal} contentLabel="Upload Revision Links">
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">Upload Revision Files</h2>
-                    <form onSubmit={handleRevisionFileSubmit} className="space-y-4">
+                    <h2 className="text-2xl mb-4 font-semibold">Upload Revision Links</h2>
+                    <form onSubmit={handleRevisionLinkSubmit} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="files">Select Files</label>
-                            <input type="file" name="files" className="w-full px-3 py-2 border rounded-md" multiple onChange={handleRevisionFileUpload} required />
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Revision Links</label>
+                            {selectedLinks.map((link, index) => (
+                                <div key={index} className="flex gap-2 mb-2">
+                                    <input
+                                        type="url"
+                                        value={link}
+                                        onChange={(e) => handleLinkChange(index, e.target.value)}
+                                        placeholder="https://example.com/your-revision-link"
+                                        className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        required={index === 0 || link.trim() !== ''}
+                                    />
+                                    {selectedLinks.length > 1 && (
+                                        <button
+                                            type="button"
+                                            onClick={() => removeLinkField(index)}
+                                            className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600"
+                                        >
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                onClick={addLinkField}
+                                className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 mt-2"
+                            >
+                                Add Another Link
+                            </button>
                         </div>
                         <div className="flex justify-end space-x-4">
                             <button type="button" className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded" onClick={closeRevisionModal}>
                                 Close
                             </button>
                             <button type="submit" className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg" disabled={isUploading}>
-                                {isUploading ? 'Uploading...' : 'Upload'}
+                                {isUploading ? 'Uploading...' : 'Upload Links'}
                             </button>
                         </div>
                     </form>
