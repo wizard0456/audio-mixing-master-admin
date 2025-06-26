@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: 'https://audadmin.zetdigi.com/',
+  base: '/',
   // base: 'https://portal.zetdigitesting.online/',
   // base: 'https://portal.audiomixingmastering.com/',
   optimizeDeps: {
@@ -11,6 +11,7 @@ export default defineConfig({
   },
   plugins: [react()],
   server: {
+    host: true,
     proxy: {
       '/api': {
         target: 'https://backend.zetdigitesting.online/api/',

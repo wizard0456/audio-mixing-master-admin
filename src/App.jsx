@@ -31,7 +31,7 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "/", element: <Welcome /> },
+      { path: "/", element: <RestrictedRoute roles={['admin', 'engineer', 'user']} element={Welcome} /> },
       {
         path: "/users",
         element: <RestrictedRoute roles={['admin']} element={Users} />,
