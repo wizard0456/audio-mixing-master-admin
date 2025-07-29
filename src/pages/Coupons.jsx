@@ -10,6 +10,7 @@ import { selectUser } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
 import Modal from 'react-modal';
 import Loading from '../components/Loading';
+import { formatDate } from '../utilities/dateUtils';
 
 const Coupons = () => {
     const [coupons, setCoupons] = useState([]);
@@ -26,7 +27,8 @@ const Coupons = () => {
 
     useEffect(() => {
         fetchCoupons(currentPage, filter);
-        fetchServices(); // Fetch services when the component mounts
+        
+        // fetchServices(); // Fetch services when the component mounts
     }, [currentPage, filter]);
 
     const fetchCoupons = async (page, filter) => {
@@ -52,6 +54,7 @@ const Coupons = () => {
             });
 
             setCoupons(response.data.data);
+            console.log(response.data.data);
             setCurrentPage(response.data.current_page);
             setTotalPages(response.data.last_page);
             setLoading(false);
@@ -73,35 +76,6 @@ const Coupons = () => {
                     transition: Slide,
                 });
             }
-        }
-    };
-
-    const fetchServices = async () => {
-        try {
-            const response = await axios.get('https://music.zetdigi.com/backend/public/api/services-list');
-            const servicesOptions = response.data
-                .filter(service => service.service_type !== "subscription")
-                .map(service => ({
-                    value: service.id,
-                    label: service.name
-                }));
-
-            console.log(servicesOptions);
-
-            setServices(servicesOptions); // Store the services in the state
-        } catch (error) {
-            console.error('Error fetching services', error);
-            toast.error('Error fetching services', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
         }
     };
 
@@ -229,10 +203,10 @@ const Coupons = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.uses}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(coupon.start_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{formatDate(coupon.start_date)}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? new Date(coupon.end_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' }) : 'No Expiry'}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.end_date ? formatDate(coupon.end_date) : 'No Expiry'}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
@@ -290,8 +264,8 @@ const Coupons = () => {
                             <p><strong>Discount Value:</strong> {couponDetails.discount_value}</p>
                             <p><strong>Max Uses:</strong> {couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
                             <p><strong>Uses:</strong> {couponDetails.uses}</p>
-                            <p><strong>Start Date:</strong> {new Date(couponDetails.start_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                            <p><strong>End Date:</strong> {couponDetails.end_date ? new Date(couponDetails.end_date).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' }) : 'No Expiry'}</p>
+                            <p><strong>Start Date:</strong> {formatDate(couponDetails.start_date)}</p>
+                            <p><strong>End Date:</strong> {couponDetails.end_date ? formatDate(couponDetails.end_date) : 'No Expiry'}</p>
                             <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
                             <p><strong>Products: </strong>
                                 {couponDetails.coupon_type == "1" ? (

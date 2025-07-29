@@ -86,8 +86,8 @@ const ServiceDetail = () => {
                                         <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Requirements:</strong> <span dangerouslySetInnerHTML={{ __html: service.requirements || '-' }} /></p>
                                         <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Notes:</strong> <span dangerouslySetInnerHTML={{ __html: service.notes || '-' }} /></p>
                                         <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Tags:</strong> {service.tags || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Created At:</strong> {new Date(service.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Last Updated:</strong> {new Date(service.updated_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Created At:</strong> {new Date(service.createdAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Last Updated:</strong> {new Date(service.updatedAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                     </div>
                                 </div>
                             </div>

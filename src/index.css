@@ -183,6 +183,22 @@ body {
     /* Center content within the modal */
 }
 
+/* Override react-modal transform styles */
+.ReactModal__Content {
+  transform: none !important;
+  top: 50% !important;
+  left: 50% !important;
+  position: absolute !important;
+  margin: 0 !important;
+  transform-origin: center !important;
+}
+
+.ReactModal__Overlay {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 /* react-daterange-picker */
 .react-daterange-picker,
 .react-daterange-picker__wrapper,
@@ -237,14 +253,16 @@ body {
 /* React Pagination */
 .pagination {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-
 .pagination li {
-    height: 100%;
-    width: 100%;
+    margin: 0;
 }
 
 .pagination li a {
@@ -252,24 +270,62 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #F6F6F6;
-    padding: 10px 15px;
-    font-size: 12px;
-    font-family: THICCCBOI-Bold, sans-serif;
-    font-weight: 700;
+    padding: 12px 16px;
+    font-size: 14px;
+    font-family: THICCCBOI-Medium, sans-serif;
+    font-weight: 500;
     text-decoration: none;
-    margin: 0 5px;
+    color: #333;
     border-radius: 8px;
-    height: 100%;
+    min-width: 44px;
+    height: 44px;
+    transition: all 0.2s ease;
+    border: 1px solid #E5E5E5;
+}
+
+.pagination li a:hover {
+    background-color: #E5E5E5;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .pagination .disabled a {
-    opacity: 0.5;
+    opacity: 0.4;
     cursor: not-allowed;
+    background-color: #F0F0F0;
+}
+
+.pagination .disabled a:hover {
+    background-color: #F0F0F0;
+    transform: none;
+    box-shadow: none;
 }
 
 .pagination .active a {
-    background-color: #000000;
+    background-color: #0F2005;
     color: white;
+    border-color: #0F2005;
+    font-weight: 600;
+}
+
+.pagination .active a:hover {
+    background-color: #0F2005;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Responsive pagination */
+@media screen and (max-width: 768px) {
+    .pagination {
+        gap: 4px;
+    }
+    
+    .pagination li a {
+        padding: 10px 12px;
+        font-size: 12px;
+        min-width: 36px;
+        height: 36px;
+    }
 }
 
 @media screen and (max-width: 1200px) {

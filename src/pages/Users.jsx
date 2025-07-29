@@ -10,6 +10,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 import Toggle from 'react-toggle';
 import { Slide, toast } from 'react-toastify';
 import Loading from '../components/Loading';
+import { useApiCall } from '../utilities/useApiCall';
 
 const Users = () => {
     const [users, setUsers] = useState([]);
@@ -26,10 +27,13 @@ const Users = () => {
     const user = useSelector(selectUser);
     const dispatch = useDispatch();
     const abortController = useRef(null);
+    const makeApiCall = useApiCall();
 
     useEffect(() => {
-        fetchUsers(currentPage, filter);
-    }, [currentPage, filter]);
+        if (user.token) {
+            makeApiCall(fetchUsers, currentPage, filter);
+        }
+    }, [currentPage, filter, user.token, makeApiCall]);
 
     const fetchUsers = async (page, filter) => {
         if (abortController.current) {
@@ -119,7 +123,7 @@ const Users = () => {
                 }
             });
             setIsDeleting(false);
-            fetchUsers(currentPage, filter); // Reload fetching
+            makeApiCall(fetchUsers, currentPage, filter); // Reload fetching
             closeConfirmationModal();
             toast.success('User deleted successfully', {
                 position: "top-right",
@@ -192,7 +196,7 @@ const Users = () => {
                 theme: "light",
                 transition: Slide,
             });
-            fetchUsers(currentPage, filter); // Refresh user list
+            makeApiCall(fetchUsers, currentPage, filter); // Refresh user list
         } catch (error) {
             toast.dismiss(id);
             toast.error('Error updating user status', {

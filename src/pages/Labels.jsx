@@ -269,7 +269,7 @@ const Labels = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap line-clamp-1'>{label.name}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(label.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
                                             <div className='px-3 py-5 bg-[#F6F6F6]'>{label.is_active == 1 ? 'Active' : 'Inactive'}</div>

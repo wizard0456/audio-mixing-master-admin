@@ -44,7 +44,7 @@ const Orders = () => {
         abortController.current = new AbortController();
         
         setLoading(true);
-        let url = `${API_Endpoint}fetch/order?page=${page}&per_page=${Per_Page}&order_type=${orderType}`;
+        let url = `${API_Endpoint}admin/order?page=${page}&per_page=${Per_Page}&order_type=${orderType}`;
         if (filter !== 'all') {
             url += `&order_status=${filter}`;
         }
@@ -155,7 +155,7 @@ const Orders = () => {
                 year: 'numeric',
             });
 
-            const apiUrl = `https://music.zetdigi.com/backend/public/api/generate-pdf?start_date=${startDate}&end_date=${endDate}`;
+            const apiUrl = `${API_Endpoint}/generate-pdf?start_date=${startDate}&end_date=${endDate}`;
 
             // Trigger the download
             window.open(apiUrl, '_blank');
@@ -302,10 +302,12 @@ const Orders = () => {
                                                         <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.order_type == "one_time" ? "One Time" : "Subscription"}</div>
                                                     </td>
                                                     <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>{order.username}</div>
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'>
+                                                            {order.user ? `${order.user.first_name || ''} ${order.user.last_name || ''}`.trim() || 'N/A' : 'N/A'}
+                                                        </div>
                                                     </td>
                                                     <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
-                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]  text-nowrap'>{order.useremail}</div>
+                                                        <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]  text-nowrap'>{order.user ? order.user.email || 'N/A' : 'N/A'}</div>
                                                     </td>
                                                     <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-5 md:leading-6 pb-4 md:pb-5">
                                                         <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] text-nowrap'><span className='text-sm px-2 py-1 rounded-full bg-[#4BC500] text-white'>{order.payment_status}</span></div>

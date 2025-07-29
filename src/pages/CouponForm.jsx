@@ -35,33 +35,6 @@ const CouponForm = () => {
         }
     }, [coupon, services]);
 
-    useEffect(() => {
-        fetchServices();
-    }, []);
-
-    const fetchServices = async () => {
-        try {
-            const response = await axios.get(`${API_Endpoint}services-list`);
-            const servicesOptions = response.data
-                .filter(service => service.service_type !== "subscription")
-                .map(service => ({ value: service.id, label: service.name }));
-            setServices(servicesOptions);
-        } catch (error) {
-            console.error('Error fetching services', error);
-            toast.error('Error fetching services', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-        }
-    };
-
     const handleSave = async (event) => {
         event.preventDefault();
         setLoading(true);

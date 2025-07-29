@@ -249,7 +249,7 @@ const Services = () => {
                                             <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{service.service_type}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
+                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                                         </td>
                                         <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
                                             <div className='px-3 py-4 bg-[#F6F6F6] text-nowrap'>
@@ -279,23 +279,36 @@ const Services = () => {
                 )
             )}
 
-            {loading || (
-                services.length !== 0 && (
-                    <div className="flex justify-center mt-6">
-                        <ReactPaginate
-                            previousLabel={<FaAngleDoubleLeft />}
-                            nextLabel={<FaAngleDoubleRight />}
-                            breakLabel={"..."}
-                            pageCount={totalPages}
-                            marginPagesDisplayed={2}
-                            pageRangeDisplayed={3}
-                            onPageChange={handlePageClick}
-                            containerClassName={"pagination"}
-                            activeClassName={"active"}
-                            forcePage={currentPage - 1}
-                        />
-                    </div>
-                )
+            {!loading && services.length !== 0 && (
+                <div className="flex flex-col items-center mt-8 mb-4 gap-4">
+                    {totalPages > 1 && (
+                        <div className="text-center">
+                            <p className="font-THICCCBOI-Medium text-sm text-gray-600 mb-2">
+                                Page {currentPage} of {totalPages} • Showing {services.length} services
+                            </p>
+                            <ReactPaginate
+                                previousLabel={<FaAngleDoubleLeft />}
+                                nextLabel={<FaAngleDoubleRight />}
+                                breakLabel={"..."}
+                                pageCount={totalPages}
+                                marginPagesDisplayed={2}
+                                pageRangeDisplayed={3}
+                                onPageChange={handlePageClick}
+                                containerClassName={"pagination"}
+                                activeClassName={"active"}
+                                forcePage={currentPage - 1}
+                                pageClassName="page-item"
+                                pageLinkClassName="page-link"
+                                previousClassName="page-item"
+                                previousLinkClassName="page-link"
+                                nextClassName="page-item"
+                                nextLinkClassName="page-link"
+                                breakClassName="page-item"
+                                breakLinkClassName="page-link"
+                            />
+                        </div>
+                    )}
+                </div>
             )}
         </section>
     );

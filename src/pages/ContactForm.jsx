@@ -139,7 +139,7 @@ const ContactForm = () => {
               <p><strong>Email:</strong> {selectedLead.email}</p>
               <p><strong>Subject:</strong> {selectedLead.subject}</p>
               <p><strong>Message:</strong> {selectedLead.message}</p>
-              <p><strong>Received At:</strong> {new Date(selectedLead.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
+              <p><strong>Received At:</strong> {new Date(selectedLead.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
             </div>
             <button
               type="button"
@@ -187,7 +187,7 @@ const ContactForm = () => {
                         <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.message}</div>
                       </td>
                       <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
+                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
                       </td>
                       <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
                         <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>

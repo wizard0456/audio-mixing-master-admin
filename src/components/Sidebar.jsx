@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import { NavLink, useNavigate } from "react-router-dom";
 import LOGO from "../assets/images/logo.png";
-import { FaMusic, FaUsers, FaSignOutAlt, FaTags, FaEnvelope, FaPhone, FaClipboardList } from "react-icons/fa";
+import { FaMusic, FaUsers, FaSignOutAlt, FaTags, FaEnvelope, FaPhone, FaClipboardList, FaChartPie, FaBlog } from "react-icons/fa";
 import { GoChecklist } from 'react-icons/go';
 import { BsFillFileMusicFill } from 'react-icons/bs';
 import { PiImageSquareFill } from 'react-icons/pi';
@@ -30,6 +30,14 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
         </div>
 
         <ul className="sidebar-list flex flex-col gap-2 pr-2 mx-5 overflow-auto">
+          {user.role == 'admin' && (
+            <li className="block w-full">
+              <NavLink to="/dashboard" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}>
+                <span className="icon"><FaChartPie /></span>
+                <span className="font-semibold relative top-[2px]">Dashboard</span>
+              </NavLink>
+            </li>
+          )}
           {user.role == 'admin' && (
             <li className="block w-full">
               <NavLink to="/users" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}>
@@ -84,6 +92,12 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
                 <NavLink to="/coupons" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}>
                   <span className="icon"><FaTags /></span>
                   <span className="font-semibold relative top-[2px]">Coupons</span>
+                </NavLink>
+              </li>
+              <li className="block w-full">
+                <NavLink to="/blog" className={({ isActive }) => `font-semibold text-base leading-4 text-white flex rounded-lg align-center py-3 px-5 gap-2 items-center ${isActive ? "bg-[#0F2005] active" : ""}`}>
+                  <span className="icon"><FaBlog /></span>
+                  <span className="font-semibold relative top-[2px]">Blog</span>
                 </NavLink>
               </li>
               <li className="block w-full">

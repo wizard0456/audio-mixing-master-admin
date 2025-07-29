@@ -28,10 +28,10 @@ const OrderDetail = () => {
         const fetchOrderDetails = async () => {
             if (!id) return;
             try {
-                const response = await axios.get(`${API_Endpoint}order-details/${id}`, {
+                const response = await axios.get(`${API_Endpoint}admin/order-details/${id}`, {
                     headers: {
-                        'Authorization': `Bearer ${user.token}`
-                    }
+                        "Authorization": `Bearer ${user.token}`
+                    },
                 });
                 setOrder(response.data);
                 setOrderStatus(response.data.order.Order_status);
@@ -58,15 +58,14 @@ const OrderDetail = () => {
 
         const formData = new FormData();
         formData.append('order_status', newStatus);
-
         const toastId = toast.loading("Updating order status...");
 
         try {
-            await axios(`${API_Endpoint}order/update-status/${id}`, {
-                method: 'POST',
+            await axios(`${API_Endpoint}admin/order/update-status/${id}`, {
+                method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/json'
                 },
                 data: formData,
             });
@@ -182,8 +181,8 @@ const OrderDetail = () => {
         setIsUploading(true);
 
         try {
-            const response = await axios.post(`${API_Endpoint}order/deliverable/${id}`, {
-                links: validLinks,
+            const response = await axios.post(`${API_Endpoint}admin/order/upload-file/${id}`, {
+                deliverable_links: validLinks,
                 order_item_id: selectedService,
             }, {
                 headers: {
@@ -283,7 +282,7 @@ const OrderDetail = () => {
 
         setIsUploading(true);
         try {
-            const response = await axios.post(`${API_Endpoint}revision/deliverable/${currentRevisionId}`, { links: validLinks }, {
+            const response = await axios.post(`${API_Endpoint}admin/revisions/upload/${currentRevisionId}`, { links: validLinks }, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                 },
@@ -333,7 +332,7 @@ const OrderDetail = () => {
         try {
             const response = await axios({
                 method: "post",
-                url: `${API_Endpoint}admin/admin-flag/${id}`,
+                url: `${API_Endpoint}admin/revisions/admin-flag/${id}`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 },

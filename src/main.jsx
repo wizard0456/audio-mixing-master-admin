@@ -12,7 +12,7 @@ const rootElement = document.getElementById('root');
 Modal.setAppElement(rootElement);
 
 ReactDOM.createRoot(rootElement).render(
-  <React.StrictMode>
+  <>
     <App />
     <ToastContainer
       position="top-right"
@@ -27,5 +27,5 @@ ReactDOM.createRoot(rootElement).render(
       theme="light"
       transition="Slide"
     />
-  </React.StrictMode>,
+  </>,
 );
