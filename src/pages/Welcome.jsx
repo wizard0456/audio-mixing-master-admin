@@ -22,6 +22,7 @@ import {
 } from 'react-icons/fa';
 import { GoChecklist } from 'react-icons/go';
 import { MdCategory } from 'react-icons/md';
+import { IoPeople, IoMusicalNotes, IoCheckmarkCircle, IoNewspaper, IoPricetags, IoAnalytics, IoCash, IoEye, IoTime, IoCheckmark, IoWarning, IoRefresh, IoBarChart } from 'react-icons/io5';
 import Loading from '../components/Loading';
 
 const Welcome = () => {
@@ -211,7 +212,7 @@ const Welcome = () => {
         <StatCard
           title="Total Users"
           value={stats.users.total}
-          icon={<FaUsers className="w-6 h-6 text-white" />}
+                          icon={<IoPeople className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-blue-500 to-blue-600"
           subtitle={`${stats.users.active} active users`}
           growth={stats.users.growth}
@@ -219,7 +220,7 @@ const Welcome = () => {
         <StatCard
           title="Total Orders"
           value={stats.orders.total}
-          icon={<GoChecklist className="w-6 h-6 text-white" />}
+                          icon={<IoCheckmarkCircle className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-green-500 to-green-600"
           subtitle={`$${stats.orders.revenue.toFixed(2)} revenue`}
           growth={stats.orders.growth}
@@ -227,7 +228,7 @@ const Welcome = () => {
         <StatCard
           title="Active Services"
           value={stats.services.total}
-          icon={<FaMusic className="w-6 h-6 text-white" />}
+                          icon={<IoMusicalNotes className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-purple-500 to-purple-600"
           subtitle={`${stats.services.active} active services`}
           growth={stats.services.growth}
@@ -235,7 +236,7 @@ const Welcome = () => {
         <StatCard
           title="Blog Views"
           value={stats.blogs.views}
-          icon={<FaEye className="w-6 h-6 text-white" />}
+                          icon={<IoEye className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-orange-500 to-orange-600"
           subtitle={`${stats.blogs.published} published blogs`}
           growth={stats.blogs.growth}

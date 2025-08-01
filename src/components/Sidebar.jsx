@@ -22,9 +22,10 @@ import {
   FaUser
 } from "react-icons/fa";
 import { GoChecklist } from 'react-icons/go';
-import { BsFillFileMusicFill } from 'react-icons/bs';
-import { PiImageSquareFill } from 'react-icons/pi';
-import { MdCategory } from 'react-icons/md';
+import { BsFillFileMusicFill, BsMusicNoteList } from 'react-icons/bs';
+import { PiImageSquareFill, PiMusicNotesPlus } from 'react-icons/pi';
+import { MdCategory, MdDashboard, MdPeople, MdEngineering, MdShoppingCart, MdLocalOffer, MdArticle, MdPhotoLibrary, MdAudiotrack, MdEmail, MdPhone, MdCloudUpload } from 'react-icons/md';
+import { IoAnalytics, IoPeopleCircle, IoConstruct, IoCart, IoMusicalNotes, IoPricetags, IoGrid, IoNewspaper, IoImages, IoMusicalNote, IoMail, IoCall, IoCloudUpload } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 
@@ -42,38 +43,38 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
     {
       path: "/dashboard",
       name: "Dashboard",
-      icon: <FaChartPie className="w-5 h-5" />,
+      icon: <IoAnalytics className="w-5 h-5" />,
       roles: ['admin'],
       badge: "New"
     },
     {
       path: "/users",
       name: "Users",
-      icon: <FaUsers className="w-5 h-5" />,
+      icon: <IoPeopleCircle className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/engineers",
       name: "Engineers",
-      icon: <FaUserCog className="w-5 h-5" />,
+      icon: <IoConstruct className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/orders",
       name: "Orders",
-      icon: <GoChecklist className="w-5 h-5" />,
+      icon: <IoCart className="w-5 h-5" />,
       roles: ['admin', 'engineer', 'user']
     },
     {
       path: "/services",
       name: "Services",
-      icon: <BsFillFileMusicFill className="w-5 h-5" />,
+      icon: <IoMusicalNotes className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/labels",
       name: "Labels",
-      icon: <FaTags className="w-5 h-5" />,
+      icon: <IoPricetags className="w-5 h-5" />,
       roles: ['admin']
     },
     {
@@ -85,7 +86,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
     {
       path: "/tags",
       name: "Tags",
-      icon: <FaTags className="w-5 h-5" />,
+      icon: <IoPricetags className="w-5 h-5" />,
       roles: ['admin']
     },
     {
@@ -97,37 +98,37 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
     {
       path: "/blog",
       name: "Blog",
-      icon: <FaBlog className="w-5 h-5" />,
+      icon: <IoNewspaper className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/gallery",
       name: "Gallery",
-      icon: <FaImage className="w-5 h-5" />,
+      icon: <IoImages className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/samples",
       name: "Samples",
-      icon: <FaFileAudio className="w-5 h-5" />,
+      icon: <IoMusicalNote className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/new-letter",
       name: "News Letter",
-      icon: <FaEnvelope className="w-5 h-5" />,
+      icon: <IoMail className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/contact-us",
       name: "Contact Form",
-      icon: <FaPhone className="w-5 h-5" />,
+      icon: <IoCall className="w-5 h-5" />,
       roles: ['admin']
     },
     {
       path: "/order-us",
       name: "Uploads",
-      icon: <FaUpload className="w-5 h-5" />,
+      icon: <IoCloudUpload className="w-5 h-5" />,
       roles: ['admin']
     }
   ];
@@ -154,7 +155,7 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
                   <FaUser className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h1 className="text-white font-bold text-lg">Audio Mixing</h1>
+                <h1 className="text-white font-bold text-lg">AMM-Admin</h1>
               </div>
             </div>
             <button 

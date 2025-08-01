@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt, FaPlus } from "react-icons/fa";
 import { API_Endpoint, Asset_Endpoint } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
@@ -180,94 +180,135 @@ const Gallery = () => {
     };
 
     return (
-        <section className='px-5 py-10'>
-            <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-9">Gallery</h1>
-            </div>
-
-            <div className="flex items-center justify-end mb-6">
-                <div className="flex gap-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+            {/* Header */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Gallery Management</h1>
+                        <p className="text-gray-600">Upload and manage gallery images</p>
+                    </div>
                     <button
-                        className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
                         onClick={openModal}
+                        className="btn-primary flex items-center space-x-2"
                     >
-                        Upload Images
+                        <FaPlus className="w-4 h-4 mr-1" />
+                        <span>Upload Images</span>
                     </button>
                 </div>
             </div>
 
+            {/* Gallery Grid */}
+            {loading ? (
+                <div className="flex justify-center items-center py-12">
+                    <Loading />
+                </div>
+            ) : (
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    {images.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                            {images.map(image => (
+                                <div key={image.id} className="relative group overflow-hidden rounded-xl shadow-sm border border-gray-200">
+                                    <img 
+                                        src={`${Asset_Endpoint}${image.image}`} 
+                                        alt={`Gallery ${image.id}`} 
+                                        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105" 
+                                    />
+                                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                                        <button
+                                            onClick={() => openConfirmationModal(image.id)}
+                                            className="opacity-0 group-hover:opacity-100 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transition-all duration-300 transform scale-90 group-hover:scale-100"
+                                            title="Delete Image"
+                                        >
+                                            <FaTrashAlt className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-12">
+                            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <span className="text-white font-semibold text-xl">G</span>
+                            </div>
+                            <h3 className="mt-2 text-sm font-medium text-gray-900">No images found</h3>
+                            <p className="mt-1 text-sm text-gray-500">Upload your first image to get started.</p>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            {/* Upload Image Modal */}
             <Modal
                 isOpen={modalIsOpen}
                 onRequestClose={closeModal}
                 contentLabel="Upload Image Modal"
+                className="modern-modal"
             >
-                <h2 className="text-xl md:text-2xl mb-4 font-semibold">Upload New Image</h2>
-                <form onSubmit={handleImageUpload} className="space-y-4">
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="image">Select Image</label>
-                        <input
-                            type="file"
-                            name="image"
-                            accept="image/*"
-                            className="w-full px-3 py-2 border rounded-md"
-                            onChange={handleImageUploadForm}
-                        />
-                    </div>
-                    {imagePreviewUrl && (
-                        <div className="mb-4">
-                            <img src={imagePreviewUrl} alt="Image Preview" className="w-full h-auto object-cover rounded-lg" />
+                <div className="max-w-2xl w-full">
+                    <h2 className="text-2xl mb-6 font-semibold text-gray-900">Upload New Image</h2>
+                    <form onSubmit={handleImageUpload} className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="image">
+                                Select Image
+                            </label>
+                            <input
+                                type="file"
+                                name="image"
+                                accept="image/*"
+                                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200"
+                                onChange={handleImageUploadForm}
+                                required
+                            />
                         </div>
-                    )}
-                    <div className="flex justify-end space-x-4">
-                        <button
-                            type="button"
-                            className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
-                            onClick={closeModal}
-                            disabled={uploading}
-                        >
-                            Close
-                        </button>
-                        <button
-                            type="submit"
-                            className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
-                            disabled={uploading}
-                        >
-                            {uploading ? 'Saving...' : 'Save Image'}
-                        </button>
-                    </div>
-                </form>
-            </Modal>
-
-            <ConfirmationModal
-                isOpen={!!imageToDelete}
-                onRequestClose={closeConfirmationModal}
-                onConfirm={handleDeleteImage}
-                message="Are you sure you want to delete this image?"
-                isDeleting={isDeleting}
-            />
-
-            {
-                loading ? (
-                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                        <Loading />
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                        {images.length > 0 && images.map(image => (
-                            <div key={image.id} className="gallery-image relative overflow-hidden">
-                                <img src={`${Asset_Endpoint}${image.image}`} alt={`Gallery ${image.id}`} className="w-full h-full object-cover rounded-lg" />
-                                <div
-                                    className='gallery-delete-wrapper absolute h-10 w-10 right-3 flex items-center justify-center bg-[#FF0000] rounded-full cursor-pointer'
-                                    onClick={() => openConfirmationModal(image.id)}
-                                >
-                                    <FaTrashAlt className="cursor-pointer" color="white" />
+                        
+                        {imagePreviewUrl && (
+                            <div className="space-y-2">
+                                <label className="block text-sm font-medium text-gray-700">Image Preview</label>
+                                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                                    <img 
+                                        src={imagePreviewUrl} 
+                                        alt="Image Preview" 
+                                        className="w-full h-auto max-h-64 object-cover" 
+                                    />
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )
-            }
-        </section>
+                        )}
+                        
+                        <div className="flex justify-end space-x-4 pt-4">
+                            <button
+                                type="button"
+                                className="px-6 py-3 bg-gray-500 text-white rounded-xl font-medium hover:bg-gray-600 transition-all duration-200"
+                                onClick={closeModal}
+                                disabled={uploading}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50"
+                                disabled={uploading || !selectedImage}
+                            >
+                                {uploading ? 'Uploading...' : 'Upload Image'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </Modal>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={!!imageToDelete}
+                onClose={closeConfirmationModal}
+                onConfirm={handleDeleteImage}
+                title="Delete Image"
+                message="Are you sure you want to delete this image? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                isLoading={isDeleting}
+                confirmButtonClass="bg-red-600 hover:bg-red-700"
+            />
+        </div>
     );
 }
 

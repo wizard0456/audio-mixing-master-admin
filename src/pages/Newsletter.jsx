@@ -117,96 +117,165 @@ const Newsletter = () => {
         year: 'numeric',
       });
 
-      const apiUrl = `${API_Endpoint}/export-leads?start_date=${startDate}&end_date=${endDate}`;
+      const apiUrl = `${API_Endpoint}export/lead?start_date=${startDate}&end_date=${endDate}`;
 
       // Trigger the download
       window.open(apiUrl, '_blank');
+    } else {
+      toast.error('Please select a valid date range', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     }
   };
 
   return (
-    <section className='px-4 py-8 md:px-6 md:py-10'>
-      <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
-        <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Newsletter</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Newsletter Management</h1>
+            <p className="text-gray-600">Manage newsletter leads and export data by date range</p>
+          </div>
+        </div>
+
+        {/* Export Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <label className="text-sm font-medium text-gray-700">Export Date Range:</label>
+              <DateRangePicker 
+                value={dates} 
+                onChange={setDates} 
+                className="custom-daterange-picker"
+                placeholder="Select date range"
+              />
+            </div>
+            <button
+              onClick={handleExportLeads}
+              className="btn-primary flex items-center space-x-2"
+            >
+              <span>Export Leads</span>
+            </button>
+          </div>
+        </div>
       </div>
 
-      {/* Date Range Picker and Export Button */}
-      <form onSubmit={(e) => e.preventDefault()} className="flex flex-col lg:flex-row items-center justify-end mb-6 gap-4">
-        <DateRangePicker value={dates} onChange={setDates} className="custom-daterange-picker" />
-        <button
-          onClick={handleExportLeads}
-          className="bg-[#0F2005] font-THICCCBOI-Medium font-medium text-sm md:text-[14px] text-white px-4 md:px-5 py-2 rounded-lg"
-        >
-          Export Leads
-        </button>
-      </form>
-
-      <ConfirmationModal
-        isOpen={confirmationModalOpen}
-        onClose={closeConfirmationModal}
-        onConfirm={handleDeleteLead}
-        message="Are you sure you want to delete this lead?"
-        isLoading={isDeleting}
-      />
-
+      {/* Leads Table */}
       {loading ? (
-        <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+        <div className="flex justify-center items-center py-12">
           <Loading />
         </div>
       ) : (
         leads.length !== 0 ? (
-          <div className="overflow-x-auto">
-            <table className='w-full border-0'>
-              <thead>
-                <tr>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Email</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Created At</th>
-                  <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-4 md:pb-5">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {leads?.map(lead => (
-                  <tr key={lead.id}>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
-                      <div className='px-3 py-4 md:py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.email}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
-                      <div className='px-3 py-4 md:py-5 bg-[#F6F6F6]'>{new Date(lead.createdAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</div>
-                    </td>
-                    <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-4 md:pb-5">
-                      <div className='flex gap-2 md:gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                        <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button>
-                      </div>
-                    </td>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email Address
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created At
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {leads?.map(lead => (
+                    <tr key={lead.id} className="hover:bg-gray-50 transition-colors duration-200">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-white font-semibold text-sm">
+                              {lead.email.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{lead.email}</div>
+                            <div className="text-sm text-gray-500">Newsletter Lead</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(lead.createdAt).toLocaleDateString("en-US", { 
+                          month: 'long', 
+                          day: 'numeric', 
+                          year: 'numeric' 
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button 
+                          onClick={() => openConfirmationModal(lead)}
+                          className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
+                          title="Delete Lead"
+                        >
+                          <FaTrashAlt className="w-5 h-5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         ) : (
-          <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-            No leads found
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-semibold text-xl">N</span>
+            </div>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No leads found</h3>
+            <p className="mt-1 text-sm text-gray-500">Newsletter leads will appear here when users subscribe.</p>
           </div>
         )
       )}
 
-      {!loading && leads.length !== 0 && (
-        <div className="flex justify-center mt-6">
+      {/* Pagination */}
+      {!loading && leads.length > 0 && (
+        <div className="mt-6">
           <ReactPaginate
             previousLabel={<FaAngleDoubleLeft />}
             nextLabel={<FaAngleDoubleRight />}
-            breakLabel={"..."}
             pageCount={totalPages}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={3}
             onPageChange={handlePageClick}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
+            containerClassName="pagination"
+            pageClassName=""
+            pageLinkClassName=""
+            previousClassName=""
+            previousLinkClassName=""
+            nextClassName=""
+            nextLinkClassName=""
+            activeClassName="active"
+            disabledClassName="disabled"
             forcePage={currentPage}
           />
         </div>
       )}
-    </section>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModalOpen}
+        onClose={closeConfirmationModal}
+        onConfirm={handleDeleteLead}
+        title="Delete Lead"
+        message="Are you sure you want to delete this newsletter lead? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+        confirmButtonClass="bg-red-600 hover:bg-red-700"
+      />
+    </div>
   );
 }
 

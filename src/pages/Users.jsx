@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt, FaSearch, FaFilter, FaUserPlus } from "react-icons/fa";
+import { IoEye, IoTrash, IoSearch, IoFilter, IoPersonAdd, IoPerson, IoPeople } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
@@ -347,7 +348,7 @@ const Users = () => {
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                                                        <FaUserPlus className="w-5 h-5 text-white" />
+                                                        <IoPerson className="w-5 h-5 text-white" />
                                                     </div>
                                                     <div className="ml-4">
                                                         <div className="text-sm font-medium text-gray-900">
@@ -383,14 +384,14 @@ const Users = () => {
                                                         className="text-green-600 hover:text-green-900"
                                                         title="View Details"
                                                     >
-                                                        <FaEye className="w-4 h-4" />
+                                                        <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openConfirmationModal(user)}
                                                         className="text-red-600 hover:text-red-900"
                                                         title="Delete User"
                                                     >
-                                                        <FaTrashAlt className="w-4 h-4" />
+                                                        <IoTrash className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -402,7 +403,7 @@ const Users = () => {
                     </div>
                 ) : (
                     <div className="text-center py-12">
-                        <FaUserPlus className="mx-auto h-12 w-12 text-gray-400" />
+                        <IoPeople className="mx-auto h-12 w-12 text-gray-400" />
                         <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
                         <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
                     </div>

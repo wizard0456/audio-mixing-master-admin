@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEdit, FaEye, FaTrashAlt } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEdit, FaEye, FaTrashAlt, FaPlus } from "react-icons/fa";
+import { IoMusicalNotes, IoEye, IoCreate, IoAdd, IoTrash, IoMusicalNote } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
@@ -193,6 +194,7 @@ const Services = () => {
                         onClick={() => navigate('/add-service')}
                         className="btn-primary flex items-center space-x-2"
                     >
+                        <IoAdd className="w-4 h-4" />
                         <span>Add Service</span>
                     </button>
                 </div>
@@ -332,14 +334,14 @@ const Services = () => {
                                                         className="text-blue-600 hover:text-blue-900"
                                                         title="Edit Service"
                                                     >
-                                                        <FaEdit className="w-4 h-4" />
+                                                        <IoCreate className="w-4 h-4" />
                                                     </Link>
                                                     <Link 
                                                         to={`/service-detail/${service.id}`}
                                                         className="text-green-600 hover:text-green-900"
                                                         title="View Details"
                                                     >
-                                                        <FaEye className="w-4 h-4" />
+                                                        <IoEye className="w-4 h-4" />
                                                     </Link>
                                                 </div>
                                             </td>
@@ -352,7 +354,7 @@ const Services = () => {
                 ) : (
                     <div className="text-center py-12">
                         <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white font-semibold text-lg">S</span>
+                            <IoMusicalNote className="w-6 h-6 text-white" />
                         </div>
                         <h3 className="mt-2 text-sm font-medium text-gray-900">No services found</h3>
                         <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>

@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
+import { IoTrash, IoAdd, IoCreate, IoGrid, IoApps } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import Toggle from 'react-toggle';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../reducers/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, selectUser } from '../reducers/authSlice';
+import { Slide, toast } from 'react-toastify';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Loading from '../components/Loading';
 
@@ -185,6 +187,7 @@ const Categories = () => {
                         onClick={() => openModal()}
                         className="btn-primary flex items-center space-x-2"
                     >
+                        <IoAdd className="w-4 h-4 mr-1" />
                         <span>Add Category</span>
                     </button>
                 </div>
@@ -298,7 +301,7 @@ const Categories = () => {
                                                         className="text-blue-600 hover:text-blue-900"
                                                         title="Edit Category"
                                                     >
-                                                        <TiPencil className="w-4 h-4" />
+                                                        <IoCreate className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -311,7 +314,7 @@ const Categories = () => {
                 ) : (
                     <div className="text-center py-12">
                         <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white font-semibold text-lg">C</span>
+                            <IoApps className="w-6 h-6 text-white" />
                         </div>
                         <h3 className="mt-2 text-sm font-medium text-gray-900">No categories found</h3>
                         <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>

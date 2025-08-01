@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
+import { IoEye, IoAdd, IoCreate, IoGift, IoPricetag } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
@@ -153,11 +154,11 @@ const Coupons = () => {
             key: 'code',
             label: 'Coupon',
             subtitle: 'Coupon Details',
-            icon: <FaEye className="w-5 h-5 text-white" />,
+                            icon: <IoEye className="w-5 h-5 text-white" />,
             render: (value, row) => (
                 <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <FaEye className="w-6 h-6 text-white" />
+                        <IoEye className="w-6 h-6 text-white" />
                     </div>
                     <div>
                         <p className="font-semibold text-gray-900">{row.code}</p>
@@ -197,13 +198,13 @@ const Coupons = () => {
     // Table actions
     const tableActions = [
         {
-            icon: <FaEye className="w-4 h-4" />,
+                            icon: <IoEye className="w-4 h-4" />,
             onClick: fetchCouponDetails,
             className: "text-blue-600 hover:bg-blue-50",
             title: "View Details"
         },
         {
-            icon: <TiPencil className="w-4 h-4" />,
+                            icon: <IoCreate className="w-4 h-4" />,
             onClick: () => navigate(`/update-coupons?id=${couponDetails?.id}`),
             className: "text-green-600 hover:bg-green-50",
             title: "Edit Coupon"
@@ -223,6 +224,7 @@ const Coupons = () => {
                         onClick={openAddCouponPage}
                         className="btn-primary flex items-center space-x-2"
                     >
+                        <IoAdd className="w-4 h-4 mr-1" />
                         <span>Add Coupon</span>
                     </button>
                 </div>
@@ -353,7 +355,7 @@ const Coupons = () => {
                                                         className="text-blue-600 hover:text-blue-900"
                                                         title="View Details"
                                                     >
-                                                        <FaEye className="w-4 h-4" />
+                                                        <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <Link 
                                                         to={"/update-coupons"} 
@@ -361,7 +363,7 @@ const Coupons = () => {
                                                         className="text-green-600 hover:text-green-900"
                                                         title="Edit Coupon"
                                                     >
-                                                        <TiPencil className="w-4 h-4" />
+                                                        <IoCreate className="w-4 h-4" />
                                                     </Link>
                                                 </div>
                                             </td>
@@ -374,7 +376,7 @@ const Coupons = () => {
                 ) : (
                     <div className="text-center py-12">
                         <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white font-semibold text-lg">C</span>
+                            <IoGift className="w-6 h-6 text-white" />
                         </div>
                         <h3 className="mt-2 text-sm font-medium text-gray-900">No coupons found</h3>
                         <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>

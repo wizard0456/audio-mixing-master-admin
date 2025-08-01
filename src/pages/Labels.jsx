@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
@@ -225,6 +225,7 @@ const Labels = () => {
                         onClick={() => openModal()}
                         className="btn-primary flex items-center space-x-2"
                     >
+                        <FaPlus className="w-4 h-4 mr-1" />
                         <span>Add Label</span>
                     </button>
                 </div>

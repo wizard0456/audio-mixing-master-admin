@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
+import { IoEye, IoCart, IoCheckmarkCircle, IoTime, IoWarning } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
@@ -399,7 +400,7 @@ const Orders = () => {
                                                         className="text-green-600 hover:text-green-900"
                                                         title="View Details"
                                                     >
-                                                        <FaEye className="w-4 h-4" />
+                                                        <IoEye className="w-4 h-4" />
                                                     </Link>
                                                 </div>
                                             </td>

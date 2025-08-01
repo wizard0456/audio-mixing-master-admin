@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt, FaEdit, FaPlus } from "react-icons/fa";
+import { IoEye, IoTrash, IoCreate, IoAdd, IoNewspaper, IoEyeOutline } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
@@ -492,7 +493,7 @@ const Blog = () => {
                         onClick={openAddBlogModal}
                         className="btn-primary flex items-center space-x-2"
                     >
-                        <FaPlus className="w-4 h-4" />
+                        <IoAdd className="w-4 h-4" />
                         <span>Add New Blog</span>
                     </button>
                 </div>
@@ -622,21 +623,21 @@ const Blog = () => {
                                                         className="text-blue-600 hover:text-blue-900"
                                                         title="View Details"
                                                     >
-                                                        <FaEye className="w-4 h-4" />
+                                                        <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openEditBlogModal(blog)}
                                                         className="text-green-600 hover:text-green-900"
                                                         title="Edit Blog"
                                                     >
-                                                        <FaEdit className="w-4 h-4" />
+                                                        <IoCreate className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openConfirmationModal(blog)}
                                                         className="text-red-600 hover:text-red-900"
                                                         title="Delete Blog"
                                                     >
-                                                        <FaTrashAlt className="w-4 h-4" />
+                                                        <IoTrash className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -649,7 +650,7 @@ const Blog = () => {
                 ) : (
                     <div className="text-center py-12">
                         <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white font-semibold text-lg">B</span>
+                            <IoNewspaper className="w-6 h-6 text-white" />
                         </div>
                         <h3 className="mt-2 text-sm font-medium text-gray-900">No blogs found</h3>
                         <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>

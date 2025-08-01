@@ -113,120 +113,224 @@ const ContactForm = () => {
   };
 
   return (
-    <section className='px-4 py-8 md:px-6 md:py-10'>
-      <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
-        <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Contact Form</h1>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Form Management</h1>
+            <p className="text-gray-600">View and manage contact form submissions from users</p>
+          </div>
+        </div>
       </div>
 
-      <ConfirmationModal
-        isOpen={confirmationModalOpen}
-        onClose={closeConfirmationModal}
-        onConfirm={handleDeleteLead}
-        message="Are you sure you want to delete this lead?"
-        isLoading={isDeleting}
-      />
-
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        className="modal-content"
-        overlayClassName="modal-overlay"
-      >
-        {selectedLead && (
-          <div>
-            <h2 className="text-xl text-center md:text-2xl mb-4 font-semibold">Lead Details</h2>
-            <div className='flex flex-col items-start gap-3'>
-              <p><strong>Name:</strong> {selectedLead.name}</p>
-              <p><strong>Email:</strong> {selectedLead.email}</p>
-              <p><strong>Subject:</strong> {selectedLead.subject}</p>
-              <p><strong>Message:</strong> {selectedLead.message}</p>
-              <p><strong>Received At:</strong> {new Date(selectedLead.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
-            </div>
-            <button
-              type="button"
-              className="bg-red-500 font-semibold text-sm md:text-base text-white px-4 py-2 mx-auto block rounded mt-4"
-              onClick={closeModal}
-            >
-              Close
-            </button>
-          </div>
-        )}
-      </Modal>
-
+      {/* Contact Leads Table */}
       {loading ? (
-        <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+        <div className="flex justify-center items-center py-12">
           <Loading />
         </div>
       ) : (
-        leads.length !== 0
-          ? (
+        leads.length !== 0 ? (
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className='w-full min-w-[1100px] border-0'>
-                <thead>
+              <table className="w-full min-w-[1100px]">
+                <thead className="bg-gray-50">
                   <tr>
-                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Name</th>
-                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Email</th>
-                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Subject</th>
-                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Message</th>
-                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Created At</th>
-                    <th className="font-THICCCBOI-SemiBold font-semibold text-left px-3 text-sm md:text-base leading-6 pb-5">Actions</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Subject
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Message
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created At
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="bg-white divide-y divide-gray-200">
                   {leads.map(lead => (
-                    <tr key={lead.id}>
-                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg'>{lead.name}</div>
-                      </td>
-                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.email}</div>
-                      </td>
-                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.subject}</div>
-                      </td>
-                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>{lead.message}</div>
-                      </td>
-                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='px-3 py-5 bg-[#F6F6F6]'>{new Date(lead.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
-                      </td>
-                      <td className="font-THICCCBOI-SemiBold font-semibold text-sm md:text-base leading-6 pb-5">
-                        <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                          <button onClick={() => openModal(lead)}><FaEye color="#4BC500" /></button>
-                          {/* <button onClick={() => openConfirmationModal(lead)}><FaTrashAlt color="#FF0000" /></button> */}
+                    <tr key={lead.id} className="hover:bg-gray-50 transition-colors duration-200">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
+                            <span className="text-white font-semibold text-sm">
+                              {lead.name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-sm font-medium text-gray-900">{lead.name}</div>
                         </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {lead.email}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {lead.subject}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        <div className="max-w-xs truncate" title={lead.message}>
+                          {lead.message}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(lead.createdAt).toLocaleDateString("en-US", {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <button
+                          onClick={() => openModal(lead)}
+                          className="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50 transition-all duration-200"
+                          title="View Details"
+                        >
+                          <FaEye className="w-5 h-5" />
+                        </button>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          ) : (
-            <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-              No leads found
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-semibold text-xl">C</span>
             </div>
-          )
-      )}
-
-      {loading || (
-        leads.length !== 0 && (
-          <div className="flex justify-center mt-6">
-            <ReactPaginate
-              previousLabel={<FaAngleDoubleLeft />}
-              nextLabel={<FaAngleDoubleRight />}
-              breakLabel={"..."}
-              pageCount={totalPages}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={3}
-              onPageChange={handlePageClick}
-              containerClassName={"pagination"}
-              activeClassName={"active"}
-              forcePage={currentPage}
-            />
+            <h3 className="mt-2 text-sm font-medium text-gray-900">No contact leads found</h3>
+            <p className="mt-1 text-sm text-gray-500">Contact form submissions will appear here when users submit the form.</p>
           </div>
         )
       )}
-    </section>
+
+      {/* Pagination */}
+      {!loading && leads.length > 0 && (
+        <div className="mt-6">
+          <ReactPaginate
+            previousLabel={<FaAngleDoubleLeft />}
+            nextLabel={<FaAngleDoubleRight />}
+            pageCount={totalPages}
+            onPageChange={handlePageClick}
+            containerClassName="pagination"
+            pageClassName=""
+            pageLinkClassName=""
+            previousClassName=""
+            previousLinkClassName=""
+            nextClassName=""
+            nextLinkClassName=""
+            activeClassName="active"
+            disabledClassName="disabled"
+            forcePage={currentPage}
+          />
+        </div>
+      )}
+
+      {/* Lead Details Modal */}
+      <Modal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        className="modern-modal"
+        overlayClassName="modal-overlay"
+      >
+        {selectedLead && (
+          <div className="max-w-2xl w-full">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">Lead Details</h2>
+              <button
+                onClick={closeModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
+              >
+                <span className="sr-only">Close</span>
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                  <span className="text-white font-semibold text-lg">
+                    {selectedLead.name.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">{selectedLead.name}</h3>
+                  <p className="text-sm text-gray-500">Contact Lead</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                    {selectedLead.email}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
+                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                    {selectedLead.subject}
+                  </div>
+                </div>
+                
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg min-h-[100px] whitespace-pre-wrap">
+                    {selectedLead.message}
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Received At</label>
+                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                    {new Date(selectedLead.createdAt).toLocaleDateString("en-US", {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric'
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex justify-end mt-8">
+              <button
+                type="button"
+                className="px-6 py-3 bg-gray-500 text-white rounded-xl font-medium hover:bg-gray-600 transition-all duration-200"
+                onClick={closeModal}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={confirmationModalOpen}
+        onClose={closeConfirmationModal}
+        onConfirm={handleDeleteLead}
+        title="Delete Lead"
+        message="Are you sure you want to delete this contact lead? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+        isLoading={isDeleting}
+        confirmButtonClass="bg-red-600 hover:bg-red-700"
+      />
+    </div>
   );
 }
 

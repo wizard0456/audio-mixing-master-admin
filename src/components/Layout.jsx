@@ -16,6 +16,7 @@ import {
   FaBars,
   FaTimes
 } from 'react-icons/fa';
+import { IoSearch, IoNotifications, IoPerson, IoSettings, IoMail, IoLogOut, IoMenu, IoClose } from 'react-icons/io5';
 
 const Layout = () => {
     const [openSidebar, setOpenSidebar] = useState(false);
@@ -81,9 +82,9 @@ const Layout = () => {
                                 className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-all duration-200 group"
                             >
                                 {openSidebar ? (
-                                    <FaTimes className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
+                                    <IoClose className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
                                 ) : (
-                                    <FaBars className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
+                                    <IoMenu className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
                                 )}
                             </button>
                             
@@ -92,7 +93,7 @@ const Layout = () => {
                                     <img src={LOGO} className="w-6 h-6" alt="Logo" />
                                 </div>
                                 <div className="hidden md:block">
-                                    <h1 className="text-xl font-bold text-gray-900">Audio Mixing Master</h1>
+                                    <h1 className="text-xl font-bold text-gray-900">Audio Mixing and Mastering</h1>
                                     <p className="text-sm text-gray-500">Admin Dashboard</p>
                                 </div>
                             </div>
@@ -102,7 +103,7 @@ const Layout = () => {
                         <div className="flex items-center space-x-4">
                             {/* Search */}
                             <div className="relative hidden md:block">
-                                <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                                 <input
                                     type="text"
                                     placeholder="Search..."
@@ -117,7 +118,7 @@ const Layout = () => {
                                 onClick={() => setShowNotifications(!showNotifications)}
                                 className="relative p-2 rounded-xl hover:bg-gray-100 transition-all duration-200 group"
                             >
-                                <FaBell className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
+                                <IoNotifications className="w-5 h-5 text-gray-600 group-hover:text-gray-800" />
                                 <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
                             </button>
 
@@ -128,7 +129,7 @@ const Layout = () => {
                                     className="flex items-center space-x-3 p-2 rounded-xl hover:bg-gray-100 transition-all duration-200 group"
                                 >
                                     <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                                        <FaUser className="w-6 h-6 text-white" />
+                                        <IoPerson className="w-6 h-6 text-white" />
                                     </div>
                                     <div className="hidden md:block text-left">
                                         <p className="text-sm font-medium text-gray-900">{user?.name || 'Admin'}</p>
@@ -153,15 +154,15 @@ const Layout = () => {
                                         
                                         <div className="py-1">
                                             <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 transition-colors duration-200">
-                                                <FaUser className="w-4 h-4" />
+                                                <IoPerson className="w-4 h-4" />
                                                 <span>Profile</span>
                                             </button>
                                             <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 transition-colors duration-200">
-                                                <FaCog className="w-4 h-4" />
+                                                <IoSettings className="w-4 h-4" />
                                                 <span>Settings</span>
                                             </button>
                                             <button className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 transition-colors duration-200">
-                                                <FaEnvelope className="w-4 h-4" />
+                                                <IoMail className="w-4 h-4" />
                                                 <span>Messages</span>
                                             </button>
                                         </div>
@@ -171,7 +172,7 @@ const Layout = () => {
                                                 onClick={handleLogout}
                                                 className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2 transition-colors duration-200"
                                             >
-                                                <FaSignOutAlt className="w-4 h-4" />
+                                                <IoLogOut className="w-4 h-4" />
                                                 <span>Logout</span>
                                             </button>
                                         </div>
