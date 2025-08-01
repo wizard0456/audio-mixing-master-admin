@@ -24,15 +24,16 @@ const Categories = () => {
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [filter, setFilter] = useState('all');
+    const [searchQuery, setSearchQuery] = useState('');
     const user = useSelector(selectUser);
     const [isDeleting, setIsDeleting] = useState(false);
     const abortController = useRef(null);
 
     useEffect(() => {
-        fetchCategories(currentPage, filter);
-    }, [currentPage, filter]);
+        fetchCategories(currentPage, filter, searchQuery);
+    }, [currentPage, filter, searchQuery]);
 
-    const fetchCategories = async (page, filter) => {
+    const fetchCategories = async (page, filter, searchQuery) => {
         if (abortController.current) {
             abortController.current.abort();
         }
@@ -42,6 +43,9 @@ const Categories = () => {
         let url = `${API_Endpoint}admin/categories?page=${page}&per_page=${Per_Page}`;
         if (filter !== 'all') {
             url += `&is_active=${filter}`;
+        }
+        if (searchQuery) {
+            url += `&search=${searchQuery}`;
         }
 
         try {
@@ -75,6 +79,11 @@ const Categories = () => {
 
     const handleFilterChange = (newFilter) => {
         setFilter(newFilter);
+        setCurrentPage(1);
+    };
+
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
         setCurrentPage(1);
     };
 
@@ -170,6 +179,15 @@ const Categories = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 mb-6 sm:mb-8">
+                <div className='flex items-center gap-2 w-full lg:w-auto'>
+                    <input
+                        type="text"
+                        placeholder="Search categories"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
+                    />
+                </div>
                 <div className="flex gap-2 sm:gap-4 mb-4 sm:mb-0">
                     <button
                         className={`font-THICCCBOI-Medium font-medium text-[14px] px-3 sm:px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
