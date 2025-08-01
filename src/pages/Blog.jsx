@@ -39,7 +39,9 @@ const Blog = () => {
         content: '',
         category_id: '',
         is_active: true,
-        html_content: ''
+        html_content: '',
+        image_url: '',
+        image_file: null
     });
     const [categories, setCategories] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -215,7 +217,9 @@ const Blog = () => {
             content: '',
             category_id: '',
             is_active: true,
-            html_content: ''
+            html_content: '',
+            image_url: '',
+            image_file: null
         });
         setEditingBlogId(null);
         setAddBlogModalOpen(true);
@@ -233,7 +237,9 @@ const Blog = () => {
             content: '',
             category_id: '',
             is_active: true,
-            html_content: ''
+            html_content: '',
+            image_url: '',
+            image_file: null
         });
     };
 
@@ -255,7 +261,9 @@ const Blog = () => {
             content: blog.content,
             category_id: blog.category_id,
             is_published: blog.is_published,
-            html_content: blog.html_content || ''
+            html_content: blog.html_content || '',
+            image_url: blog.image_url || '',
+            image_file: null
         });
         setEditingBlogId(blog.id);
         setEditBlogModalOpen(true);
@@ -273,7 +281,9 @@ const Blog = () => {
             content: '',
             category_id: '',
             is_active: true,
-            html_content: ''
+            html_content: '',
+            image_url: '',
+            image_file: null
         });
     };
 
@@ -292,6 +302,33 @@ const Blog = () => {
         }));
     };
 
+    const handleImageFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setBlogFormData(prev => ({
+                ...prev,
+                image_file: file,
+                image_url: '' // Clear URL when file is selected
+            }));
+        }
+    };
+
+    const handleImageUrlChange = (e) => {
+        setBlogFormData(prev => ({
+            ...prev,
+            image_url: e.target.value,
+            image_file: null // Clear file when URL is entered
+        }));
+    };
+
+    const clearImageInput = () => {
+        setBlogFormData(prev => ({
+            ...prev,
+            image_url: '',
+            image_file: null
+        }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -306,6 +343,13 @@ const Blog = () => {
         formData.append('category_id', blogFormData.category_id);
         formData.append('is_published', blogFormData.is_active ? 1 : 0);
         formData.append('html_content', blogFormData.html_content);
+        
+        // Handle image - either file upload or URL
+        if (blogFormData.image_file) {
+            formData.append('image', blogFormData.image_file);
+        } else if (blogFormData.image_url) {
+            formData.append('image_url', blogFormData.image_url);
+        }
 
         try {
             if (editingBlogId) {
@@ -625,6 +669,92 @@ const Blog = () => {
                             />
                         </div>
                     </div>
+                    
+                    {/* Image Input Section */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-semibold text-gray-800">Blog Image</h3>
+                        
+                        {/* Image URL Input */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="url"
+                                    name="image_url"
+                                    value={blogFormData.image_url}
+                                    onChange={handleImageUrlChange}
+                                    className="flex-1 px-3 py-2 border rounded-md"
+                                    placeholder="https://example.com/image.jpg"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={clearImageInput}
+                                    className="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                        
+                        {/* File Upload */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Upload Image File</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageFileChange}
+                                    className="flex-1 px-3 py-2 border rounded-md"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => document.querySelector('input[type="file"]').click()}
+                                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                >
+                                    Browse
+                                </button>
+                            </div>
+                            {blogFormData.image_file && (
+                                <div className="mt-2 p-2 bg-green-100 rounded-md">
+                                    <p className="text-sm text-green-800">
+                                        Selected file: {blogFormData.image_file.name}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Image Preview */}
+                        {(blogFormData.image_url || blogFormData.image_file) && (
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Image Preview</label>
+                                <div className="border rounded-md p-4 bg-gray-50">
+                                    {blogFormData.image_file ? (
+                                        <img
+                                            src={URL.createObjectURL(blogFormData.image_file)}
+                                            alt="Preview"
+                                            className="max-w-full h-auto max-h-48 object-contain"
+                                        />
+                                    ) : blogFormData.image_url ? (
+                                        <img
+                                            src={blogFormData.image_url}
+                                            alt="Preview"
+                                            className="max-w-full h-auto max-h-48 object-contain"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'block';
+                                            }}
+                                        />
+                                    ) : null}
+                                    {blogFormData.image_url && (
+                                        <div className="hidden text-sm text-red-600 mt-2">
+                                            Unable to load image from URL
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">HTML Content</label>
                         <textarea

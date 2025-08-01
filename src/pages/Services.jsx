@@ -52,7 +52,7 @@ const Services = () => {
             });
             setServices(response.data.data);
             setCurrentPage(response.data.current_page);
-            setTotalPages(response.data.last_page);
+            setTotalPages(response.data.total_pages);
             setLoading(false);
         } catch (error) {
             if (axios.isCancel(error)) {
@@ -170,6 +170,9 @@ const Services = () => {
             });
         }
     };
+
+    // Log currentPage and totalPages on every render
+    console.log('Current Page:', currentPage, 'Total Pages:', totalPages);
 
     return (
         <section className='px-4 py-8 md:px-5 md:py-10'>
