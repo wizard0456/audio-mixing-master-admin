@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt, FaPlus } from "react-icons/fa";
 import Modal from 'react-modal';
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
@@ -317,136 +317,161 @@ const Engineers = () => {
     };
 
     return (
-        <section className='px-4 py-8 md:px-5 md:py-10'>
-            <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Engineers</h1>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+            {/* Header */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Engineer Management</h1>
+                        <p className="text-gray-600">Manage your platform engineers and their permissions</p>
+                    </div>
+                    <button
+                        className="btn-primary flex items-center space-x-2"
+                        onClick={openAddEngineerModal}
+                    >
+                        <FaPlus className="w-4 h-4 mr-1" />
+                        <span>Add Engineer</span>
+                    </button>
+                </div>
 
-            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-                <div className='flex items-center gap-2 w-full lg:w-auto'>
-                    <input
-                        type="text"
-                        placeholder="Search engineers"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
-                    />
+                {/* Search and Filters */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                        {/* Search */}
+                        <div className="relative flex-1 max-w-md">
+                            <input
+                                type="text"
+                                placeholder="Search engineers by name or email..."
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                className="modern-input w-full"
+                            />
+                        </div>
+
+                        {/* Filters */}
+                        <div className="flex items-center space-x-2">
+                            <button
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                    filter === 'all' 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                                onClick={() => handleFilterChange('all')}
+                            >
+                                All Engineers
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                    filter === 'active' 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                                onClick={() => handleFilterChange('active')}
+                            >
+                                Active
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                    filter === 'inactive' 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                                onClick={() => handleFilterChange('inactive')}
+                            >
+                                Inactive
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex gap-4">
-                    <button
-                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
-                        onClick={() => handleFilterChange('all')}
-                    >
-                        All Engineers
-                    </button>
-                    <button
-                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
-                        onClick={() => handleFilterChange('active')}
-                    >
-                        Active Engineers
-                    </button>
-                    <button
-                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
-                        onClick={() => handleFilterChange('inactive')}
-                    >
-                        Inactive Engineers
-                    </button>
-                </div>
-                <button
-                    className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
-                    onClick={openAddEngineerModal}
-                >
-                    Add Engineer
-                </button>
             </div>
 
             {/* Add Engineer Modal */}
             <Modal
                 isOpen={addEngineerModalOpen}
                 onRequestClose={closeAddEngineerModal}
-                contentLabel="Add Engineer"
+                className="modal-content"
+                overlayClassName="modal-overlay"
             >
-                <div>
-                    <h2 className="text-xl md:text-2xl mb-4 font-semibold">Add Engineer</h2>
+                <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Add Engineer</h2>
                     <form onSubmit={handleAddEngineer} className="space-y-4">
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="first_name">First Name</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">First Name</label>
                             <input
                                 type="text"
                                 name="first_name"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input"
                                 value={newEngineer.first_name}
                                 onChange={handleAddEngineerInputChange}
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="last_name">Last Name</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
                             <input
                                 type="text"
                                 name="last_name"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input"
                                 value={newEngineer.last_name}
                                 onChange={handleAddEngineerInputChange}
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="email">Email</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                             <input
                                 type="email"
                                 name="email"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input"
                                 value={newEngineer.email}
                                 onChange={handleAddEngineerInputChange}
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="phone_number">Phone Number</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                             <input
                                 type="text"
                                 name="phone_number"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input"
                                 value={newEngineer.phone_number}
                                 onChange={handleAddEngineerInputChange}
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="password">Password</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
                             <input
                                 type="password"
                                 name="password"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input"
                                 value={newEngineer.password}
                                 onChange={handleAddEngineerInputChange}
                                 required
                             />
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="confirm_password">Confirm Password</label>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
                             <input
                                 type="password"
                                 name="confirm_password"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input"
                                 value={newEngineer.confirm_password}
                                 onChange={handleAddEngineerInputChange}
                                 required
                             />
                         </div>
-                        <div className="flex justify-end space-x-4">
+                        <div className="flex justify-end space-x-3 mt-6">
                             <button
                                 type="button"
-                                className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                                className="btn-secondary"
                                 onClick={closeAddEngineerModal}
-                                disabled={adding}
                             >
-                                Close
+                                Cancel
                             </button>
                             <button
                                 type="submit"
-                                className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                                className="btn-primary"
                                 disabled={adding}
                             >
                                 {adding ? 'Adding...' : 'Add Engineer'}
@@ -459,48 +484,78 @@ const Engineers = () => {
             {/* Confirmation Modal */}
             <ConfirmationModal
                 isOpen={confirmationModalOpen}
-                onRequestClose={closeConfirmationModal}
+                onClose={closeConfirmationModal}
                 onConfirm={handleDeleteEngineer}
-                message="Are you sure you want to delete this engineer?"
-                isDeleting={isDeleting} // Pass the isDeleting state to modal
+                title="Delete Engineer"
+                message="Are you sure you want to delete this engineer? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                isLoading={isDeleting}
+                confirmButtonClass="bg-red-600 hover:bg-red-700"
             />
 
             {/* Engineer Details Modal */}
             <Modal
                 isOpen={engineerDetailsModalOpen}
                 onRequestClose={closeEngineerDetailsModal}
-                contentLabel="Engineer Details"
+                className="modal-content"
+                overlayClassName="modal-overlay"
             >
                 {engineerDetailsLoading ? (
-                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                    <div className="flex justify-center items-center py-8">
                         <Loading />
                     </div>
                 ) : (
                     selectedEngineer && (
-                        <div>
-                            <h2 className="text-2xl mb-4 font-semibold">Engineer Details</h2>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <p>{`${selectedEngineer.first_name} ${selectedEngineer.last_name}`}</p>
+                        <div className="bg-white rounded-2xl p-6 max-w-lg w-full mx-4">
+                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Engineer Details</h2>
+                            <div className="space-y-4">
+                                <div className="flex items-center space-x-4">
+                                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                                        <span className="text-white font-semibold text-lg">
+                                            {selectedEngineer.first_name?.charAt(0)?.toUpperCase() || 'E'}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold text-gray-900">
+                                            {selectedEngineer.first_name} {selectedEngineer.last_name}
+                                        </h3>
+                                        <p className="text-gray-500">{selectedEngineer.email}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-sm font-medium text-gray-500 mb-1">Email</p>
+                                        <p className="text-gray-900">{selectedEngineer.email}</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-sm font-medium text-gray-500 mb-1">Phone</p>
+                                        <p className="text-gray-900">{selectedEngineer.phone_number || 'N/A'}</p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
+                                        <p className={`font-medium ${selectedEngineer.is_active === 1 ? 'text-green-600' : 'text-red-600'}`}>
+                                            {selectedEngineer.is_active === 1 ? 'Active' : 'Inactive'}
+                                        </p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-sm font-medium text-gray-500 mb-1">Joined Date</p>
+                                        <p className="text-gray-900">
+                                            {new Date(selectedEngineer.created_at).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                    <div className="bg-gray-50 rounded-lg p-4">
+                                        <p className="text-sm font-medium text-gray-500 mb-1">Engineer ID</p>
+                                        <p className="text-gray-900">{selectedEngineer.id}</p>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                                <p>{selectedEngineer.email}</p>
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Joined Date</label>
-                                <p>{new Date(selectedEngineer.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</p>
-                            </div>
-                            <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Current Status</label>
-                                <p>{selectedEngineer.is_active == 1 ? 'Active' : 'Inactive'}</p>
-                            </div>
-
-                            <div className="flex justify-center">
+                            
+                            <div className="flex justify-end space-x-3 mt-6">
                                 <button
-                                    type="button"
-                                    className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
                                     onClick={closeEngineerDetailsModal}
+                                    className="btn-secondary"
                                 >
                                     Close
                                 </button>
@@ -510,80 +565,123 @@ const Engineers = () => {
                 )}
             </Modal>
 
+            {/* Engineers Table */}
             {loading ? (
-                <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                <div className="flex justify-center items-center py-8">
                     <Loading />
                 </div>
             ) : (
                 engineers.length !== 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className='w-full border-0'>
-                            <thead>
-                                <tr>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Full Name</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Email Address</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Status</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {engineers.map(engineer => (
-                                    <tr key={engineer.id}>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{`${engineer.first_name} ${engineer.last_name}`}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{engineer.email}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-4 bg-[#F6F6F6]'>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Engineer
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Email
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Phone
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Status
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {engineers.map(engineer => (
+                                        <tr key={engineer.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                                                        <span className="text-white font-semibold text-sm">
+                                                            {engineer.first_name?.charAt(0)?.toUpperCase() || 'E'}
+                                                        </span>
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-medium text-gray-900">
+                                                            {engineer.first_name} {engineer.last_name}
+                                                        </div>
+                                                        <div className="text-sm text-gray-500">ID: {engineer.id}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{engineer.email}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{engineer.phone_number || 'N/A'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 <Toggle
-                                                    checked={engineer.is_active == '1'}
+                                                    checked={engineer.is_active == '1' || engineer.is_active === 1}
                                                     onChange={() => handleToggleActivation(engineer.id, engineer.is_active)}
                                                     icons={false}
-                                                    aria-label="Engineer status"
+                                                    className="modern-toggle"
                                                 />
-                                            </div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                                <button onClick={() => openEngineerDetailsModal(engineer)} >
-                                                    <FaEye />
-                                                </button>
-                                                {/* <button onClick={() => openConfirmationModal(engineer)}><FaTrashAlt color="#FF0000" /></button> */}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex space-x-2">
+                                                    <button
+                                                        onClick={() => openEngineerDetailsModal(engineer)}
+                                                        className="text-green-600 hover:text-green-900"
+                                                        title="View Details"
+                                                    >
+                                                        <FaEye className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openConfirmationModal(engineer)}
+                                                        className="text-red-600 hover:text-red-900"
+                                                        title="Delete Engineer"
+                                                    >
+                                                        <FaTrashAlt className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 ) : (
-                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                        No engineers found
+                    <div className="text-center py-12">
+                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-white font-semibold text-lg">E</span>
+                        </div>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No engineers found</h3>
+                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
 
-            {loading || (
-                engineers.length !== 0 && (
-                    <div className="flex justify-center mt-6">
-                        <ReactPaginate
-                            previousLabel={<FaAngleDoubleLeft />}
-                            nextLabel={<FaAngleDoubleRight />}
-                            breakLabel={"..."}
-                            pageCount={totalPages}
-                            marginPagesDisplayed={2}
-                            pageRangeDisplayed={3}
-                            onPageChange={handlePageClick}
-                            containerClassName={"pagination"}
-                            activeClassName={"active"}
-                            forcePage={currentPage - 1}
-                        />
-                    </div>
-                )
+            {/* Pagination */}
+            {!loading && engineers.length > 0 && (
+                <div className="mt-6">
+                    <ReactPaginate
+                        previousLabel={<FaAngleDoubleLeft />}
+                        nextLabel={<FaAngleDoubleRight />}
+                        pageCount={totalPages}
+                        onPageChange={handlePageClick}
+                        containerClassName="pagination"
+                        pageClassName=""
+                        pageLinkClassName=""
+                        previousClassName=""
+                        previousLinkClassName=""
+                        nextClassName=""
+                        nextLinkClassName=""
+                        activeClassName="active"
+                        disabledClassName="disabled"
+                    />
+                </div>
             )}
-        </section>
+        </div>
     );
 };
 

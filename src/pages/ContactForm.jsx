@@ -108,28 +108,29 @@ const ContactForm = () => {
   };
 
   const closeModal = () => {
-    setSelectedLead(null);
     setModalIsOpen(false);
+    setSelectedLead(null);
   };
 
   return (
-    <section className='px-5 py-10'>
-      <div className="mb-10 flex items-center justify-center bg-[#F6F6F6] py-6 rounded-lg">
-        <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-9">Contact Leads</h1>
+    <section className='px-4 py-8 md:px-6 md:py-10'>
+      <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
+        <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Contact Form</h1>
       </div>
 
       <ConfirmationModal
         isOpen={confirmationModalOpen}
-        onRequestClose={closeConfirmationModal}
+        onClose={closeConfirmationModal}
         onConfirm={handleDeleteLead}
         message="Are you sure you want to delete this lead?"
-        isDeleting={isDeleting}
+        isLoading={isDeleting}
       />
 
       <Modal
         isOpen={modalIsOpen}
         onRequestClose={closeModal}
-        contentLabel="Lead Details"
+        className="modal-content"
+        overlayClassName="modal-overlay"
       >
         {selectedLead && (
           <div>

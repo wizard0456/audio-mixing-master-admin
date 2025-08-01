@@ -103,7 +103,6 @@ const Newsletter = () => {
     }
   };
 
-  // Export logic
   const handleExportLeads = async () => {
     if (dates[0] && dates[1]) {
       const startDate = dates[0].toLocaleDateString('en-GB', {
@@ -118,22 +117,10 @@ const Newsletter = () => {
         year: 'numeric',
       });
 
-      const apiUrl = `${API_Endpoint}export/lead?start_date=${startDate}&end_date=${endDate}`;
+      const apiUrl = `${API_Endpoint}/export-leads?start_date=${startDate}&end_date=${endDate}`;
 
       // Trigger the download
       window.open(apiUrl, '_blank');
-    } else {
-      toast.error('Please select a valid date range', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Slide,
-      });
     }
   };
 
@@ -156,10 +143,10 @@ const Newsletter = () => {
 
       <ConfirmationModal
         isOpen={confirmationModalOpen}
-        onRequestClose={closeConfirmationModal}
+        onClose={closeConfirmationModal}
         onConfirm={handleDeleteLead}
         message="Are you sure you want to delete this lead?"
-        isDeleting={isDeleting} // Pass the isDeleting state to modal
+        isLoading={isDeleting}
       />
 
       {loading ? (

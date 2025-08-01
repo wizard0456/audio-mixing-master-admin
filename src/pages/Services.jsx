@@ -180,159 +180,226 @@ const Services = () => {
         }
     };
 
-    // Log currentPage and totalPages on every render
-    console.log('Current Page:', currentPage, 'Total Pages:', totalPages);
-
     return (
-        <section className='px-4 py-8 md:px-5 md:py-10'>
-            <div className="mb-8 md:mb-10 flex items-center justify-center bg-[#F6F6F6] py-4 md:py-6 rounded-lg">
-                <h1 className="font-THICCCBOI-SemiBold font-semibold text-2xl md:text-3xl leading-7 md:leading-9">Services</h1>
-            </div>
-
-            <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-4">
-                <div className='flex items-center gap-2 w-full lg:w-auto'>
-                    <input
-                        type="text"
-                        placeholder="Search services"
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        className="px-4 py-2 rounded-md bg-white border border-gray-300 w-full lg:w-auto"
-                    />
-                </div>
-                <div className="flex gap-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+            {/* Header */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Management</h1>
+                        <p className="text-gray-600">Manage and configure all platform services and pricing</p>
+                    </div>
                     <button
-                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'all' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
-                        onClick={() => handleFilterChange('all')}
+                        onClick={() => navigate('/add-service')}
+                        className="btn-primary flex items-center space-x-2"
                     >
-                        All Services
-                    </button>
-                    <button
-                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'active' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
-                        onClick={() => handleFilterChange('active')}
-                    >
-                        Active Services
-                    </button>
-                    <button
-                        className={`font-THICCCBOI-Medium font-medium text-[14px] px-5 py-2 rounded-lg ${filter === 'inactive' ? 'bg-[#0F2005] text-white' : 'bg-[#E9E9E9] text-black'}`}
-                        onClick={() => handleFilterChange('inactive')}
-                    >
-                        Inactive Services
+                        <span>Add Service</span>
                     </button>
                 </div>
-                <button
-                    onClick={() => navigate('/add-service')}
-                    className="font-THICCCBOI-Medium font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
-                >
-                    Add Service
-                </button>
+
+                {/* Search and Filters */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                        {/* Search */}
+                        <div className="relative flex-1 max-w-md">
+                            <input
+                                type="text"
+                                placeholder="Search services by name..."
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                className="modern-input w-full"
+                            />
+                        </div>
+
+                        {/* Filters */}
+                        <div className="flex items-center space-x-2">
+                            <button
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                    filter === 'all' 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                                onClick={() => handleFilterChange('all')}
+                            >
+                                All Services
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                    filter === 'active' 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                                onClick={() => handleFilterChange('active')}
+                            >
+                                Active Services
+                            </button>
+                            <button
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                    filter === 'inactive' 
+                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                }`}
+                                onClick={() => handleFilterChange('inactive')}
+                            >
+                                Inactive Services
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <ConfirmationModal
-                isOpen={confirmationModalOpen}
-                onRequestClose={closeConfirmationModal}
-                onConfirm={handleDeleteService}
-                message="Are you sure you want to delete this service?"
-                isDeleting={isDeleting}
-            />
-
+            {/* Services Table */}
             {loading ? (
-                <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
+                <div className="flex justify-center items-center py-8">
                     <Loading />
                 </div>
             ) : (
                 services.length !== 0 ? (
-                    <div className="overflow-x-auto">
-                        <table className='w-full border-0'>
-                            <thead>
-                                <tr>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Name</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Price Before</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Price After Discount</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Service Type</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Created At</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Active</th>
-                                    <th className="font-THICCCBOI-SemiBold font-semibold text-left text-base leading-6 px-3 pb-5 text-nowrap">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {services.map(service => (
-                                    <tr key={service.id}>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] rounded-tl-lg rounded-bl-lg text-nowrap'>{service.name}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>${service.price || '-'}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{(Number(service.discounted_price) != 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "-"}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{service.service_type}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-5 bg-[#F6F6F6] text-nowrap'>{new Date(service.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}</div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='px-3 py-4 bg-[#F6F6F6] text-nowrap'>
-                                                <Toggle
-                                                    checked={service.is_active == "1"}
-                                                    onChange={() => handleStatusToggle(service.id, service.is_active)}
-                                                    icons={false}
-                                                />
-                                            </div>
-                                        </td>
-                                        <td className="font-THICCCBOI-SemiBold font-semibold text-base leading-6 pb-5">
-                                            <div className='flex gap-3 px-3 py-6 bg-[#F6F6F6] rounded-tr-lg rounded-br-lg'>
-                                                <Link to={`/edit-service/${service.id}`}><FaEdit /></Link>
-                                                <Link to={`/service-detail/${service.id}`}><FaEye /></Link>
-                                                {/* <button onClick={() => openConfirmationModal(service.id)}><FaTrashAlt color="#FF0000" /></button> */}
-                                            </div>
-                                        </td>
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Name
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Price Before
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Price After Discount
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Service Type
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Created At
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Active
+                                        </th>
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Actions
+                                        </th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {services.map(service => (
+                                        <tr key={service.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                                                        <span className="text-white font-semibold text-sm">
+                                                            {service.name.charAt(0).toUpperCase()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="ml-3">
+                                                        <div className="text-sm font-medium text-gray-900">{service.name}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm font-medium text-gray-900">${service.price || '-'}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {(Number(service.discounted_price) != 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "-"}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">{service.service_type}</div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
+                                                    {new Date(service.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <Toggle
+                                                        checked={service.is_active == "1"}
+                                                        onChange={() => handleStatusToggle(service.id, service.is_active)}
+                                                        icons={false}
+                                                        aria-label="Service status"
+                                                        className="react-toggle"
+                                                    />
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                <div className="flex space-x-3">
+                                                    <Link 
+                                                        to={`/edit-service/${service.id}`}
+                                                        className="text-blue-600 hover:text-blue-900"
+                                                        title="Edit Service"
+                                                    >
+                                                        <FaEdit className="w-4 h-4" />
+                                                    </Link>
+                                                    <Link 
+                                                        to={`/service-detail/${service.id}`}
+                                                        className="text-green-600 hover:text-green-900"
+                                                        title="View Details"
+                                                    >
+                                                        <FaEye className="w-4 h-4" />
+                                                    </Link>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 ) : (
-                    <div className="flex justify-center items-center font-THICCCBOI-SemiBold font-semibold text-base">
-                        No services found
+                    <div className="text-center py-12">
+                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span className="text-white font-semibold text-lg">S</span>
+                        </div>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No services found</h3>
+                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
 
-            {!loading && services.length !== 0 && (
-                <div className="flex flex-col items-center mt-8 mb-4 gap-4">
-                    {totalPages > 1 && (
-                        <div className="text-center">
-                            <p className="font-THICCCBOI-Medium text-sm text-gray-600 mb-2">
-                                Page {currentPage} of {totalPages} • Showing {services.length} services
-                            </p>
-                            <ReactPaginate
-                                previousLabel={<FaAngleDoubleLeft />}
-                                nextLabel={<FaAngleDoubleRight />}
-                                breakLabel={"..."}
-                                pageCount={totalPages}
-                                marginPagesDisplayed={2}
-                                pageRangeDisplayed={3}
-                                onPageChange={handlePageClick}
-                                containerClassName={"pagination"}
-                                activeClassName={"active"}
-                                forcePage={currentPage - 1}
-                                pageClassName="page-item"
-                                pageLinkClassName="page-link"
-                                previousClassName="page-item"
-                                previousLinkClassName="page-link"
-                                nextClassName="page-item"
-                                nextLinkClassName="page-link"
-                                breakClassName="page-item"
-                                breakLinkClassName="page-link"
-                            />
-                        </div>
-                    )}
+            {/* Pagination */}
+            {!loading && services.length > 0 && (
+                <div className="mt-6">
+                    <div className="text-center">
+                        <p className="font-medium text-sm text-gray-600 mb-2">
+                            Page {currentPage} of {totalPages} • Showing {services.length} services
+                        </p>
+                        <ReactPaginate
+                            previousLabel={<FaAngleDoubleLeft />}
+                            nextLabel={<FaAngleDoubleRight />}
+                            pageCount={totalPages}
+                            onPageChange={handlePageClick}
+                            containerClassName="pagination"
+                            pageClassName=""
+                            pageLinkClassName=""
+                            previousClassName=""
+                            previousLinkClassName=""
+                            nextClassName=""
+                            nextLinkClassName=""
+                            activeClassName="active"
+                            disabledClassName="disabled"
+                        />
+                    </div>
                 </div>
             )}
-        </section>
+
+            {/* Confirmation Modal */}
+            <ConfirmationModal
+                isOpen={confirmationModalOpen}
+                onClose={closeConfirmationModal}
+                onConfirm={handleDeleteService}
+                title="Delete Service"
+                message="Are you sure you want to delete this service? This action cannot be undone."
+                confirmText="Delete"
+                cancelText="Cancel"
+                isLoading={isDeleting}
+                confirmButtonClass="bg-red-600 hover:bg-red-700"
+            />
+        </div>
     );
-}
+};
 
 export default Services;

@@ -47,385 +47,475 @@
     src: url(./assets/fonts/Thicccboi/THICCCBOI-Thin.woff2);
 }
 
-/* Select */
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* Selection */
 ::selection {
-    background: #4BC300;
-    color: #fff;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
     text-shadow: none;
 }
 
-
-::-webkit-scrollbar {
-    width: 6px;
-    background-color: #060505;
-}
-
-::-webkit-scrollbar-button:start:decrement,
-::-webkit-scrollbar-button:end:increment {
-    display: none;
-}
-
-::-webkit-scrollbar-track-piece {
-    background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb:vertical {
-    border-radius: 0px;
-    background-image: linear-gradient(100.68deg, #4BC300 -19.35%, #336613 135.67%) !important;
-}
-
-::-webkit-scrollbar:horizontal {
-    height: 6px;
-    background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb:horizontal {
-    border-radius: 10px;
-    background-image: linear-gradient(100.68deg, #4BC300 -19.35%, #336613 135.67%) !important;
-}
-
+/* Global Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-:root {
-    --sidebar-width: 230px;
-    --sidebar-logo-height: 140px;
-}
-
 body {
-    background: #fff;
-    color: #111111;
+    font-family: 'THICCCBOI-Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
 }
 
 #root {
-    height: fit-content;
+    height: 100vh;
 }
 
-.sidebar>div {
-    width: var(--sidebar-width);
+/* Modern Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 50;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-logo {
-    height: var(--sidebar-logo-height);
-    padding: 0px 40px;
-    padding-top: 30px;
+.sidebar > div {
+    width: 288px;
+    height: 100%;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.sidebar-list {
-    height: calc(100% - var(--sidebar-logo-height));
+.sidebar.active > div {
+    transform: translateX(0);
 }
 
-.sidebar-list a.active .icon {
-    color: #4BC500;
-}
-
-.top-header {
-    display: none;
-}
-
-.sidebar-close-btn,
-.hamburger-icon-wrapper {
-    display: none;
-}
-
-.body-wrapper {
-    width: calc(100% - var(--sidebar-width));
-    margin-left: var(--sidebar-width);
-}
-
-
-.gallery-image:hover .gallery-buttons-wrapper {
-    bottom: 0;
-}
-
-.gallery-image:hover .gallery-delete-wrapper {
-    top: 10px;
-}
-
-/* react-modal */
-.ReactModalPortal>div {
-    z-index: 999;
-    background-color: rgba(0, 0, 0, 0.6) !important;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-    /* Add transition property */
-}
-
-.ReactModalPortal>div>div {
-    inset: 0 !important;
-    top: 50% !important;
-    left: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    height: fit-content !important;
-    padding: 20px !important;
-    border-radius: 20px !important;
-    border: none !important;
-    transition: all 0.3s ease-in-out;
-    /* Add transition property */
-    max-width: 500px !important;
-    /* Ensure the max-width is enforced */
+/* Modern Cards */
+.modern-card {
     background: white;
-    /* Ensure the modal content is visible */
-    margin: 0%;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.ReactModalPortal>div.ReactModal__Overlay--after-open {
-    opacity: 1;
+.modern-card:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
 }
 
-.ReactModal__Content {
-    max-width: 500px;
-    /* Ensure the max-width is enforced */
-    margin: auto;
-    /* Center content within the modal */
-}
-
-/* Override react-modal transform styles */
-.ReactModal__Content {
-  transform: none !important;
-  top: 50% !important;
-  left: 50% !important;
-  position: absolute !important;
-  margin: 0 !important;
-  transform-origin: center !important;
-}
-
-.ReactModal__Overlay {
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* react-daterange-picker */
-.react-daterange-picker,
-.react-daterange-picker__wrapper,
-.react-daterange-picker__inputGroup {
-    border-radius: 8px;
-    padding: 3px;
-    background-color: #F6F6F6;
-    color: #7A7A7A;
-    border: none;
-    min-width: fit-content !important;
-}
-
-.react-daterange-picker__inputGroup__input {
-    color: #7A7A7A;
-    background: none;
-    outline: none;
-    font-size: 12px;
-    font-family: THICCCBOI-Bold, sans-serif;
-    font-weight: 700;
-    border: none;
-}
-
-.react-daterange-picker__inputGroup__input:focus {
-    outline: none;
-    background-color: transparent !important;
-}
-
-.react-daterange-picker__inputGroup__input:invalid {
-    background: transparent !important;
-}
-
-.react-daterange-picker__range-divider {
-    margin-left: 6px;
-    margin-right: 6px;
-}
-
-.react-daterange-picker__calendar-button,
-.react-daterange-picker__clear-button {
-    color: #7A7A7A;
-}
-
-.react-daterange-picker__calendar {
-    border-radius: 8px;
-}
-
-.react-calendar__tile--active {
-    background: #000000;
+/* Modern Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
 }
 
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4);
+}
 
-/* React Pagination */
-.pagination {
+.btn-secondary {
+    background: #f8fafc;
+    color: #64748b;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #f1f5f9;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+/* Modern Tables */
+.modern-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.modern-table th {
+    background: #f8fafc;
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modern-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+    transition: background-color 0.2s ease;
+}
+
+.modern-table tr:hover td {
+    background-color: #f9fafb;
+}
+
+/* Modern Forms */
+.modern-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+.modern-input:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Modern Modals */
+.ReactModalPortal > div {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
+    padding: 1rem;
+}
+
+.ReactModalPortal > div > div {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Modern Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
 }
 
 .pagination li {
-    margin: 0;
+    list-style: none;
 }
 
 .pagination li a {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #F6F6F6;
-    padding: 12px 16px;
-    font-size: 14px;
-    font-family: THICCCBOI-Medium, sans-serif;
-    font-weight: 500;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 12px;
+    background: white;
+    color: #64748b;
     text-decoration: none;
-    color: #333;
-    border-radius: 8px;
-    min-width: 44px;
-    height: 44px;
-    transition: all 0.2s ease;
-    border: 1px solid #E5E5E5;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid #e2e8f0;
 }
 
 .pagination li a:hover {
-    background-color: #E5E5E5;
+    background: #f8fafc;
+    color: #475569;
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.pagination .disabled a {
-    opacity: 0.4;
-    cursor: not-allowed;
-    background-color: #F0F0F0;
-}
-
-.pagination .disabled a:hover {
-    background-color: #F0F0F0;
-    transform: none;
-    box-shadow: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .pagination .active a {
-    background-color: #0F2005;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     color: white;
-    border-color: #0F2005;
-    font-weight: 600;
+    border-color: transparent;
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3);
 }
 
 .pagination .active a:hover {
-    background-color: #0F2005;
-    transform: none;
-    box-shadow: none;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
 }
 
-/* Responsive pagination */
+/* Modern Loading */
+.loading-spinner {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid #f3f4f6;
+    border-radius: 50%;
+    border-top-color: #10b981;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Modern Toggle */
+.react-toggle {
+    position: relative;
+    display: inline-block;
+    width: 3rem;
+    height: 1.5rem;
+    background: #d1d5db;
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+}
+
+.react-toggle--checked {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.react-toggle-track {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.react-toggle-thumb {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 1.25rem;
+    height: 1.25rem;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.react-toggle--checked .react-toggle-thumb {
+    transform: translateX(1.5rem);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1200px) {
+    .sidebar > div {
+        width: 280px;
+    }
+}
+
 @media screen and (max-width: 768px) {
-    .pagination {
-        gap: 4px;
+    .sidebar > div {
+        width: 100%;
+    }
+    
+    .modern-table {
+        font-size: 0.875rem;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: 0.75rem 0.5rem;
     }
     
     .pagination li a {
-        padding: 10px 12px;
-        font-size: 12px;
-        min-width: 36px;
-        height: 36px;
+        width: 2rem;
+        height: 2rem;
+        font-size: 0.875rem;
     }
 }
 
-@media screen and (max-width: 1200px) {
-    .sidebar>div {
-        left: -100%;
-
-        transition: all 0.3s 0.2s ease-in-out;
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #0f172a;
+        color: #f1f5f9;
     }
-
-    .sidebar.active>div {
-        left: 0%;
+    
+    .modern-card {
+        background: #1e293b;
+        border-color: #334155;
     }
-
-    .sidebar::before {
-        content: "";
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 0%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        z-index: 20;
-        transition: all 0.3s ease-in-out;
-        /* Add transition property */
+    
+    .modern-table {
+        background: #1e293b;
     }
-
-    .sidebar.active::before {
-        width: 100%;
+    
+    .modern-table th {
+        background: #334155;
+        color: #f1f5f9;
+        border-bottom-color: #475569;
     }
-
-    .body-wrapper {
-        width: 100%;
-        margin-left: 0px;
+    
+    .modern-table td {
+        border-bottom-color: #334155;
     }
-
-    .content-wrapper {
-        padding-left: 30px;
-        padding-right: 30px;
+    
+    .modern-table tr:hover td {
+        background-color: #334155;
     }
-
-    .top-header {
-        display: flex;
+    
+    .modern-input {
+        background: #1e293b;
+        border-color: #475569;
+        color: #f1f5f9;
     }
-
-    .sidebar.active .sidebar-close-btn {
-        display: block;
-    }
-
-    .hamburger-icon-wrapper {
-        display: block;
-    }
-
-    .sidebar-close-btn {
-        position: fixed;
-        top: 55px;
-        right: 5%;
-        font-size: 30px;
+    
+    .modern-input:focus {
+        border-color: #3b82f6;
     }
 }
 
-@media screen and (max-width: 768px) {
-    .sidebar-list-item a {
-        font-size: 16px;
+/* Custom animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
     }
-
-    .content-wrapper {
-        padding-top: 130px;
-    }
-
-    .content-wrapper .content-header-action-btn-wrapper .action-btn {
-        width: 250px;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 
-@media screen and (max-width: 550px) {
-    .sidebar>div {
-        width: 100%;
-        border-radius: 0%;
-    }
+.fade-in-up {
+    animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .sidebar-logo {
-        height: fit-content;
-        padding: 20px 30px;
-        margin-bottom: 20px;
-        text-align: center;
-        justify-content: space-between;
-    }
+/* Gradient text */
+.gradient-text {
+    background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
 
-    .sidebar-close-btn {
-        position: relative;
-        top: 7px;
-        right: 0px;
-        font-size: 30px;
-    }
+/* Glass morphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
 
-    .ReactModalPortal>div>div {
-        width: 100% !important;
-    }
+/* Hover effects */
+.hover-lift {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .content-wrapper .content-header-action-btn-wrapper .action-btn {
-        width: 230px;
+.hover-lift:hover {
+    transform: translateY(-2px);
+}
+
+/* Pulse animation */
+.pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+/* Bounce animation */
+.bounce {
+    animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(-25%);
+        animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+    }
+    50% {
+        transform: none;
+        animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
     }
 }

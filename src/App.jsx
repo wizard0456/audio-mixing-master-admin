@@ -14,6 +14,7 @@ import Categories from "./pages/Categories.jsx";
 import ServiceDetail from "./pages/ServiceDetail.jsx";
 import Newsletter from "./pages/Newsletter.jsx";
 import ContactForm from "./pages/ContactForm.jsx";
+import Uploads from "./pages/Uploads.jsx";
 import OrderForm from "./pages/OrderForm.jsx";
 import ServiceForm from "./pages/ServiceForm.jsx";
 import OrderDetail from "./pages/OrderDetail.jsx";
@@ -105,6 +106,10 @@ const router = createBrowserRouter([
       {
         path: "/contact-us",
         element: <RestrictedRoute roles={['admin']} element={ContactForm} />,
+      },
+      {
+        path: "/uploads",
+        element: <RestrictedRoute roles={['admin']} element={Uploads} />,
       },
       {
         path: "/order-us",
