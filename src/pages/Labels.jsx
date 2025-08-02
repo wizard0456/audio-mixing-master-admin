@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus, FaSearch, FaFilter } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
+import { IoSearch, IoFilter, IoAdd, IoTrash } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import Toggle from 'react-toggle';
@@ -32,10 +33,10 @@ const Labels = () => {
     const abortController = useRef(null);
 
     useEffect(() => {
-        fetchLabels(currentPage, filter, searchQuery);
-    }, [currentPage, filter, searchQuery]);
+        fetchLabels(currentPage, filter);
+    }, [currentPage, filter]);
 
-    const fetchLabels = async (page, filter, searchQuery) => {
+    const fetchLabels = async (page, filter) => {
         if (abortController.current) {
             abortController.current.abort();
         }
@@ -45,9 +46,6 @@ const Labels = () => {
         let url = `${API_Endpoint}admin/labels?page=${page}&per_page=${Per_Page}`;
         if (filter !== 'all') {
             url += `&is_active=${filter}`;
-        }
-        if (searchQuery) {
-            url += `&search=${searchQuery}`;
         }
 
         try {
@@ -88,7 +86,14 @@ const Labels = () => {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1);
+    };
+
+    const getFilteredLabels = () => {
+        if (!searchQuery) return labels;
+        
+        return labels.filter(label => 
+            label.name?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
     };
 
     const openModal = (label = null) => {
@@ -114,61 +119,41 @@ const Labels = () => {
     const handleAddOrUpdateLabel = async (event) => {
         event.preventDefault();
         setAdding(true);
+
+        const id = toast.loading(labelId ? 'Updating label...' : 'Adding label...', {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
-            if (labelId) {
-                // Update label
-                await axios({
-                    method: 'put',
-                    url: `${API_Endpoint}admin/labels/${labelId}?name=${labelName}&is_active=${isActive ? 1 : 0}`,
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                toast.success("Label updated successfully!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Slide,
-                });
-            } else {
-                // Add new label
-                await axios({
-                    method: 'post',
-                    url: `${API_Endpoint}admin/labels`,
-                    headers: {
-                        'Authorization': `Bearer ${user.token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    data: { name: labelName, is_active: isActive ? 1 : 0 }
-                });
-                toast.success("Label added successfully!", {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Slide,
-                });
-            }
-            setAdding(false);
-            closeModal();
-            fetchLabels(currentPage, filter); // Refetch labels to get the updated list
-        } catch (error) {
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
-            }
-            console.error('Error adding/updating label:', error);
-            setAdding(false);
-            toast.error("Error adding/updating label.", {
+            const url = labelId 
+                ? `${API_Endpoint}admin/labels/${labelId}` 
+                : `${API_Endpoint}admin/labels`;
+            
+            const method = labelId ? 'PUT' : 'POST';
+            
+            await axios({
+                method: method,
+                url: url,
+                data: {
+                    name: labelName,
+                    is_active: isActive ? 1 : 0
+                },
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            toast.dismiss(id);
+            toast.success(labelId ? 'Label updated successfully!' : 'Label added successfully!', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -179,6 +164,25 @@ const Labels = () => {
                 theme: "light",
                 transition: Slide,
             });
+
+            closeModal();
+            fetchLabels(currentPage, filter);
+        } catch (error) {
+            toast.dismiss(id);
+            toast.error('Error saving label.', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            console.error('Error saving label:', error);
+        } finally {
+            setAdding(false);
         }
     };
 
@@ -194,7 +198,20 @@ const Labels = () => {
 
     const handleDeleteLabel = async () => {
         if (!labelToDelete) return;
+
         setIsDeleting(true);
+        const id = toast.loading('Deleting label...', {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
             await axios({
                 method: 'delete',
@@ -203,78 +220,106 @@ const Labels = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-            setIsDeleting(false);
-            fetchLabels(currentPage, filter); // Reload fetching
+            toast.dismiss(id);
+            toast.success('Label deleted successfully', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            fetchLabels(currentPage, filter);
             closeConfirmationModal();
         } catch (error) {
+            toast.dismiss(id);
+            toast.error('Error deleting label', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
             console.error('Error deleting label:', error);
+        } finally {
             setIsDeleting(false);
         }
     };
 
+    const filteredLabels = getFilteredLabels();
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Label Management</h1>
-                        <p className="text-gray-600">Manage and configure all platform labels and categories</p>
+                        <h1 className="page-title dark-text">Label Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage and configure all platform labels and categories</p>
                     </div>
                     <button
                         onClick={() => openModal()}
                         className="btn-primary flex items-center space-x-2"
                     >
-                        <FaPlus className="w-4 h-4 mr-1" />
+                        <IoAdd className="w-4 h-4" />
                         <span>Add Label</span>
                     </button>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="dark-card p-6 search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
                                 placeholder="Search labels by name..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input w-full"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Labels
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'active' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
-                                Active Labels
+                                Active
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'inactive' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
-                                Inactive Labels
+                                Inactive
                             </button>
                         </div>
                     </div>
@@ -287,30 +332,30 @@ const Labels = () => {
                     <Loading />
                 </div>
             ) : (
-                labels.length !== 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                filteredLabels.length !== 0 ? (
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Name
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Created At
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {labels.map(label => (
-                                        <tr key={label.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                <tbody className="table-body">
+                                    {filteredLabels.map(label => (
+                                        <tr key={label.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                                                         <span className="text-white font-semibold text-sm">
@@ -318,28 +363,35 @@ const Labels = () => {
                                                         </span>
                                                     </div>
                                                     <div className="ml-3">
-                                                        <div className="text-sm font-medium text-gray-900">{label.name}</div>
+                                                        <div className="text-sm font-medium dark-text">{label.name}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">
                                                     {new Date(label.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">
                                                     {label.is_active == 1 ? 'Active' : 'Inactive'}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-3">
                                                     <button
                                                         onClick={() => openModal(label)}
-                                                        className="text-blue-600 hover:text-blue-900"
+                                                        className="action-button action-button-edit"
                                                         title="Edit Label"
                                                     >
                                                         <TiPencil className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openConfirmationModal(label)}
+                                                        className="action-button action-button-delete"
+                                                        title="Delete Label"
+                                                    >
+                                                        <IoTrash className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -350,18 +402,18 @@ const Labels = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
                             <span className="text-white font-semibold text-lg">L</span>
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No labels found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No labels found</h3>
+                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
 
             {/* Pagination */}
-            {!loading && labels.length > 0 && (
+            {!loading && filteredLabels.length > 0 && !searchQuery && (
                 <div className="mt-6">
                     <ReactPaginate
                         previousLabel={<FaAngleDoubleLeft />}
@@ -381,6 +433,15 @@ const Labels = () => {
                 </div>
             )}
 
+            {/* Filtering message */}
+            {searchQuery && (
+                <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-600">
+                        Showing {filteredLabels.length} of {labels.length} labels matching "{searchQuery}"
+                    </p>
+                </div>
+            )}
+
             {/* Add/Edit Label Modal */}
             <Modal
                 isOpen={modalIsOpen}
@@ -389,32 +450,33 @@ const Labels = () => {
                 className="modern-modal"
             >
                 <div>
-                    <h2 className="text-xl md:text-2xl mb-4 font-semibold">{labelId ? 'Update Label' : 'Add Label'}</h2>
+                    <h2 className="text-xl md:text-2xl mb-4 font-semibold dark-text">{labelId ? 'Update Label' : 'Add Label'}</h2>
                     <form onSubmit={handleAddOrUpdateLabel} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="label">Label Name</label>
+                            <label className="block text-sm font-medium dark-text-muted mb-2" htmlFor="label">Label Name</label>
                             <input
                                 type="text"
                                 name="label"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="modern-input w-full"
                                 value={labelName}
                                 onChange={(e) => setLabelName(e.target.value)}
                                 required
                             />
                         </div>
                         <div className="flex items-center gap-2 mb-4">
-                            <p><strong>Status:</strong></p>
+                            <p className="dark-text"><strong>Status:</strong></p>
                             <Toggle
                                 checked={isActive}
                                 onChange={() => setIsActive(!isActive)}
                                 icons={false}
                                 aria-label="Label status"
+                                className="modern-toggle"
                             />
                         </div>
                         <div className="flex justify-end space-x-4">
                             <button
                                 type="button"
-                                className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                                className="btn-secondary"
                                 onClick={closeModal}
                                 disabled={adding}
                             >
@@ -422,7 +484,7 @@ const Labels = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                                className="btn-primary"
                                 disabled={adding}
                             >
                                 {adding ? (labelId ? 'Updating...' : 'Adding...') : (labelId ? 'Update Label' : 'Add Label')}

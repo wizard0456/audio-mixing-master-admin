@@ -52,67 +52,130 @@ const ServiceDetail = () => {
     }, [id, dispatch, user.token]);
 
     return (
-        <section className='px-4 py-8 md:px-5 md:py-10 font-THICCCBOI-Regular'>
-            <div className="mb-8 md:mb-10 bg-[#F6F6F6] py-4 md:py-6 rounded-lg px-4 md:px-5">
-                <h1 className="font-THICCCBOI-SemiBold text-2xl md:text-3xl leading-7 md:leading-9 flex items-center">
-                    <FaAngleDoubleLeft size={20} className="cursor-pointer mr-2" onClick={() => window.history.back()} /> Service Details / {id}
-                </h1>
+        <div className="page-container dark-bg animated-bg">
+            {/* Header */}
+            <div className="page-header">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                        <FaAngleDoubleLeft 
+                            size={20} 
+                            className="cursor-pointer mr-3 text-slate-400 hover:text-white transition-colors" 
+                            onClick={() => window.history.back()} 
+                        />
+                        <div>
+                            <h1 className="page-title dark-text">Service Details</h1>
+                            <p className="page-subtitle dark-text-secondary">Service #{id}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {
-                loading ?
-                    (
-                        <div className="flex justify-center items-center font-THICCCBOI-Medium text-base">
-                            <Loading />
-                        </div>
-                    )
-                    :
-                    (
-                        <div className='flex flex-col lg:flex-row lg:items-stretch lg:justify-between gap-5'>
-                            <div className='lg:w-2/3 flex flex-col gap-5'>
-                                <div className='p-4 md:p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5 font-THICCCBOI-Light'>
-                                    <div className='flex flex-col gap-2'>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Name:</strong> {service?.name || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Category:</strong> {service.category?.name || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Label:</strong> {service.label?.name || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Price Before:</strong> ${service.price || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Price After:</strong> ${service.discounted_price || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Discount:</strong> {service.discounted_price ? `${((1 - service.discounted_price / service.price) * 100).toFixed(0)}%` : '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Service Type:</strong> {service.service_type || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Detail:</strong> {service.detail || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Brief Detail:</strong> <span dangerouslySetInnerHTML={{ __html: service.brief_detail || '-' }} /></p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Includes:</strong> <span dangerouslySetInnerHTML={{ __html: service.includes || '-' }} /></p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Description:</strong> <span dangerouslySetInnerHTML={{ __html: service.description || '-' }} /></p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Requirements:</strong> <span dangerouslySetInnerHTML={{ __html: service.requirements || '-' }} /></p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Notes:</strong> <span dangerouslySetInnerHTML={{ __html: service.notes || '-' }} /></p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Tags:</strong> {service.tags || '-'}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Created At:</strong> {new Date(service.createdAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
-                                        <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Last Updated:</strong> {new Date(service.updatedAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+            {loading ? (
+                <div className="flex justify-center items-center py-8">
+                    <Loading />
+                </div>
+            ) : (
+                <div className='flex flex-col lg:flex-row lg:items-stretch lg:justify-between gap-5'>
+                    <div className='lg:w-2/3 flex flex-col gap-5'>
+                        <div className='dark-card p-6 flex flex-col gap-5 border border-slate-700/50'>
+                            <div className='flex flex-col gap-4'>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Name:</strong> {service?.name || '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Category:</strong> {service.category?.name || '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Label:</strong> {service.label?.name || '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Price Before:</strong> ${service.price || '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Price After:</strong> ${service.discounted_price || '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Discount:</strong> {service.discounted_price ? `${((1 - service.discounted_price / service.price) * 100).toFixed(0)}%` : '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Service Type:</strong> {service.service_type || '-'}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Created At:</strong> {new Date(service.createdAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                                    </div>
+                                    <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                        <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Last Updated:</strong> {new Date(service.updatedAt).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })}</p>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className='lg:w-1/3 flex flex-col gap-5'>
-                                <div className='w-full flex justify-center items-center bg-[#F6F6F6] p-4 md:p-5 rounded-lg'>
-                                    <img src={service.is_url == "1" ? service.image : `${Asset_Endpoint}${service.image}`} alt={service.name} className="max-h-60 md:max-h-80 w-full object-contain rounded-lg" />
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Detail:</strong> {service.detail || '-'}</p>
                                 </div>
 
-                                <div key={service.id} className='p-4 md:p-5 bg-[#F6F6F6] rounded-lg flex flex-col gap-5 font-THICCCBOI-Light'>
-                                    <h2 className='font-THICCCBOI-SemiBold text-xl md:text-2xl text-[#000000] text-center font-bold'>Variation</h2>
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Brief Detail:</strong></p>
+                                    <div className="mt-2 dark-text-muted" dangerouslySetInnerHTML={{ __html: service.brief_detail || '-' }} />
                                 </div>
 
-                                {service?.variation && service?.variation?.length > 0 &&
-                                    service?.variation?.map((service) => (
-                                        <div key={service?.id} className='flex flex-col gap-2 p-4 md:p-5 bg-[#F6F6F6] rounded-lg '>
-                                            <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Name:</strong> {service?.name || '-'}</p>
-                                            <p><strong className='font-THICCCBOI-SemiBold text-lg md:text-xl text-[#000000] font-bold'>Price Before:</strong> ${service?.price || '-'}</p>
-                                        </div>
-                                    ))}
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Includes:</strong></p>
+                                    <div className="mt-2 dark-text-muted" dangerouslySetInnerHTML={{ __html: service.includes || '-' }} />
+                                </div>
+
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Description:</strong></p>
+                                    <div className="mt-2 dark-text-muted" dangerouslySetInnerHTML={{ __html: service.description || '-' }} />
+                                </div>
+
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Requirements:</strong></p>
+                                    <div className="mt-2 dark-text-muted" dangerouslySetInnerHTML={{ __html: service.requirements || '-' }} />
+                                </div>
+
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Notes:</strong></p>
+                                    <div className="mt-2 dark-text-muted" dangerouslySetInnerHTML={{ __html: service.notes || '-' }} />
+                                </div>
+
+                                <div className="dark-card p-4 border border-slate-700/50 rounded-lg">
+                                    <p className="dark-text"><strong className='font-semibold text-lg dark-text'>Tags:</strong> {service.tags || '-'}</p>
+                                </div>
                             </div>
                         </div>
-                    )
-            }
-        </section>
+                    </div>
+
+                    <div className='lg:w-1/3 flex flex-col gap-5'>
+                        <div className='dark-card p-6 border border-slate-700/50 rounded-lg'>
+                            <div className='w-full flex justify-center items-center'>
+                                <img 
+                                    src={service.is_url == "1" ? service.image : `${Asset_Endpoint}${service.image}`} 
+                                    alt={service.name} 
+                                    className="max-h-60 md:max-h-80 w-full object-contain rounded-lg" 
+                                />
+                            </div>
+                        </div>
+
+                        <div className='dark-card p-6 border border-slate-700/50 rounded-lg'>
+                            <h2 className='font-semibold text-xl md:text-2xl dark-text text-center mb-4'>Variations</h2>
+                            
+                            {service?.variation && service?.variation?.length > 0 ? (
+                                <div className="space-y-3">
+                                    {service?.variation?.map((variation, index) => (
+                                        <div key={variation?.id || index} className='dark-card p-4 border border-slate-700/50 rounded-lg'>
+                                            <p className="dark-text"><strong className='font-semibold dark-text'>Name:</strong> {variation?.name || '-'}</p>
+                                            <p className="dark-text"><strong className='font-semibold dark-text'>Price Before:</strong> ${variation?.price || '-'}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="dark-text-muted text-center">No variations available</p>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 

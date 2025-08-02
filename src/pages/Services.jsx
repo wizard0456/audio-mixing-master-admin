@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEdit, FaEye, FaTrashAlt, FaPlus } from "react-icons/fa";
-import { IoMusicalNotes, IoEye, IoCreate, IoAdd, IoTrash, IoMusicalNote } from 'react-icons/io5';
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEdit, FaEye, FaTrashAlt, FaPlus, FaSearch, FaFilter } from "react-icons/fa";
+import { IoMusicalNotes, IoEye, IoCreate, IoAdd, IoTrash, IoMusicalNote, IoSearch, IoFilter } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
@@ -11,9 +11,6 @@ import Toggle from 'react-toggle';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import Loading from '../components/Loading';
-import PageLayout from '../components/PageLayout';
-import DataTable from '../components/DataTable';
-import EmptyState from '../components/EmptyState';
 
 const Services = () => {
     const [services, setServices] = useState([]);
@@ -31,10 +28,10 @@ const Services = () => {
     const abortController = useRef(null);
 
     useEffect(() => {
-        fetchServices(currentPage, filter, searchQuery);
-    }, [currentPage, filter, searchQuery]);
+        fetchServices(currentPage, filter);
+    }, [currentPage, filter]);
 
-    const fetchServices = async (page, filter, searchQuery) => {
+    const fetchServices = async (page, filter) => {
         if (abortController.current) {
             abortController.current.abort();
         }
@@ -44,9 +41,6 @@ const Services = () => {
         let url = `${API_Endpoint}admin/services?page=${page}&per_page=${Per_Page}`;
         if (filter !== 'all') {
             url += `&is_active=${filter}`;
-        }
-        if (searchQuery) {
-            url += `&search=${searchQuery}`;
         }
 
         try {
@@ -87,7 +81,15 @@ const Services = () => {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
-        setCurrentPage(1);
+    };
+
+    const getFilteredServices = () => {
+        if (!searchQuery) return services;
+        
+        return services.filter(service => 
+            service.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            service.service_type?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
     };
 
     const openConfirmationModal = (serviceId) => {
@@ -102,7 +104,20 @@ const Services = () => {
 
     const handleDeleteService = async () => {
         if (!serviceToDelete) return;
+
         setIsDeleting(true);
+        const id = toast.loading('Deleting service...', {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
             await axios({
                 method: 'delete',
@@ -111,25 +126,23 @@ const Services = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
+            toast.dismiss(id);
+            toast.success('Service deleted successfully', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
             fetchServices(currentPage, filter);
             closeConfirmationModal();
-            toast.success("Service deleted successfully!", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
         } catch (error) {
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
-            }
-            console.error('Error deleting service:', error);
-            toast.error("Error deleting service.", {
+            toast.dismiss(id);
+            toast.error('Error deleting service', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -140,23 +153,39 @@ const Services = () => {
                 theme: "light",
                 transition: Slide,
             });
+            console.error('Error deleting service:', error);
         } finally {
             setIsDeleting(false);
         }
     };
 
     const handleStatusToggle = async (serviceId, currentStatus) => {
+        const newStatus = currentStatus === 1 ? 0 : 1;
+        const id = toast.loading('Updating service status...', {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+        
         try {
-            const newStatus = currentStatus == "1" ? "0" : "1";
             await axios({
                 method: 'post',
-                url: `${API_Endpoint}admin/services/${serviceId}/status?status=${newStatus}`,
+                url: `${API_Endpoint}admin/services/${serviceId}/status`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`
+                },
+                data: {
+                    is_active: newStatus
                 }
             });
-
-            toast.success(`Service status updated to ${newStatus === "1" ? "Active" : "Inactive"}!`, {
+            toast.dismiss(id);
+            toast.success('Service status updated successfully', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -169,8 +198,8 @@ const Services = () => {
             });
             fetchServices(currentPage, filter);
         } catch (error) {
-            console.error('Error updating service status:', error);
-            toast.error("Error updating service status.", {
+            toast.dismiss(id);
+            toast.error('Error updating service status', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -181,37 +210,82 @@ const Services = () => {
                 theme: "light",
                 transition: Slide,
             });
+            console.error('Error updating service status:', error);
         }
     };
 
-    const filters = [
-        { value: 'all', label: 'All Services' },
-        { value: 'active', label: 'Active Services' },
-        { value: 'inactive', label: 'Inactive Services' }
-    ];
-
-    const actionButton = (
-        <button
-            onClick={() => navigate('/add-service')}
-            className="btn-primary flex items-center space-x-2"
-        >
-            <IoAdd className="w-4 h-4" />
-            <span>Add Service</span>
-        </button>
-    );
+    const filteredServices = getFilteredServices();
 
     return (
-        <PageLayout
-            title="Service Management"
-            subtitle="Manage and configure all platform services and pricing"
-            searchQuery={searchQuery}
-            onSearchChange={handleSearchChange}
-            searchPlaceholder="Search services by name..."
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            currentFilter={filter}
-            actionButton={actionButton}
-        >
+        <div className="page-container dark-bg animated-bg">
+            {/* Header */}
+            <div className="page-header">
+                <div className="flex items-center justify-between mb-4">
+                    <div>
+                        <h1 className="page-title dark-text">Service Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage and configure all platform services and pricing</p>
+                    </div>
+                    <button
+                        onClick={() => navigate('/add-service')}
+                        className="btn-primary flex items-center space-x-2"
+                    >
+                        <IoAdd className="w-4 h-4" />
+                        <span>Add Service</span>
+                    </button>
+                </div>
+
+                {/* Search and Filters */}
+                <div className="dark-card p-6 search-filters-container">
+                    <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
+                        {/* Search */}
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
+                            <input
+                                type="text"
+                                placeholder="Search services by name or type..."
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                className="modern-input search-input"
+                            />
+                        </div>
+
+                        {/* Filters */}
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
+                            <button
+                                className={`filter-button ${
+                                    filter === 'all' 
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
+                                }`}
+                                onClick={() => handleFilterChange('all')}
+                            >
+                                All Services
+                            </button>
+                            <button
+                                className={`filter-button ${
+                                    filter === 'active' 
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
+                                }`}
+                                onClick={() => handleFilterChange('active')}
+                            >
+                                Active
+                            </button>
+                            <button
+                                className={`filter-button ${
+                                    filter === 'inactive' 
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
+                                }`}
+                                onClick={() => handleFilterChange('inactive')}
+                            >
+                                Inactive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Services Table */}
             {loading ? (
@@ -219,39 +293,39 @@ const Services = () => {
                     <Loading />
                 </div>
             ) : (
-                services.length !== 0 ? (
-                    <div className="dark-card overflow-hidden">
+                filteredServices.length !== 0 ? (
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="modern-table-header">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Name
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Price Before
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Price After Discount
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Service Type
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Created At
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Active
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {services.map(service => (
-                                        <tr key={service.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                <tbody className="table-body">
+                                    {filteredServices.map(service => (
+                                        <tr key={service.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                                                         <span className="text-white font-semibold text-sm">
@@ -259,53 +333,60 @@ const Services = () => {
                                                         </span>
                                                     </div>
                                                     <div className="ml-3">
-                                                        <div className="text-sm font-medium text-gray-900">{service.name}</div>
+                                                        <div className="text-sm font-medium dark-text">{service.name}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">${service.price || '-'}</div>
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm font-medium dark-text">${service.price || '-'}</div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">
                                                     {(Number(service.discounted_price) != 0 || service.discounted_price != null) ? `$${service.discounted_price}` : "-"}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{service.service_type}</div>
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">{service.service_type}</div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">
                                                     {new Date(service.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <Toggle
                                                         checked={service.is_active == "1"}
                                                         onChange={() => handleStatusToggle(service.id, service.is_active)}
                                                         icons={false}
                                                         aria-label="Service status"
-                                                        className="react-toggle"
+                                                        className="modern-toggle"
                                                     />
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-3">
                                                     <Link 
                                                         to={`/edit-service/${service.id}`}
-                                                        className="text-blue-600 hover:text-blue-900"
+                                                        className="action-button action-button-edit"
                                                         title="Edit Service"
                                                     >
                                                         <IoCreate className="w-4 h-4" />
                                                     </Link>
                                                     <Link 
                                                         to={`/service-detail/${service.id}`}
-                                                        className="text-green-600 hover:text-green-900"
+                                                        className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
                                                     </Link>
+                                                    <button
+                                                        onClick={() => openConfirmationModal(service.id)}
+                                                        className="action-button action-button-delete"
+                                                        title="Delete Service"
+                                                    >
+                                                        <IoTrash className="w-4 h-4" />
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -315,39 +396,43 @@ const Services = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <IoMusicalNote className="w-6 h-6 text-white" />
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <IoMusicalNote className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No services found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No services found</h3>
+                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
 
             {/* Pagination */}
-            {!loading && services.length > 0 && (
+            {!loading && filteredServices.length > 0 && !searchQuery && (
                 <div className="mt-6">
-                    <div className="text-center">
-                        <p className="font-medium text-sm text-gray-600 mb-2">
-                            Page {currentPage} of {totalPages} • Showing {services.length} services
-                        </p>
-                        <ReactPaginate
-                            previousLabel={<FaAngleDoubleLeft />}
-                            nextLabel={<FaAngleDoubleRight />}
-                            pageCount={totalPages}
-                            onPageChange={handlePageClick}
-                            containerClassName="pagination"
-                            pageClassName=""
-                            pageLinkClassName=""
-                            previousClassName=""
-                            previousLinkClassName=""
-                            nextClassName=""
-                            nextLinkClassName=""
-                            activeClassName="active"
-                            disabledClassName="disabled"
-                        />
-                    </div>
+                    <ReactPaginate
+                        previousLabel={<FaAngleDoubleLeft />}
+                        nextLabel={<FaAngleDoubleRight />}
+                        pageCount={totalPages}
+                        onPageChange={handlePageClick}
+                        containerClassName="pagination"
+                        pageClassName=""
+                        pageLinkClassName=""
+                        previousClassName=""
+                        previousLinkClassName=""
+                        nextClassName=""
+                        nextLinkClassName=""
+                        activeClassName="active"
+                        disabledClassName="disabled"
+                    />
+                </div>
+            )}
+
+            {/* Filtering message */}
+            {searchQuery && (
+                <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-600">
+                        Showing {filteredServices.length} of {services.length} services matching "{searchQuery}"
+                    </p>
                 </div>
             )}
 
@@ -363,7 +448,7 @@ const Services = () => {
                 isLoading={isDeleting}
                 confirmButtonClass="bg-red-600 hover:bg-red-700"
             />
-        </PageLayout>
+        </div>
     );
 };
 
