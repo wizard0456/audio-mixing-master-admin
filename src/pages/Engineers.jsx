@@ -592,40 +592,40 @@ const Engineers = () => {
                 ) : (
                     selectedEngineer && (
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">Engineer Details</h2>
+                            <h2 className="text-2xl font-bold dark-text mb-6">Engineer Details</h2>
                             <div className="space-y-4">
                                 <div className="flex items-center space-x-4">
                                     <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-full flex items-center justify-center">
                                         <IoConstruct className="w-8 h-8 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-semibold text-gray-900">
+                                        <h3 className="text-xl font-semibold dark-text">
                                             {selectedEngineer.first_name} {selectedEngineer.last_name}
                                         </h3>
-                                        <p className="text-gray-500">{selectedEngineer.email}</p>
+                                        <p className="dark-text-muted">{selectedEngineer.email}</p>
                                     </div>
                                 </div>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">Phone</p>
-                                        <p className="text-gray-900">{selectedEngineer.phone_number || 'N/A'}</p>
+                                    <div className="dark-card rounded-lg p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">Phone</p>
+                                        <p className="dark-text">{selectedEngineer.phone_number || 'N/A'}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">Status</p>
-                                        <p className={`font-medium ${selectedEngineer.is_active === 1 ? 'text-green-600' : 'text-red-600'}`}>
+                                    <div className="dark-card rounded-lg p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">Status</p>
+                                        <p className={`font-medium ${selectedEngineer.is_active === 1 ? 'text-green-400' : 'text-red-400'}`}>
                                             {selectedEngineer.is_active === 1 ? 'Active' : 'Inactive'}
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">Joined Date</p>
-                                        <p className="text-gray-900">
+                                    <div className="dark-card rounded-lg p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">Joined Date</p>
+                                        <p className="dark-text">
                                             {new Date(selectedEngineer.created_at).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">Engineer ID</p>
-                                        <p className="text-gray-900">{selectedEngineer.id}</p>
+                                    <div className="dark-card rounded-lg p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">Engineer ID</p>
+                                        <p className="dark-text">{selectedEngineer.id}</p>
                                     </div>
                                 </div>
                             </div>
@@ -651,11 +651,11 @@ const Engineers = () => {
                 className="modern-modal"
             >
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">Add New Engineer</h2>
+                    <h2 className="text-2xl font-bold dark-text mb-6">Add New Engineer</h2>
                     <form onSubmit={handleAddEngineer} className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <label className="block text-sm font-medium dark-text-muted mb-1">First Name</label>
                                 <input
                                     type="text"
                                     name="first_name"
@@ -666,7 +666,7 @@ const Engineers = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <label className="block text-sm font-medium dark-text-muted mb-1">Last Name</label>
                                 <input
                                     type="text"
                                     name="last_name"
@@ -679,7 +679,7 @@ const Engineers = () => {
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <label className="block text-sm font-medium dark-text-muted mb-1">Email</label>
                             <input
                                 type="email"
                                 name="email"
@@ -691,7 +691,7 @@ const Engineers = () => {
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                            <label className="block text-sm font-medium dark-text-muted mb-1">Phone Number</label>
                             <input
                                 type="tel"
                                 name="phone_number"
@@ -703,7 +703,7 @@ const Engineers = () => {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                <label className="block text-sm font-medium dark-text-muted mb-1">Password</label>
                                 <input
                                     type="password"
                                     name="password"
@@ -714,7 +714,7 @@ const Engineers = () => {
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                                <label className="block text-sm font-medium dark-text-muted mb-1">Confirm Password</label>
                                 <input
                                     type="password"
                                     name="confirm_password"
