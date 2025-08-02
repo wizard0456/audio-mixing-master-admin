@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
-import { IoEye, IoCart, IoCheckmarkCircle, IoTime, IoWarning } from 'react-icons/io5';
+import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight, FaSearch, FaFilter } from "react-icons/fa";
+import { IoEye, IoCart, IoCheckmarkCircle, IoTime, IoWarning, IoSearch, IoFilter } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
 import { useDispatch, useSelector } from 'react-redux';
@@ -101,7 +101,20 @@ const Orders = () => {
 
     const handleDeleteOrder = async () => {
         if (!orderToDelete) return;
+
         setIsDeleting(true);
+        const id = toast.loading('Deleting order...', {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
             await axios({
                 method: 'delete',
@@ -110,13 +123,14 @@ const Orders = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-            toast.success('Order deleted successfully!', {
+            toast.dismiss(id);
+            toast.success('Order deleted successfully', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
                 closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
+                pauseOnHover: false,
+                draggable: false,
                 progress: undefined,
                 theme: "light",
                 transition: Slide,
@@ -124,116 +138,132 @@ const Orders = () => {
             fetchOrders(currentPage, filter, searchQuery);
             closeConfirmationModal();
         } catch (error) {
-            console.error('Error deleting order:', error);
-            toast.error('Error deleting order.', {
+            toast.dismiss(id);
+            toast.error('Error deleting order', {
                 position: "top-right",
                 autoClose: 3000,
-                hideProgressBar: false,
+                hideProgressBar: true,
                 closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
+                pauseOnHover: false,
+                draggable: false,
                 progress: undefined,
                 theme: "light",
                 transition: Slide,
             });
+            console.error('Error deleting order:', error);
         } finally {
             setIsDeleting(false);
         }
     };
 
     const handleGenerateReport = async () => {
-        if (dates[0] && dates[1]) {
-            const startDate = dates[0].toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
+        if (!dates[0] || !dates[1]) {
+            toast.error('Please select a date range', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
             });
-
-            const endDate = dates[1].toLocaleDateString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-            });
-
-            const apiUrl = `${API_Endpoint}/generate-pdf?start_date=${startDate}&end_date=${endDate}`;
-
-            // Trigger the download
-            window.open(apiUrl, '_blank');
+            return;
         }
+
+        const startDate = dates[0].toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+
+        const endDate = dates[1].toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        });
+
+        const apiUrl = `${API_Endpoint}/generate-pdf?start_date=${startDate}&end_date=${endDate}`;
+
+        // Trigger the download
+        window.open(apiUrl, '_blank');
     }
 
     return (
-        <div className="min-h-screen dark-bg animated-bg p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold dark-text mb-2">Order Management</h1>
-                        <p className="dark-text-secondary">Manage and track all platform orders and transactions</p>
+                        <h1 className="page-title dark-text">Order Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage and track all platform orders and transactions</p>
                     </div>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="dark-card p-6 mb-6">
+                <div className="dark-card p-6 search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
                                 placeholder="Search orders by ID or user..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input w-full"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Orders
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === '0' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('0')}
                             >
                                 Pending
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === '1' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('1')}
                             >
                                 Processing
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === '2' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('2')}
                             >
                                 Delivered
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === '3' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('3')}
                             >
@@ -278,55 +308,55 @@ const Orders = () => {
                 </div>
             ) : (
                 orders.length !== 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Order ID
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Order Date
                                         </th>
                                         {user.role !== 'admin' ? (
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            <th className="table-header-cell">
                                                 Order Type
                                             </th>
                                         ) : (
                                             <>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     Transaction ID
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     Amount
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     Payment Method
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     Order Type
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     User Name
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     User Email
                                                 </th>
-                                                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                <th className="table-header-cell">
                                                     Payment Status
                                                 </th>
                                             </>
                                         )}
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="table-body">
                                     {orders.map(order => (
-                                        <tr key={order.id} className="hover:bg-gray-50 relative">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={order.id} className="table-row relative">
+                                            <td className="table-cell whitespace-nowrap">
                                                 {Number(order?.notify) === 1 && (
                                                     <span className="absolute -top-2 -left-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">
                                                         New Revision
@@ -339,12 +369,12 @@ const Orders = () => {
                                                         </span>
                                                     </div>
                                                     <div className="ml-3">
-                                                        <div className="text-sm font-medium text-gray-900">Order #{order.id}</div>
+                                                        <div className="text-sm font-medium dark-text">Order #{order.id}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">
                                                     {new Date(order.created_at).toLocaleDateString("en-US", { 
                                                         month: 'long', 
                                                         day: 'numeric', 
@@ -353,51 +383,51 @@ const Orders = () => {
                                                 </div>
                                             </td>
                                             {user.role !== 'admin' ? (
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <td className="table-cell whitespace-nowrap">
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
                                                         {order.order_type}
                                                     </span>
                                                 </td>
                                             ) : (
                                                 <>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">{order.transaction_id || 'N/A'}</div>
+                                                    <td className="table-cell whitespace-nowrap">
+                                                        <div className="text-sm dark-text">{order.transaction_id || 'N/A'}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900">${order.amount}</div>
+                                                    <td className="table-cell whitespace-nowrap">
+                                                        <div className="text-sm font-medium dark-text">${order.amount}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">{order.payment_method || 'N/A'}</div>
+                                                    <td className="table-cell whitespace-nowrap">
+                                                        <div className="text-sm dark-text">{order.payment_method || 'N/A'}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                    <td className="table-cell whitespace-nowrap">
+                                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
                                                             {order.order_type === "one_time" ? "One Time" : "Subscription"}
                                                         </span>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">
+                                                    <td className="table-cell whitespace-nowrap">
+                                                        <div className="text-sm dark-text">
                                                             {order.user ? `${order.user.first_name || ''} ${order.user.last_name || ''}`.trim() || 'N/A' : 'N/A'}
                                                         </div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm text-gray-900">{order.user ? order.user.email || 'N/A' : 'N/A'}</div>
+                                                    <td className="table-cell whitespace-nowrap">
+                                                        <div className="text-sm dark-text">{order.user ? order.user.email || 'N/A' : 'N/A'}</div>
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                    <td className="table-cell whitespace-nowrap">
                                                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                             order.payment_status === 'paid' 
-                                                                ? 'bg-green-100 text-green-800' 
-                                                                : 'bg-yellow-100 text-yellow-800'
+                                                                ? 'bg-green-500/20 text-green-400' 
+                                                                : 'bg-yellow-500/20 text-yellow-400'
                                                         }`}>
                                                             {order.payment_status}
                                                         </span>
                                                     </td>
                                                 </>
                                             )}
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <Link 
                                                         to={`/order-detail/${order.id}`}
-                                                        className="text-green-600 hover:text-green-900"
+                                                        className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
@@ -411,12 +441,12 @@ const Orders = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white font-semibold text-lg">O</span>
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <IoCart className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No orders found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No orders found</h3>
+                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}

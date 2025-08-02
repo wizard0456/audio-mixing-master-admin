@@ -105,6 +105,7 @@ const OrderDetail = () => {
                 theme: "light",
                 transition: Slide,
             });
+            console.error("Error updating order status", error);
         }
     };
 
@@ -114,7 +115,6 @@ const OrderDetail = () => {
 
     const closeGeneralModal = () => {
         setGeneralModalIsOpen(false);
-        setSelectedService(null);
         setSelectedLinks(['']);
     };
 
@@ -130,77 +130,26 @@ const OrderDetail = () => {
 
     const removeLinkField = (index) => {
         const newLinks = selectedLinks.filter((_, i) => i !== index);
-        setSelectedLinks(newLinks.length > 0 ? newLinks : ['']);
+        setSelectedLinks(newLinks);
     };
 
     const validateUrl = (url) => {
         try {
             new URL(url);
             return true;
-        } catch (error) {
+        } catch {
             return false;
         }
     };
 
     const handleGeneralLinkSubmit = async (event) => {
         event.preventDefault();
-
-        const validLinks = selectedLinks.filter(link => link.trim() !== '');
-
-        if (validLinks.length === 0) {
-            toast.error("Please provide at least one valid link", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            return;
-        }
-
-        const invalidLinks = validLinks.filter(link => !validateUrl(link));
-        if (invalidLinks.length > 0) {
-            toast.error("Please provide valid URLs only", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            return;
-        }
-
         setIsUploading(true);
 
-        try {
-            const response = await axios.post(`${API_Endpoint}admin/order/upload-file/${id}`, {
-                deliverable_links: validLinks,
-                order_item_id: selectedService,
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${user.token}`,
-                },
-            });
+        const validLinks = selectedLinks.filter(link => link.trim() !== '' && validateUrl(link.trim()));
 
-            setOrderStatus(response.data.Order_status.toString());
-            setOrder({
-                ...order, order_items: order.order_items.map((item) => {
-                    if (item.id === selectedService) {
-                        return response.data.order_item;
-                    }
-                    return item;
-                })
-            });
-
-            toast.success("Links uploaded successfully", {
+        if (validLinks.length === 0) {
+            toast.error('Please provide at least one valid URL', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -211,9 +160,45 @@ const OrderDetail = () => {
                 theme: "light",
                 transition: Slide,
             });
+            setIsUploading(false);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('service_id', selectedService);
+        formData.append('files', JSON.stringify(validLinks));
+
+        try {
+            await axios.post(`${API_Endpoint}admin/order/upload-file/${id}`, formData, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            toast.success('Links uploaded successfully', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+
             closeGeneralModal();
+            // Refresh order data
+            const response = await axios.get(`${API_Endpoint}admin/order-details/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${user.token}`
+                },
+            });
+            setOrder(response.data);
         } catch (error) {
-            toast.error("Error uploading links", {
+            console.error('Error uploading links:', error);
+            toast.error('Error uploading links', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -242,15 +227,12 @@ const OrderDetail = () => {
 
     const handleRevisionLinkSubmit = async (event) => {
         event.preventDefault();
+        setIsUploading(true);
 
-        if (!currentRevisionId) {
-            toast.error("Revision ID not found");
-            return;
-        }
-        const validLinks = selectedLinks.filter(link => link.trim() !== '');
+        const validLinks = selectedLinks.filter(link => link.trim() !== '' && validateUrl(link.trim()));
 
         if (validLinks.length === 0) {
-            toast.error("Please provide at least one valid link", {
+            toast.error('Please provide at least one valid URL', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -261,37 +243,23 @@ const OrderDetail = () => {
                 theme: "light",
                 transition: Slide,
             });
+            setIsUploading(false);
             return;
         }
 
-        const invalidLinks = validLinks.filter(link => !validateUrl(link));
-        if (invalidLinks.length > 0) {
-            toast.error("Please provide valid URLs only", {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            return;
-        }
+        const formData = new FormData();
+        formData.append('revision_id', currentRevisionId);
+        formData.append('files', JSON.stringify(validLinks));
 
-        setIsUploading(true);
         try {
-            const response = await axios.post(`${API_Endpoint}admin/revisions/upload/${currentRevisionId}`, { links: validLinks }, {
+            await axios.post(`${API_Endpoint}admin/order/upload-revision-file/${id}`, formData, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
-                },
+                    'Content-Type': 'multipart/form-data'
+                }
             });
 
-            setRevisions(response.data.revision);
-            setOrderStatus(response.data.order_status.toString());
-
-            toast.success("Revision links uploaded successfully", {
+            toast.success('Revision links uploaded successfully', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -302,9 +270,18 @@ const OrderDetail = () => {
                 theme: "light",
                 transition: Slide,
             });
+
             closeRevisionModal();
+            // Refresh order data
+            const response = await axios.get(`${API_Endpoint}admin/order-details/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${user.token}`
+                },
+            });
+            setOrder(response.data);
         } catch (error) {
-            toast.error("Error uploading revision links", {
+            console.error('Error uploading revision links:', error);
+            toast.error('Error uploading revision links', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -321,31 +298,31 @@ const OrderDetail = () => {
     };
 
     const toggleAccordion = (section) => {
-        if (activeAccordions.includes(section)) {
-            setActiveAccordions(activeAccordions.filter((item) => item !== section));
-        } else {
-            setActiveAccordions([...activeAccordions, section]);
-        }
+        setActiveAccordions(prev => 
+            prev.includes(section) 
+                ? prev.filter(item => item !== section)
+                : [...prev, section]
+        );
     };
 
     async function handleRevisionReaded(itemId) {
         try {
-            const response = await axios({
-                method: "post",
-                url: `${API_Endpoint}admin/revisions/admin-flag/${id}`,
+            await axios.post(`${API_Endpoint}admin/revisions/admin-flag/${itemId}`, {}, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`
-                },
-                data: {
-                    admin_is_read: "1",
-                    type: "revision",
-                    order_item_id: itemId
                 }
             });
 
-            setRevisions(response.data);
+            // Update local state to mark as read
+            setRevisions(prevRevisions => 
+                prevRevisions.map(revision => 
+                    revision.service_id === itemId 
+                        ? { ...revision, admin_is_read: 1 }
+                        : revision
+                )
+            );
         } catch (error) {
-            console.error("Error reading revision", error);
+            console.error('Error marking revision as read:', error);
         }
     }
 
@@ -354,228 +331,236 @@ const OrderDetail = () => {
     };
 
     return (
-        <>
-            <section className='px-4 py-8 md:px-6 md:py-10'>
-                <div className="mb-8 md:mb-10 bg-gray-100 py-4 md:py-6 rounded-lg px-4 md:px-5">
-                    <h1 className="font-semibold text-2xl md:text-3xl flex items-center">
-                        <FaAngleDoubleLeft size={20} className="cursor-pointer mr-2" onClick={() => window.history.back()} /> Orders / {id}
-                    </h1>
-                </div>
-
-                {
-                    !order ? (
-                        <div className="flex justify-center items-center font-semibold text-base">
-                            <Loading />
+        <div className="page-container dark-bg animated-bg">
+            {/* Header */}
+            <div className="page-header">
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                        <FaAngleDoubleLeft 
+                            size={20} 
+                            className="cursor-pointer mr-3 text-slate-400 hover:text-white transition-colors" 
+                            onClick={() => window.history.back()} 
+                        />
+                        <div>
+                            <h1 className="page-title dark-text">Order Details</h1>
+                            <p className="page-subtitle dark-text-secondary">Order #{id}</p>
                         </div>
-                    ) : (
-                        <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
-                            {/* Accordion for User Details */}
-                            <div className='w-full'>
-                                {user && user.role === 'admin' && (
-                                    <div className='bg-gray-100 rounded-lg mb-5'>
-                                        <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('userDetails')}>
-                                            <h2 className='font-semibold text-base md:text-lg'>User Details</h2>
-                                            <span className='text-2xl'>{activeAccordions.includes('userDetails') ? '-' : '+'}</span>
+                    </div>
+                </div>
+            </div>
+
+            {!order ? (
+                <div className="flex justify-center items-center py-8">
+                    <Loading />
+                </div>
+            ) : (
+                <div className='flex flex-col lg:flex-row items-stretch justify-between gap-5'>
+                    {/* Accordion for User Details */}
+                    <div className='w-full'>
+                        {user && user.role === 'admin' && (
+                            <div className='dark-card rounded-lg mb-5 border border-slate-700/50'>
+                                <div className='cursor-pointer p-5 flex justify-between items-center' onClick={() => toggleAccordion('userDetails')}>
+                                    <h2 className='font-semibold text-base md:text-lg dark-text'>User Details</h2>
+                                    <span className='text-2xl dark-text'>{activeAccordions.includes('userDetails') ? '-' : '+'}</span>
+                                </div>
+                                {activeAccordions.includes('userDetails') && (
+                                    <div className='p-5 border-t border-slate-700/50'>
+                                        <div className='flex flex-col gap-2'>
+                                            <p className='text-base dark-text'><span className='font-bold'>Name:</span> {order.user_name}</p>
+                                            <p className='text-base dark-text'><span className='font-bold'>Email:</span> {order.user_email}</p>
                                         </div>
-                                        {activeAccordions.includes('userDetails') && (
-                                            <div className='p-5'>
-                                                <div className='flex flex-col gap-2'>
-                                                    <p className='text-base'><span className='font-bold'>Name:</span> {order.user_name}</p>
-                                                    <p className='text-base'><span className='font-bold'>Email:</span> {order.user_email}</p>
-                                                </div>
-                                                <hr className='my-4' />
-                                                <div className='flex flex-col gap-2'>
-                                                    <p className='text-base'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
-                                                    <p className='text-base'><span className='font-bold '>Payer Email:</span> {order.order.payer_email}</p>
-                                                </div>
-
-                                                {Number(order?.is_giftcard) != 1 && (
-                                                    <>
-                                                        <hr className='my-4' />
-                                                        <p className='text-base'><span className='font-bold mr-2'>Order Status:</span>
-                                                            <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base bg-white border border-gray-300 p-2 rounded-md">
-                                                                {Object.entries(orderStatusMapping).map(([key, value]) => (
-                                                                    <option key={key} value={key}>{value}</option>
-                                                                ))}
-                                                            </select>
-                                                        </p>
-                                                    </>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {Number(order?.is_giftcard) == 1 ? (
-                                    <div className='bg-gray-100 rounded-lg mb-5'>
-                                        <div className='p-5 flex justify-between items-center'>
-                                            <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
+                                        <hr className='my-4 border-slate-700/50' />
+                                        <div className='flex flex-col gap-2'>
+                                            <p className='text-base dark-text'><span className='font-bold'>Payer Name:</span> {order.order.payer_name}</p>
+                                            <p className='text-base dark-text'><span className='font-bold'>Payer Email:</span> {order.order.payer_email}</p>
                                         </div>
-                                        <ul>
-                                            {order.order_items.map((item) => (
-                                                <li key={item.id} className='bg-gray-100 rounded-lg p-5 flex flex-col gap-5 '>
-                                                    <div className='flex justify-evenly gap-2'>
-                                                        <p className='text-base flex flex-col items-center'><span className='font-bold'>Name</span> {item.name}</p>
-                                                        <p className='text-base flex flex-col items-center'><span className='font-bold'>Price</span> {item.price}</p>
-                                                        <p className='text-base flex flex-col items-center'><span className='font-bold'>Quantity</span> {item.quantity}</p>
-                                                        <p className='text-base flex flex-col items-center'><span className='font-bold'>Total</span> {item.total_price}</p>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ) : (
-                                    <div className='mb-5'>
-                                        <div className={`p-5 flex justify-between items-center rounded-lg relative bg-gray-100 mb-5`} onClick={() => toggleAccordion('servicesPurchased')}>
-                                            <h2 className='font-semibold text-base md:text-lg'>Services Purchased</h2>
-                                            <span className='text-2xl'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
-                                        </div>
-                                        {activeAccordions.includes('servicesPurchased') && (
-                                            <ul className='flex flex-col gap-5'>
-                                                {order.order_items.map((item) => (
-                                                    <li key={item.id} className={`bg-gray-100 rounded-lg p-5 flex flex-col gap-5 ${(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? "cursor-pointer relative" : ""}`}
-                                                        onClick={() => {
-                                                            if (getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) {
-                                                                handleRevisionReaded(item.id);
-                                                            }
-                                                        }}>
-                                                        {(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) && (
-                                                            <span className='absolute -top-2 -left-3 bg-[#4CC800] text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span>
-                                                        )}
-                                                        <div className='flex justify-between items-center'>
-                                                            <h3 className={`text-xl font-bold`}>{item.name}</h3>
-                                                            <div className='flex gap-2'>
-                                                                <button onClick={() => {
-                                                                    openGeneralModal();
-                                                                    setSelectedService(item.id);
-                                                                }} className='text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg'>Upload Deliverable Links</button>
-                                                            </div>
-                                                        </div>
-                                                        <div className='flex justify-between items-center bg-gray-200 rounded-lg p-5'>
-                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
-                                                                <span className='text-base font-bold'>Service Type</span>{item.service_type}
-                                                            </p>
-                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
-                                                                <span className='text-base font-bold'>Max Revisions</span>{item.max_revision}
-                                                            </p>
-                                                            {user && user.role === 'admin' && (
-                                                                <>
-                                                                    <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
-                                                                        <span className='text-base font-bold'>Price</span>
-                                                                        <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.price} / {item.service_type.replace('_', ' ')}</span>
-                                                                    </p>
-                                                                </>
-                                                            )}
-                                                            <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center`}>
-                                                                <span className='text-base font-bold'>Quantity</span>{item.quantity}
-                                                            </p>
-                                                            {user && user.role === 'admin' && (
-                                                                <>
-                                                                    <p className='text-sm md:text-basetext-center w-full flex flex-col items-center justify-center'>
-                                                                        <span className='text-base font-bold'>Total Price</span>
-                                                                        <span className='bg-green-600 text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</span>
-                                                                    </p>
-                                                                </>
-                                                            )}
-                                                        </div>
 
-                                                        <div className={`flex ${JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 ? "justify-between" : "justify-end"} gap-5 items-start`}>
-                                                            {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && (
-                                                                <div className='p-4 bg-gray-200 rounded-lg w-full lg:w-1/2'>
-                                                                    {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4'>Deliverable Links ({JSON.parse(item.deliverable_files)?.length})</p>}
-
-                                                                    <ul className='flex flex-col gap-3'>
-                                                                        {JSON.parse(item.deliverable_files).map((link, index) => (
-                                                                            <li key={index} className='flex justify-between items-center p-3 bg-gray-100 rounded-lg'>
-                                                                                <a
-                                                                                    href={link}
-                                                                                    target="_blank"
-                                                                                    rel="noopener noreferrer"
-                                                                                    className='text-blue-600 hover:text-blue-800 underline break-all'
-                                                                                >
-                                                                                    {link.length > 50 ? `${link.substring(0, 50)}...` : link}
-                                                                                </a>
-                                                                                <button
-                                                                                    onClick={() => navigator.clipboard.writeText(link)}
-                                                                                    className='ml-2 text-sm bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600'
-                                                                                    title="Copy link"
-                                                                                >
-                                                                                    Copy
-                                                                                </button>
-                                                                            </li>
-                                                                        ))}
-                                                                    </ul>
-                                                                </div>
-                                                            )}
-
-                                                            <div className='flex flex-col gap-4 w-full lg:w-1/2'>
-                                                                {getRevisionsForItem(item.service_id)
-                                                                    .reverse()
-                                                                    .map((revision) => (
-                                                                        <div key={revision.id} className='p-4 bg-gray-200 rounded-lg'>
-                                                                            <div className='flex justify-between items-center mb-5'>
-                                                                                <h2 className='font-semibold text-base md:text-lg'>Revision #{revision.id}</h2>
-
-                                                                                <button onClick={() => openRevisionModal(revision.id)} className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg">
-                                                                                    Upload Revision Links
-                                                                                </button>
-                                                                            </div>
-                                                                            <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg mb-5'>
-                                                                                <span className='font-medium'>Revision Message:</span> {revision.message || 'No message provided'}
-                                                                            </p>
-
-                                                                            {revision.files && JSON.parse(revision.files).length > 0 && (
-                                                                                <>
-                                                                                    <h2 className='font-semibold text-sm md:text-base'>Uploaded Links</h2>
-                                                                                    <ul className='mt-3'>
-                                                                                        {JSON.parse(revision.files).map((link, index) => (
-                                                                                            <li key={index} className='flex justify-between items-center p-3 bg-gray-100 rounded-lg mb-2'>
-                                                                                                <a
-                                                                                                    href={link}
-                                                                                                    target="_blank"
-                                                                                                    rel="noopener noreferrer"
-                                                                                                    className='text-blue-600 hover:text-blue-800 underline break-all'
-                                                                                                >
-                                                                                                    {link.length > 50 ? `${link.substring(0, 50)}...` : link}
-                                                                                                </a>
-                                                                                                <button
-                                                                                                    onClick={() => navigator.clipboard.writeText(link)}
-                                                                                                    className='ml-2 text-sm bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600'
-                                                                                                    title="Copy link"
-                                                                                                >
-                                                                                                    Copy
-                                                                                                </button>
-                                                                                            </li>
-                                                                                        ))}
-                                                                                    </ul>
-                                                                                </>
-                                                                            )}
-
-                                                                            <p className='text-sm md:text-base p-4 bg-gray-100 rounded-lg'>
-                                                                                <span className='font-medium'>Requested At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
-                                                                            </p>
-                                                                        </div>
-                                                                    ))}
-                                                            </div>
-                                                        </div>
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                        {Number(order?.is_giftcard) != 1 && (
+                                            <>
+                                                <hr className='my-4 border-slate-700/50' />
+                                                <p className='text-base dark-text'><span className='font-bold mr-2'>Order Status:</span>
+                                                    <select value={orderStatus} onChange={handleStatusChange} className="text-sm md:text-base modern-input ml-2">
+                                                        {Object.entries(orderStatusMapping).map(([key, value]) => (
+                                                            <option key={key} value={key}>{value}</option>
+                                                        ))}
+                                                    </select>
+                                                </p>
+                                            </>
                                         )}
                                     </div>
                                 )}
                             </div>
-                        </div>
-                    )}
-            </section>
+                        )}
+
+                        {Number(order?.is_giftcard) == 1 ? (
+                            <div className='dark-card rounded-lg mb-5 border border-slate-700/50'>
+                                <div className='p-5 flex justify-between items-center'>
+                                    <h2 className='font-semibold text-base md:text-lg dark-text'>Services Purchased</h2>
+                                </div>
+                                <ul>
+                                    {order.order_items.map((item) => (
+                                        <li key={item.id} className='dark-card rounded-lg p-5 flex flex-col gap-5 border border-slate-700/50 m-5'>
+                                            <div className='flex justify-evenly gap-2'>
+                                                <p className='text-base flex flex-col items-center dark-text'><span className='font-bold'>Name</span> {item.name}</p>
+                                                <p className='text-base flex flex-col items-center dark-text'><span className='font-bold'>Price</span> {item.price}</p>
+                                                <p className='text-base flex flex-col items-center dark-text'><span className='font-bold'>Quantity</span> {item.quantity}</p>
+                                                <p className='text-base flex flex-col items-center dark-text'><span className='font-bold'>Total</span> {item.total_price}</p>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ) : (
+                            <div className='mb-5'>
+                                <div className={`p-5 flex justify-between items-center rounded-lg relative dark-card border border-slate-700/50 mb-5`} onClick={() => toggleAccordion('servicesPurchased')}>
+                                    <h2 className='font-semibold text-base md:text-lg dark-text'>Services Purchased</h2>
+                                    <span className='text-2xl dark-text'>{activeAccordions.includes('servicesPurchased') ? '-' : '+'}</span>
+                                </div>
+                                {activeAccordions.includes('servicesPurchased') && (
+                                    <ul className='flex flex-col gap-5'>
+                                        {order.order_items.map((item) => (
+                                            <li key={item.id} className={`dark-card rounded-lg p-5 flex flex-col gap-5 border border-slate-700/50 ${(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) ? "cursor-pointer relative" : ""}`}
+                                                onClick={() => {
+                                                    if (getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) {
+                                                        handleRevisionReaded(item.id);
+                                                    }
+                                                }}>
+                                                {(getRevisionsForItem(item.service_id).filter((item) => ((item.admin_is_read == 0))).length > 0) && (
+                                                    <span className='absolute -top-2 -left-3 bg-green-500 text-white font-THICCCBOI-Medium text-sm px-3 py-1 rounded-full'>New Revision</span>
+                                                )}
+                                                <div className='flex justify-between items-center'>
+                                                    <h3 className={`text-xl font-bold dark-text`}>{item.name}</h3>
+                                                    <div className='flex gap-2'>
+                                                        <button onClick={() => {
+                                                            openGeneralModal();
+                                                            setSelectedService(item.id);
+                                                        }} className='btn-primary'>Upload Deliverable Links</button>
+                                                    </div>
+                                                </div>
+                                                <div className='flex justify-between items-center dark-card rounded-lg p-5 border border-slate-700/50'>
+                                                    <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center dark-text`}>
+                                                        <span className='text-base font-bold'>Service Type</span>{item.service_type}
+                                                    </p>
+                                                    <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center dark-text`}>
+                                                        <span className='text-base font-bold'>Max Revisions</span>{item.max_revision}
+                                                    </p>
+                                                    {user && user.role === 'admin' && (
+                                                        <>
+                                                            <p className='text-sm md:text-base text-center w-full flex flex-col items-center justify-center dark-text'>
+                                                                <span className='text-base font-bold'>Price</span>
+                                                                <span className='bg-green-500 text-white px-2 py-1 rounded-full'>${item.price} / {item.service_type.replace('_', ' ')}</span>
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                    <p className={`font-semibold text-sm md:text-base w-full flex flex-col items-center justify-center dark-text`}>
+                                                        <span className='text-base font-bold'>Quantity</span>{item.quantity}
+                                                    </p>
+                                                    {user && user.role === 'admin' && (
+                                                        <>
+                                                            <p className='text-sm md:text-base text-center w-full flex flex-col items-center justify-center dark-text'>
+                                                                <span className='text-base font-bold'>Total Price</span>
+                                                                <span className='bg-green-500 text-white px-2 py-1 rounded-full'>${item.total_price} / {item.service_type.replace('_', ' ')}</span>
+                                                            </p>
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                <div className={`flex ${JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 ? "justify-between" : "justify-end"} gap-5 items-start`}>
+                                                    {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && (
+                                                        <div className='p-4 dark-card rounded-lg w-full lg:w-1/2 border border-slate-700/50'>
+                                                            {JSON.parse(item.deliverable_files) && JSON.parse(item.deliverable_files)?.length > 0 && <p className='text-sm md:text-base font-bold mb-4 dark-text'>Deliverable Links ({JSON.parse(item.deliverable_files)?.length})</p>}
+
+                                                            <ul className='flex flex-col gap-3'>
+                                                                {JSON.parse(item.deliverable_files).map((link, index) => (
+                                                                    <li key={index} className='flex justify-between items-center p-3 dark-card rounded-lg border border-slate-700/50'>
+                                                                        <a
+                                                                            href={link}
+                                                                            target="_blank"
+                                                                            rel="noopener noreferrer"
+                                                                            className='text-blue-400 hover:text-blue-300 underline break-all'
+                                                                        >
+                                                                            {link.length > 50 ? `${link.substring(0, 50)}...` : link}
+                                                                        </a>
+                                                                        <button
+                                                                            onClick={() => navigator.clipboard.writeText(link)}
+                                                                            className='ml-2 text-sm btn-primary px-2 py-1'
+                                                                            title="Copy link"
+                                                                        >
+                                                                            Copy
+                                                                        </button>
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        </div>
+                                                    )}
+
+                                                    <div className='flex flex-col gap-4 w-full lg:w-1/2'>
+                                                        {getRevisionsForItem(item.service_id)
+                                                            .reverse()
+                                                            .map((revision) => (
+                                                                <div key={revision.id} className='p-4 dark-card rounded-lg border border-slate-700/50'>
+                                                                    <div className='flex justify-between items-center mb-5'>
+                                                                        <h2 className='font-semibold text-base md:text-lg dark-text'>Revision #{revision.id}</h2>
+
+                                                                        <button onClick={() => openRevisionModal(revision.id)} className="btn-primary">
+                                                                            Upload Revision Links
+                                                                        </button>
+                                                                    </div>
+                                                                    <p className='text-sm md:text-base p-4 dark-card rounded-lg mb-5 border border-slate-700/50'>
+                                                                        <span className='font-medium dark-text'>Revision Message:</span> {revision.message || 'No message provided'}
+                                                                    </p>
+
+                                                                    {revision.files && JSON.parse(revision.files).length > 0 && (
+                                                                        <>
+                                                                            <h2 className='font-semibold text-sm md:text-base dark-text'>Uploaded Links</h2>
+                                                                            <ul className='mt-3'>
+                                                                                {JSON.parse(revision.files).map((link, index) => (
+                                                                                    <li key={index} className='flex justify-between items-center p-3 dark-card rounded-lg mb-2 border border-slate-700/50'>
+                                                                                        <a
+                                                                                            href={link}
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            className='text-blue-400 hover:text-blue-300 underline break-all'
+                                                                                        >
+                                                                                            {link.length > 50 ? `${link.substring(0, 50)}...` : link}
+                                                                                        </a>
+                                                                                        <button
+                                                                                            onClick={() => navigator.clipboard.writeText(link)}
+                                                                                            className='ml-2 text-sm btn-primary px-2 py-1'
+                                                                                            title="Copy link"
+                                                                                        >
+                                                                                            Copy
+                                                                                        </button>
+                                                                                    </li>
+                                                                                ))}
+                                                                            </ul>
+                                                                        </>
+                                                                    )}
+
+                                                                    <p className='text-sm md:text-base p-4 dark-card rounded-lg border border-slate-700/50'>
+                                                                        <span className='font-medium dark-text'>Requested At:</span> {(new Date(revision.created_at).toLocaleDateString("en-US", { month: 'long', day: 'numeric', year: 'numeric' })) || 'No message provided'}
+                                                                    </p>
+                                                                </div>
+                                                            ))}
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
 
             {/* General Link Upload Modal */}
-            <Modal isOpen={generalModalIsOpen} onRequestClose={closeGeneralModal} contentLabel="Upload Links">
+            <Modal isOpen={generalModalIsOpen} onRequestClose={closeGeneralModal} contentLabel="Upload Links" className="modern-modal">
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">Upload Deliverable Links</h2>
+                    <h2 className="text-2xl mb-4 font-semibold dark-text">Upload Deliverable Links</h2>
                     <form onSubmit={handleGeneralLinkSubmit} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Deliverable Links</label>
+                            <label className="block text-sm font-medium dark-text-muted mb-2">Deliverable Links</label>
                             {selectedLinks.map((link, index) => (
                                 <div key={index} className="flex gap-2 mb-2">
                                     <input
@@ -583,14 +568,14 @@ const OrderDetail = () => {
                                         value={link}
                                         onChange={(e) => handleLinkChange(index, e.target.value)}
                                         placeholder="https://example.com/your-deliverable-link"
-                                        className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        className="modern-input flex-1"
                                         required={index === 0 || link.trim() !== ''}
                                     />
                                     {selectedLinks.length > 1 && (
                                         <button
                                             type="button"
                                             onClick={() => removeLinkField(index)}
-                                            className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600"
+                                            className="btn-secondary"
                                         >
                                             Remove
                                         </button>
@@ -600,16 +585,16 @@ const OrderDetail = () => {
                             <button
                                 type="button"
                                 onClick={addLinkField}
-                                className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 mt-2"
+                                className="btn-primary mt-2"
                             >
                                 Add Another Link
                             </button>
                         </div>
                         <div className="flex justify-end space-x-4">
-                            <button type="button" className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded" onClick={closeGeneralModal}>
+                            <button type="button" className="btn-secondary" onClick={closeGeneralModal}>
                                 Close
                             </button>
-                            <button type="submit" className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg" disabled={isUploading}>
+                            <button type="submit" className="btn-primary" disabled={isUploading}>
                                 {isUploading ? 'Uploading...' : 'Upload Links'}
                             </button>
                         </div>
@@ -618,12 +603,12 @@ const OrderDetail = () => {
             </Modal>
 
             {/* Revision Link Upload Modal */}
-            <Modal isOpen={revisionModalIsOpen} onRequestClose={closeRevisionModal} contentLabel="Upload Revision Links">
+            <Modal isOpen={revisionModalIsOpen} onRequestClose={closeRevisionModal} contentLabel="Upload Revision Links" className="modern-modal">
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">Upload Revision Links</h2>
+                    <h2 className="text-2xl mb-4 font-semibold dark-text">Upload Revision Links</h2>
                     <form onSubmit={handleRevisionLinkSubmit} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Revision Links</label>
+                            <label className="block text-sm font-medium dark-text-muted mb-2">Revision Links</label>
                             {selectedLinks.map((link, index) => (
                                 <div key={index} className="flex gap-2 mb-2">
                                     <input
@@ -631,14 +616,14 @@ const OrderDetail = () => {
                                         value={link}
                                         onChange={(e) => handleLinkChange(index, e.target.value)}
                                         placeholder="https://example.com/your-revision-link"
-                                        className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                                        className="modern-input flex-1"
                                         required={index === 0 || link.trim() !== ''}
                                     />
                                     {selectedLinks.length > 1 && (
                                         <button
                                             type="button"
                                             onClick={() => removeLinkField(index)}
-                                            className="bg-red-500 text-white px-3 py-2 rounded-md hover:bg-red-600"
+                                            className="btn-secondary"
                                         >
                                             Remove
                                         </button>
@@ -648,23 +633,23 @@ const OrderDetail = () => {
                             <button
                                 type="button"
                                 onClick={addLinkField}
-                                className="bg-blue-500 text-white px-3 py-2 rounded-md hover:bg-blue-600 mt-2"
+                                className="btn-primary mt-2"
                             >
                                 Add Another Link
                             </button>
                         </div>
                         <div className="flex justify-end space-x-4">
-                            <button type="button" className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded" onClick={closeRevisionModal}>
+                            <button type="button" className="btn-secondary" onClick={closeRevisionModal}>
                                 Close
                             </button>
-                            <button type="submit" className="text-sm md:text-base bg-green-600 text-white px-5 py-2 rounded-lg" disabled={isUploading}>
+                            <button type="submit" className="btn-primary" disabled={isUploading}>
                                 {isUploading ? 'Uploading...' : 'Upload Links'}
                             </button>
                         </div>
                     </form>
                 </div>
             </Modal>
-        </>
+        </div>
     );
 };
 
