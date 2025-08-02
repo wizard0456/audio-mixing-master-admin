@@ -124,22 +124,22 @@ const Welcome = () => {
   };
 
   const StatCard = ({ title, value, icon, color, subtitle, trend, growth }) => (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 group">
+    <div className="dark-card p-6 hover:shadow-lg transition-all duration-300 group">
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-xl ${color} group-hover:scale-110 transition-transform duration-300`}>
           {icon}
         </div>
         <div className={`flex items-center space-x-1 text-sm font-medium ${
-          growth > 0 ? 'text-green-600' : 'text-red-600'
+          growth > 0 ? 'text-green-400' : 'text-red-400'
         }`}>
           {growth > 0 ? <FaArrowUp className="w-3 h-3" /> : <FaArrowDown className="w-3 h-3" />}
           <span>{Math.abs(growth)}%</span>
         </div>
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-        <p className="text-3xl font-bold text-gray-900 mb-2">{value}</p>
-        {subtitle && <p className="text-xs text-gray-500">{subtitle}</p>}
+        <p className="text-sm font-medium dark-text-secondary mb-1">{title}</p>
+        <p className="text-3xl font-bold dark-text mb-2">{value}</p>
+        {subtitle && <p className="text-xs dark-text-muted">{subtitle}</p>}
       </div>
     </div>
   );
@@ -162,16 +162,16 @@ const Welcome = () => {
   );
 
   const ChartCard = ({ title, data, color }) => (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">{title}</h3>
+    <div className="dark-card p-6">
+      <h3 className="text-lg font-semibold dark-text mb-4">{title}</h3>
       <div className="space-y-3">
         {Object.entries(data).map(([key, value]) => (
           <div key={key} className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className={`w-3 h-3 rounded-full ${color}`}></div>
-              <span className="text-sm font-medium text-gray-700 capitalize">{key}</span>
+              <span className="text-sm font-medium dark-text-secondary capitalize">{key}</span>
             </div>
-            <span className="text-sm font-bold text-gray-900">{value}</span>
+            <span className="text-sm font-bold dark-text">{value}</span>
           </div>
         ))}
       </div>
@@ -180,28 +180,28 @@ const Welcome = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <div className="flex items-center justify-center min-h-screen dark-bg animated-bg">
         <div className="text-center">
           <div className="loading-spinner mb-4"></div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="dark-text-secondary">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+    <div className="min-h-screen dark-bg animated-bg p-6">
       {/* Header */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Dashboard</h1>
-            <p className="text-gray-600 text-lg">Welcome back! Here's what's happening with your audio mixing business.</p>
+            <h1 className="text-4xl font-bold dark-text mb-2">Dashboard</h1>
+            <p className="dark-text-secondary text-lg">Welcome back! Here's what's happening with your audio mixing business.</p>
           </div>
           <div className="flex items-center space-x-3">
-            <div className="bg-white rounded-xl px-4 py-2 shadow-sm border border-gray-200">
-              <p className="text-sm text-gray-500">Last updated</p>
-              <p className="text-sm font-medium text-gray-900">{new Date().toLocaleTimeString()}</p>
+            <div className="dark-card px-4 py-2">
+              <p className="text-sm dark-text-muted">Last updated</p>
+              <p className="text-sm font-medium dark-text">{new Date().toLocaleTimeString()}</p>
             </div>
           </div>
         </div>

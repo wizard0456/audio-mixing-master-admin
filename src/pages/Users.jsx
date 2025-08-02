@@ -247,59 +247,59 @@ const Users = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">User Management</h1>
-                        <p className="text-gray-600">Manage your platform users and their permissions</p>
+                        <h1 className="page-title dark-text">User Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage your platform users and their permissions</p>
                     </div>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="dark-card p-6 search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
-                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
                                 placeholder="Search users by name or email..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input pl-12"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
-                            <FaFilter className="text-gray-500 w-4 h-4" />
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Users
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'active' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
                                 Active
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'inactive' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
@@ -317,56 +317,56 @@ const Users = () => {
                 </div>
             ) : (
                 filteredUsers.length !== 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             User
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Email
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Role
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Joined
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="table-body">
                                     {filteredUsers.map(user => (
-                                        <tr key={user.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={user.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                                                         <IoPerson className="w-5 h-5 text-white" />
                                                     </div>
                                                     <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">
+                                                        <div className="text-sm font-medium dark-text">
                                                             {user.first_name} {user.last_name}
                                                         </div>
-                                                        <div className="text-sm text-gray-500">ID: {user.id}</div>
+                                                        <div className="text-sm dark-text-muted">ID: {user.id}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{user.email}</div>
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="text-sm dark-text">{user.email}</div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium green-gradient text-white">
                                                     {user.role}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <Toggle
                                                     checked={user.is_active == '1' || user.is_active === 1}
                                                     onChange={() => handleToggleActivation(user.id, user.is_active)}
@@ -374,21 +374,21 @@ const Users = () => {
                                                     className="modern-toggle"
                                                 />
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
                                                 {new Date(user.created_at).toLocaleDateString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <button
                                                         onClick={() => openUserDetailsModal(user)}
-                                                        className="text-green-600 hover:text-green-900"
+                                                        className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openConfirmationModal(user)}
-                                                        className="text-red-600 hover:text-red-900"
+                                                        className="action-button action-button-delete"
                                                         title="Delete User"
                                                     >
                                                         <IoTrash className="w-4 h-4" />
@@ -402,10 +402,12 @@ const Users = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <IoPeople className="mx-auto h-12 w-12 text-gray-400" />
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No users found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <IoPeople className="w-8 h-8 text-white" />
+                        </div>
+                        <h3 className="empty-state-title dark-text">No users found</h3>
+                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}

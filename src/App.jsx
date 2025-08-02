@@ -121,7 +121,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/dashboard",
-        element: <DashboardPage />,
+        element: <RestrictedRoute roles={['admin', 'engineer', 'user']} element={Welcome} />,
       },
     ]
   },

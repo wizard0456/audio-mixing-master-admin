@@ -481,13 +481,13 @@ const Blog = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="min-h-screen dark-bg animated-bg p-6">
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Blog Management</h1>
-                        <p className="text-gray-600">Manage and publish blog articles and content</p>
+                        <h1 className="text-3xl font-bold dark-text mb-2">Blog Management</h1>
+                        <p className="dark-text-secondary">Manage and publish blog articles and content</p>
                     </div>
                     <button
                         onClick={openAddBlogModal}
@@ -499,7 +499,7 @@ const Blog = () => {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="dark-card p-6 mb-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
                         <div className="relative flex-1 max-w-md">
@@ -517,8 +517,8 @@ const Blog = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'all' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
@@ -527,8 +527,8 @@ const Blog = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'active' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
@@ -537,8 +537,8 @@ const Blog = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'inactive' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
@@ -556,10 +556,10 @@ const Blog = () => {
                 </div>
             ) : (
                 blogs.length !== 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="dark-card overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="modern-table-header">
                                     <tr>
                                         <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Title

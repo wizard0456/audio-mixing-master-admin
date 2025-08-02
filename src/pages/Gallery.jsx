@@ -180,13 +180,13 @@ const Gallery = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="min-h-screen dark-bg animated-bg p-6">
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Gallery Management</h1>
-                        <p className="text-gray-600">Upload and manage gallery images</p>
+                        <h1 className="text-3xl font-bold dark-text mb-2">Gallery Management</h1>
+                        <p className="dark-text-secondary">Upload and manage gallery images</p>
                     </div>
                     <button
                         onClick={openModal}
@@ -204,7 +204,7 @@ const Gallery = () => {
                     <Loading />
                 </div>
             ) : (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                <div className="dark-card p-6">
                     {images.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
                             {images.map(image => (
@@ -231,8 +231,8 @@ const Gallery = () => {
                             <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <span className="text-white font-semibold text-xl">G</span>
                             </div>
-                            <h3 className="mt-2 text-sm font-medium text-gray-900">No images found</h3>
-                            <p className="mt-1 text-sm text-gray-500">Upload your first image to get started.</p>
+                            <h3 className="mt-2 text-sm font-medium dark-text">No images found</h3>
+                            <p className="mt-1 text-sm dark-text-muted">Upload your first image to get started.</p>
                         </div>
                     )}
                 </div>

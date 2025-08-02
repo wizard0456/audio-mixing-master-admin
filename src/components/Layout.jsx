@@ -68,7 +68,7 @@ const Layout = () => {
     };
 
     return (
-        <div className="flex h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50">
+        <div className="flex h-screen dark-bg animated-bg">
             <Sidebar openSidebar={openSidebar} setOpenSidebar={setOpenSidebar} />
             
             <main className="flex-1 flex flex-col overflow-hidden lg:ml-72">

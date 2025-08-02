@@ -174,13 +174,13 @@ const Uploads = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="min-h-screen dark-bg animated-bg p-6">
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">File Upload Management</h1>
-                        <p className="text-gray-600">Manage uploaded files and media</p>
+                        <h1 className="text-3xl font-bold dark-text mb-2">File Upload Management</h1>
+                        <p className="dark-text-secondary">Manage uploaded files and media</p>
                     </div>
                     <button className="btn-primary flex items-center space-x-2">
                         <IoCloudUpload className="w-4 h-4" />
@@ -189,11 +189,11 @@ const Uploads = () => {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="dark-card p-6 mb-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
                         <div className="relative flex-1 max-w-md">
-                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 dark-text-muted w-4 h-4" />
                             <input
                                 type="text"
                                 placeholder="Search files by name..."
@@ -205,12 +205,12 @@ const Uploads = () => {
 
                         {/* Filters */}
                         <div className="flex items-center space-x-2">
-                            <IoFilter className="text-gray-500 w-4 h-4" />
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'all' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
@@ -219,8 +219,8 @@ const Uploads = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'audio' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('audio')}
                             >
@@ -229,8 +229,8 @@ const Uploads = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'image' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('image')}
                             >
@@ -239,8 +239,8 @@ const Uploads = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'document' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('document')}
                             >
@@ -258,78 +258,78 @@ const Uploads = () => {
                 </div>
             ) : (
                 uploads.length !== 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="dark-card overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="modern-table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                                             File
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                                             Type
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                                             Size
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                                             Uploaded By
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                                             Uploaded
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="modern-table-body divide-y divide-gray-700">
                                     {uploads.map(upload => (
-                                        <tr key={upload.id} className="hover:bg-gray-50 transition-colors duration-200">
+                                        <tr key={upload.id} className="hover:bg-gray-800 transition-colors duration-200">
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
                                                         <IoDocument className="w-5 h-5 text-white" />
                                                     </div>
                                                     <div>
-                                                        <div className="text-sm font-medium text-gray-900">{upload.filename}</div>
-                                                        <div className="text-sm text-gray-500">ID: {upload.id}</div>
+                                                        <div className="text-sm font-medium dark-text">{upload.filename}</div>
+                                                        <div className="text-sm dark-text-muted">ID: {upload.id}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium green-gradient text-white">
                                                     {upload.file_type || 'Unknown'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
                                                 {formatFileSize(upload.file_size || 0)}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
                                                 {upload.uploaded_by || 'System'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
                                                 {new Date(upload.created_at).toLocaleDateString()}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex items-center space-x-3">
                                                     <button
                                                         onClick={() => openUploadDetailsModal(upload)}
-                                                        className="text-blue-600 hover:text-blue-900 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
+                                                        className="text-blue-400 hover:text-blue-300 p-2 rounded-lg hover:bg-blue-900/20 transition-all duration-200"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDownload(upload.file_url, upload.filename)}
-                                                        className="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50 transition-all duration-200"
+                                                        className="text-green-400 hover:text-green-300 p-2 rounded-lg hover:bg-green-900/20 transition-all duration-200"
                                                         title="Download File"
                                                     >
                                                         <IoDownload className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openConfirmationModal(upload)}
-                                                        className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
+                                                        className="text-red-400 hover:text-red-300 p-2 rounded-lg hover:bg-red-900/20 transition-all duration-200"
                                                         title="Delete File"
                                                     >
                                                         <IoTrash className="w-4 h-4" />
@@ -347,8 +347,8 @@ const Uploads = () => {
                         <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <IoCloudUpload className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No uploaded files found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="mt-2 text-sm font-medium dark-text">No uploaded files found</h3>
+                        <p className="mt-1 text-sm dark-text-muted">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}

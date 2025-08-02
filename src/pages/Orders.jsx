@@ -163,18 +163,18 @@ const Orders = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="min-h-screen dark-bg animated-bg p-6">
             {/* Header */}
             <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Order Management</h1>
-                        <p className="text-gray-600">Manage and track all platform orders and transactions</p>
+                        <h1 className="text-3xl font-bold dark-text mb-2">Order Management</h1>
+                        <p className="dark-text-secondary">Manage and track all platform orders and transactions</p>
                     </div>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="dark-card p-6 mb-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
                         <div className="relative flex-1 max-w-md">
@@ -192,8 +192,8 @@ const Orders = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'all' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
@@ -202,8 +202,8 @@ const Orders = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === '0' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('0')}
                             >
@@ -212,8 +212,8 @@ const Orders = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === '1' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('1')}
                             >
@@ -222,8 +222,8 @@ const Orders = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === '2' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('2')}
                             >
@@ -232,8 +232,8 @@ const Orders = () => {
                             <button
                                 className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === '3' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('3')}
                             >
