@@ -315,7 +315,7 @@ const Engineers = () => {
         try {
             await axios({
                 method: 'post',
-                url: `${API_Endpoint}admin/engineer`,
+                url: `${API_Endpoint}admin/engineer/store`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
                     'Content-Type': 'application/json'
