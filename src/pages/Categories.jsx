@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus, FaSearch, FaFilter } from "react-icons/fa";
+import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
-import { IoTrash, IoAdd, IoCreate, IoGrid, IoApps, IoSearch, IoFilter } from 'react-icons/io5';
+import { IoTrash, IoAdd, IoCreate, IoGrid, IoApps } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import Toggle from 'react-toggle';
@@ -32,10 +32,10 @@ const Categories = () => {
     const abortController = useRef(null);
 
     useEffect(() => {
-        fetchCategories(currentPage, filter);
-    }, [currentPage, filter]);
+        fetchCategories(currentPage, filter, searchQuery);
+    }, [currentPage, filter, searchQuery]);
 
-    const fetchCategories = async (page, filter) => {
+    const fetchCategories = async (page, filter, searchQuery) => {
         if (abortController.current) {
             abortController.current.abort();
         }
@@ -45,6 +45,9 @@ const Categories = () => {
         let url = `${API_Endpoint}admin/categories?page=${page}&per_page=${Per_Page}`;
         if (filter !== 'all') {
             url += `&is_active=${filter}`;
+        }
+        if (searchQuery) {
+            url += `&search=${searchQuery}`;
         }
 
         try {
@@ -83,14 +86,7 @@ const Categories = () => {
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
-    };
-
-    const getFilteredCategories = () => {
-        if (!searchQuery) return categories;
-        
-        return categories.filter(category => 
-            category.name?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+        setCurrentPage(1);
     };
 
     const openModal = (category = null) => {
@@ -116,68 +112,33 @@ const Categories = () => {
     const handleAddOrUpdateCategory = async (event) => {
         event.preventDefault();
         setAdding(true);
-
-        const id = toast.loading(editingCategory ? 'Updating category...' : 'Adding category...', {
-            position: "top-right",
-            autoClose: false,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
-            theme: "light",
-            transition: Slide,
-        });
-
         try {
-            const url = editingCategory 
-                ? `${API_Endpoint}admin/categories/${editingCategory.id}` 
-                : `${API_Endpoint}admin/categories`;
-            
-            const method = editingCategory ? 'PUT' : 'POST';
-            
-            await axios({
-                method: method,
-                url: url,
-                data: {
-                    name: categoryName,
-                    is_active: isActive ? 1 : 0
-                },
-                headers: {
-                    'Authorization': `Bearer ${user.token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            toast.dismiss(id);
-            toast.success(editingCategory ? 'Category updated successfully!' : 'Category added successfully!', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-
+            if (editingCategory) {
+                // Update category
+                await axios({
+                    method: "put",
+                    url: `${API_Endpoint}admin/categories/${editingCategory.id}?name=${categoryName}&is_active=${isActive ? 1 : 0}`,
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`,
+                        "Content-Type": "application/json"
+                    }
+                });
+            } else {
+                // Add new category
+                await axios({
+                    method: "post",
+                    url: `${API_Endpoint}admin/categories`,
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`,
+                        "Content-Type": "application/json"
+                    },
+                    data: { name: categoryName, is_active: isActive ? 1 : 0 }
+                });
+            }
             closeModal();
-            fetchCategories(currentPage, filter);
+            fetchCategories(currentPage, filter); // Reload fetching
         } catch (error) {
-            toast.dismiss(id);
-            toast.error('Error saving category.', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            console.error('Error saving category:', error);
+            console.error(`Error ${editingCategory ? 'updating' : 'adding'} category`, error);
         } finally {
             setAdding(false);
         }
@@ -195,20 +156,7 @@ const Categories = () => {
 
     const handleDeleteCategory = async () => {
         if (!categoryToDelete) return;
-
         setIsDeleting(true);
-        const id = toast.loading('Deleting category...', {
-            position: "top-right",
-            autoClose: false,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
-            theme: "light",
-            transition: Slide,
-        });
-
         try {
             await axios({
                 method: 'delete',
@@ -217,106 +165,78 @@ const Categories = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-            toast.dismiss(id);
-            toast.success('Category deleted successfully', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            fetchCategories(currentPage, filter);
+            setIsDeleting(false);
+            fetchCategories(currentPage, filter); // Reload fetching
             closeConfirmationModal();
         } catch (error) {
-            toast.dismiss(id);
-            toast.error('Error deleting category', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
             console.error('Error deleting category:', error);
-        } finally {
             setIsDeleting(false);
         }
     };
 
-    const filteredCategories = getFilteredCategories();
-
     return (
-        <div className="page-container dark-bg animated-bg">
+        <div className="min-h-screen dark-bg animated-bg p-6">
             {/* Header */}
-            <div className="page-header">
+            <div className="mb-8">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="page-title dark-text">Category Management</h1>
-                        <p className="page-subtitle dark-text-secondary">Manage and configure all platform categories and classifications</p>
+                        <h1 className="text-3xl font-bold dark-text mb-2">Category Management</h1>
+                        <p className="dark-text-secondary">Manage and configure all platform categories and organization</p>
                     </div>
                     <button
                         onClick={() => openModal()}
                         className="btn-primary flex items-center space-x-2"
                     >
-                        <IoAdd className="w-4 h-4" />
+                        <IoAdd className="w-4 h-4 mr-1" />
                         <span>Add Category</span>
                     </button>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="dark-card p-6 search-filters-container">
+                <div className="dark-card p-6 mb-6">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="search-input-container">
-                            <IoSearch className="search-icon dark-text-muted" />
+                        <div className="relative flex-1 max-w-md">
                             <input
                                 type="text"
                                 placeholder="Search categories by name..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input search-input"
+                                className="modern-input w-full"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="filters-container">
-                            <IoFilter className="dark-text-muted w-4 h-4" />
+                        <div className="flex items-center space-x-2">
                             <button
-                                className={`filter-button ${
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'all' 
-                                        ? 'filter-button-active' 
-                                        : 'filter-button-inactive'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Categories
                             </button>
                             <button
-                                className={`filter-button ${
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'active' 
-                                        ? 'filter-button-active' 
-                                        : 'filter-button-inactive'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
-                                Active
+                                Active Categories
                             </button>
                             <button
-                                className={`filter-button ${
+                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
                                     filter === 'inactive' 
-                                        ? 'filter-button-active' 
-                                        : 'filter-button-inactive'
+                                        ? 'green-gradient text-white shadow-lg' 
+                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
-                                Inactive
+                                Inactive Categories
                             </button>
                         </div>
                     </div>
@@ -329,30 +249,30 @@ const Categories = () => {
                     <Loading />
                 </div>
             ) : (
-                filteredCategories.length !== 0 ? (
-                    <div className="dark-card table-container">
+                categories.length !== 0 ? (
+                    <div className="dark-card overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="table-header">
+                                <thead className="modern-table-header">
                                     <tr>
-                                        <th className="table-header-cell">
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Name
                                         </th>
-                                        <th className="table-header-cell">
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Created At
                                         </th>
-                                        <th className="table-header-cell">
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Status
                                         </th>
-                                        <th className="table-header-cell">
+                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="table-body">
-                                    {filteredCategories.map(category => (
-                                        <tr key={category.id} className="table-row">
-                                            <td className="table-cell whitespace-nowrap">
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {categories.map(category => (
+                                        <tr key={category.id} className="hover:bg-gray-50">
+                                            <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                                                         <span className="text-white font-semibold text-sm">
@@ -360,35 +280,28 @@ const Categories = () => {
                                                         </span>
                                                     </div>
                                                     <div className="ml-3">
-                                                        <div className="text-sm font-medium dark-text">{category.name}</div>
+                                                        <div className="text-sm font-medium text-gray-900">{category.name}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="table-cell whitespace-nowrap">
-                                                <div className="text-sm dark-text">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
                                                     {new Date(category.createdAt).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
                                                 </div>
                                             </td>
-                                            <td className="table-cell whitespace-nowrap">
-                                                <div className="text-sm dark-text">
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="text-sm text-gray-900">
                                                     {category.is_active == 1 ? 'Active' : 'Inactive'}
                                                 </div>
                                             </td>
-                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-3">
                                                     <button
                                                         onClick={() => openModal(category)}
-                                                        className="action-button action-button-edit"
+                                                        className="text-blue-600 hover:text-blue-900"
                                                         title="Edit Category"
                                                     >
                                                         <IoCreate className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => openConfirmationModal(category)}
-                                                        className="action-button action-button-delete"
-                                                        title="Delete Category"
-                                                    >
-                                                        <IoTrash className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -399,18 +312,18 @@ const Categories = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="empty-state">
-                        <div className="empty-state-icon">
-                            <IoApps className="w-8 h-8 text-white" />
+                    <div className="text-center py-12">
+                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <IoApps className="w-6 h-6 text-white" />
                         </div>
-                        <h3 className="empty-state-title dark-text">No categories found</h3>
-                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
+                        <h3 className="mt-2 text-sm font-medium text-gray-900">No categories found</h3>
+                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
 
             {/* Pagination */}
-            {!loading && filteredCategories.length > 0 && !searchQuery && (
+            {!loading && categories.length > 0 && (
                 <div className="mt-6">
                     <ReactPaginate
                         previousLabel={<FaAngleDoubleLeft />}
@@ -430,15 +343,6 @@ const Categories = () => {
                 </div>
             )}
 
-            {/* Filtering message */}
-            {searchQuery && (
-                <div className="mt-4 text-center">
-                    <p className="text-sm text-gray-600">
-                        Showing {filteredCategories.length} of {categories.length} categories matching "{searchQuery}"
-                    </p>
-                </div>
-            )}
-
             {/* Add/Edit Category Modal */}
             <Modal
                 isOpen={modalIsOpen}
@@ -447,33 +351,32 @@ const Categories = () => {
                 className="modern-modal"
             >
                 <div>
-                    <h2 className="text-xl md:text-2xl mb-4 font-semibold dark-text">{editingCategory ? 'Update Category' : 'Add Category'}</h2>
+                    <h2 className="text-xl md:text-2xl mb-4 font-semibold">{editingCategory ? 'Update Category' : 'Add Category'}</h2>
                     <form onSubmit={handleAddOrUpdateCategory} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium dark-text-muted mb-2" htmlFor="category">Category Name</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="category">Category Name</label>
                             <input
                                 type="text"
                                 name="category"
-                                className="modern-input w-full"
+                                className="w-full px-3 py-2 border rounded-md"
                                 value={categoryName}
                                 onChange={(e) => setCategoryName(e.target.value)}
                                 required
                             />
                         </div>
                         <div className="flex items-center gap-2 mb-4">
-                            <p className="dark-text"><strong>Status:</strong></p>
+                            <p><strong>Status:</strong></p>
                             <Toggle
                                 checked={isActive}
                                 onChange={() => setIsActive(!isActive)}
                                 icons={false}
                                 aria-label="Category status"
-                                className="modern-toggle"
                             />
                         </div>
                         <div className="flex justify-end space-x-4">
                             <button
                                 type="button"
-                                className="btn-secondary"
+                                className="bg-red-500 text-sm md:text-base font-semibold text-white px-4 py-2 rounded"
                                 onClick={closeModal}
                                 disabled={adding}
                             >
@@ -481,7 +384,7 @@ const Categories = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="btn-primary"
+                                className="font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
                                 disabled={adding}
                             >
                                 {adding ? (editingCategory ? 'Updating...' : 'Adding...') : (editingCategory ? 'Update Category' : 'Add Category')}
