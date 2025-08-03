@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaTrashAlt, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
+import { IoSearch, IoFilter, IoMail, IoDownload } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../reducers/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser, logout } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import { Slide, toast } from 'react-toastify';
 import Loading from '../components/Loading';
@@ -12,6 +13,7 @@ import DateRangePicker from '@wojtekmaj/react-daterange-picker';
 import '@wojtekmaj/react-daterange-picker/dist/DateRangePicker.css';
 
 const Newsletter = () => {
+  const dispatch = useDispatch();
   const [leads, setLeads] = useState([]);
   const [currentPage, setCurrentPage] = useState(0); // Set initial page to 0
   const [totalPages, setTotalPages] = useState(1);
@@ -39,7 +41,21 @@ const Newsletter = () => {
       setLeads(response.data.data);
       setTotalPages(response.data.last_page);
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+      }
       console.error('Error fetching leads', error);
+      toast.error('Error fetching leads', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     } finally {
       setLoading(false);
     }
@@ -62,7 +78,19 @@ const Newsletter = () => {
 
   const handleDeleteLead = async () => {
     if (!leadToDelete) return;
-    setIsDeleting(true); // Start loading state
+    setIsDeleting(true);
+    const id = toast.loading('Deleting lead...', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+      theme: "light",
+      transition: Slide,
+    });
+    
     try {
       await axios({
         method: 'delete',
@@ -71,35 +99,40 @@ const Newsletter = () => {
           'Authorization': `Bearer ${user.token}`
         }
       });
-      fetchLeads(currentPage + 1); // Reload fetching
-      closeConfirmationModal();
-      toast.success('Lead deleted successfully!', {
+      toast.dismiss(id);
+      toast.success('Lead deleted successfully', {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+        pauseOnHover: false,
+        draggable: false,
         progress: undefined,
         theme: "light",
         transition: Slide,
       });
+      fetchLeads(currentPage + 1);
+      closeConfirmationModal();
     } catch (error) {
+      toast.dismiss(id);
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+      }
       console.error('Error deleting lead:', error);
-      toast.error('Error deleting lead.', {
+      toast.error('Error deleting lead', {
         position: "top-right",
         autoClose: 3000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+        pauseOnHover: false,
+        draggable: false,
         progress: undefined,
         theme: "light",
         transition: Slide,
       });
       closeConfirmationModal();
     } finally {
-      setIsDeleting(false); // End loading state
+      setIsDeleting(false);
     }
   };
 
@@ -137,25 +170,25 @@ const Newsletter = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+    <div className="page-container dark-bg animated-bg">
       {/* Header */}
-      <div className="mb-8">
+      <div className="page-header">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Newsletter Management</h1>
-            <p className="text-gray-600">Manage newsletter leads and export data by date range</p>
+            <h1 className="page-title dark-text">Newsletter Management</h1>
+            <p className="page-subtitle dark-text-secondary">Manage newsletter leads and export data by date range</p>
           </div>
         </div>
 
         {/* Export Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="dark-card search-filters-container">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <label className="text-sm font-medium text-gray-700">Export Date Range:</label>
+              <label className="form-label">Export Date Range:</label>
               <DateRangePicker 
                 value={dates} 
                 onChange={setDates} 
-                className="custom-daterange-picker"
+                className="form-input"
                 placeholder="Select date range"
               />
             </div>
@@ -163,6 +196,7 @@ const Newsletter = () => {
               onClick={handleExportLeads}
               className="btn-primary flex items-center space-x-2"
             >
+              <IoDownload className="w-4 h-4" />
               <span>Export Leads</span>
             </button>
           </div>
@@ -176,49 +210,47 @@ const Newsletter = () => {
         </div>
       ) : (
         leads.length !== 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="dark-card table-container">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="table-header">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Email Address
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Created At
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="table-body">
                   {leads?.map(lead => (
-                    <tr key={lead.id} className="hover:bg-gray-50 transition-colors duration-200">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                    <tr key={lead.id} className="table-row">
+                      <td className="table-cell">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-white font-semibold text-sm">
-                              {lead.email.charAt(0).toUpperCase()}
-                            </span>
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                            <IoMail className="text-white text-lg" />
                           </div>
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{lead.email}</div>
-                            <div className="text-sm text-gray-500">Newsletter Lead</div>
+                            <div className="text-sm font-medium dark-text">{lead.email}</div>
+                            <div className="text-sm dark-text-secondary">Newsletter Lead</div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="table-cell dark-text">
                         {new Date(lead.createdAt).toLocaleDateString("en-US", { 
                           month: 'long', 
                           day: 'numeric', 
                           year: 'numeric' 
                         })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="table-cell">
                         <button 
                           onClick={() => openConfirmationModal(lead)}
-                          className="text-red-600 hover:text-red-900 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
+                          className="action-button action-button-delete"
                           title="Delete Lead"
                         >
                           <FaTrashAlt className="w-5 h-5" />
@@ -231,12 +263,12 @@ const Newsletter = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-semibold text-xl">N</span>
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <IoMail className="text-4xl" />
             </div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No leads found</h3>
-            <p className="mt-1 text-sm text-gray-500">Newsletter leads will appear here when users subscribe.</p>
+            <h3 className="empty-state-title dark-text">No leads found</h3>
+            <p className="empty-state-description dark-text-secondary">Newsletter leads will appear here when users subscribe.</p>
           </div>
         )
       )}

@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { FaTrashAlt, FaEye, FaAngleDoubleLeft, FaAngleDoubleRight } from "react-icons/fa";
+import { IoSearch, IoFilter, IoPerson, IoMail, IoDocumentText } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../reducers/authSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectUser, logout } from '../reducers/authSlice';
 import ConfirmationModal from '../components/ConfirmationModal';
 import Modal from 'react-modal';
 import { Slide, toast } from 'react-toastify';
 import Loading from '../components/Loading';
 
 const ContactForm = () => {
+  const dispatch = useDispatch();
   const [leads, setLeads] = useState([]);
   const [currentPage, setCurrentPage] = useState(0); // Set initial page to 0
   const [totalPages, setTotalPages] = useState(1);
@@ -39,7 +41,21 @@ const ContactForm = () => {
       setLeads(response.data.data);
       setTotalPages(response.data.last_page);
     } catch (error) {
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+      }
       console.error('Error fetching leads', error);
+      toast.error('Error fetching leads', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: false,
+        progress: undefined,
+        theme: "light",
+        transition: Slide,
+      });
     } finally {
       setLoading(false);
     }
@@ -63,6 +79,18 @@ const ContactForm = () => {
   const handleDeleteLead = async () => {
     if (!leadToDelete) return;
     setIsDeleting(true);
+    const id = toast.loading('Deleting lead...', {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: false,
+      progress: undefined,
+      theme: "light",
+      transition: Slide,
+    });
+    
     try {
       await axios({
         method: 'delete',
@@ -71,32 +99,38 @@ const ContactForm = () => {
           'Authorization': `Bearer ${user.token}`
         }
       });
-      fetchLeads(currentPage + 1);
-      closeConfirmationModal();
-      toast.success('Lead deleted successfully!', {
+      toast.dismiss(id);
+      toast.success('Lead deleted successfully', {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: true,
         closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+        pauseOnHover: false,
+        draggable: false,
         progress: undefined,
         theme: "light",
         transition: Slide,
       });
+      fetchLeads(currentPage + 1);
+      closeConfirmationModal();
     } catch (error) {
+      toast.dismiss(id);
+      if (error.response && error.response.status === 401) {
+        dispatch(logout());
+      }
       console.error('Error deleting lead:', error);
-      toast.error('Error deleting lead.', {
+      toast.error('Error deleting lead', {
         position: "top-right",
         autoClose: 3000,
-        hideProgressBar: false,
+        hideProgressBar: true,
         closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
+        pauseOnHover: false,
+        draggable: false,
         progress: undefined,
         theme: "light",
         transition: Slide,
       });
+      closeConfirmationModal();
     } finally {
       setIsDeleting(false);
     }
@@ -113,13 +147,13 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+    <div className="page-container dark-bg animated-bg">
       {/* Header */}
-      <div className="mb-8">
+      <div className="page-header">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Form Management</h1>
-            <p className="text-gray-600">View and manage contact form submissions from users</p>
+            <h1 className="page-title dark-text">Contact Form Management</h1>
+            <p className="page-subtitle dark-text-secondary">View and manage contact form submissions from users</p>
           </div>
         </div>
       </div>
@@ -131,66 +165,64 @@ const ContactForm = () => {
         </div>
       ) : (
         leads.length !== 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="dark-card table-container">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px]">
-                <thead className="bg-gray-50">
+                <thead className="table-header">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Name
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Email
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Subject
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Message
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Created At
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="table-header-cell">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="table-body">
                   {leads.map(lead => (
-                    <tr key={lead.id} className="hover:bg-gray-50 transition-colors duration-200">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                    <tr key={lead.id} className="table-row">
+                      <td className="table-cell">
                         <div className="flex items-center">
-                          <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                            <span className="text-white font-semibold text-sm">
-                              {lead.name.charAt(0).toUpperCase()}
-                            </span>
+                          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
+                            <IoPerson className="text-white text-lg" />
                           </div>
-                          <div className="text-sm font-medium text-gray-900">{lead.name}</div>
+                          <div className="text-sm font-medium dark-text">{lead.name}</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="table-cell dark-text">
                         {lead.email}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="table-cell dark-text">
                         {lead.subject}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="table-cell dark-text">
                         <div className="max-w-xs truncate" title={lead.message}>
                           {lead.message}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="table-cell dark-text">
                         {new Date(lead.createdAt).toLocaleDateString("en-US", {
                           month: 'long',
                           day: 'numeric',
                           year: 'numeric'
                         })}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      <td className="table-cell">
                         <button
                           onClick={() => openModal(lead)}
-                          className="text-green-600 hover:text-green-900 p-2 rounded-lg hover:bg-green-50 transition-all duration-200"
+                          className="action-button action-button-view"
                           title="View Details"
                         >
                           <FaEye className="w-5 h-5" />
@@ -203,12 +235,12 @@ const ContactForm = () => {
             </div>
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-white font-semibold text-xl">C</span>
+          <div className="empty-state">
+            <div className="empty-state-icon">
+              <IoDocumentText className="text-4xl" />
             </div>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No contact leads found</h3>
-            <p className="mt-1 text-sm text-gray-500">Contact form submissions will appear here when users submit the form.</p>
+            <h3 className="empty-state-title dark-text">No contact leads found</h3>
+            <p className="empty-state-description dark-text-secondary">Contact form submissions will appear here when users submit the form.</p>
           </div>
         )
       )}
@@ -245,7 +277,7 @@ const ContactForm = () => {
         {selectedLead && (
           <div className="max-w-2xl w-full">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-900">Lead Details</h2>
+              <h2 className="text-2xl font-semibold dark-text">Lead Details</h2>
               <button
                 onClick={closeModal}
                 className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -259,42 +291,40 @@ const ContactForm = () => {
             
             <div className="space-y-6">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-semibold text-lg">
-                    {selectedLead.name.charAt(0).toUpperCase()}
-                  </span>
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <IoPerson className="text-white text-xl" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{selectedLead.name}</h3>
-                  <p className="text-sm text-gray-500">Contact Lead</p>
+                  <h3 className="text-lg font-semibold dark-text">{selectedLead.name}</h3>
+                  <p className="text-sm dark-text-secondary">Contact Lead</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                  <label className="form-label">Email Address</label>
+                  <div className="form-input bg-gray-700 text-gray-200">
                     {selectedLead.email}
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                  <label className="form-label">Subject</label>
+                  <div className="form-input bg-gray-700 text-gray-200">
                     {selectedLead.subject}
                   </div>
                 </div>
                 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg min-h-[100px] whitespace-pre-wrap">
+                  <label className="form-label">Message</label>
+                  <div className="form-input bg-gray-700 text-gray-200 min-h-[100px] whitespace-pre-wrap">
                     {selectedLead.message}
                   </div>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Received At</label>
-                  <div className="text-sm text-gray-900 bg-gray-50 px-4 py-3 rounded-lg">
+                  <label className="form-label">Received At</label>
+                  <div className="form-input bg-gray-700 text-gray-200">
                     {new Date(selectedLead.createdAt).toLocaleDateString("en-US", {
                       month: 'long',
                       day: 'numeric',
@@ -308,7 +338,7 @@ const ContactForm = () => {
             <div className="flex justify-end mt-8">
               <button
                 type="button"
-                className="px-6 py-3 bg-gray-500 text-white rounded-xl font-medium hover:bg-gray-600 transition-all duration-200"
+                className="btn-secondary"
                 onClick={closeModal}
               >
                 Close
