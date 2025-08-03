@@ -3,12 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
-import { IoEye, IoAdd, IoCreate, IoGift, IoPricetag } from 'react-icons/io5';
+import { IoEye, IoAdd, IoCreate, IoGift, IoPricetag, IoSearch, IoFilter } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../reducers/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectUser, logout } from '../reducers/authSlice';
 import { Slide, toast } from 'react-toastify';
 import Loading from '../components/Loading';
 import { formatDate } from '../utilities/dateUtils';
@@ -24,6 +24,7 @@ const Coupons = () => {
     const [viewModalIsOpen, setViewModalIsOpen] = useState(false);
     const [services, setServices] = useState([]);
     const user = useSelector(selectUser);
+    const dispatch = useDispatch();
     const abortController = useRef(null);
     const navigate = useNavigate();
 
@@ -67,6 +68,9 @@ const Coupons = () => {
             } else {
                 console.error("Error fetching coupons", error);
                 setLoading(false);
+                if (error.response && error.response.status === 401) {
+                    dispatch(logout());
+                }
                 toast.error('Error fetching coupons', {
                     position: "top-right",
                     autoClose: 3000,
@@ -102,21 +106,20 @@ const Coupons = () => {
     };
 
     const fetchCouponDetails = async (couponId) => {
-        setCouponDetails(null); // Reset coupon details
-        setViewModalIsOpen(true); // Open the modal immediately
-
         try {
             const response = await axios({
-                method: 'get',
+                method: "get",
                 url: `${API_Endpoint}admin/coupons/${couponId}`,
                 headers: {
                     "Authorization": `Bearer ${user.token}`
                 }
             });
-
-            setCouponDetails(response.data);
+            // Handle both possible response structures
+            const couponData = response.data.data || response.data;
+            setCouponDetails(couponData);
+            setViewModalIsOpen(true);
         } catch (error) {
-            console.error('Error fetching coupon details', error);
+            console.error("Error fetching coupon details", error);
             toast.error('Error fetching coupon details', {
                 position: "top-right",
                 autoClose: 3000,
@@ -137,143 +140,74 @@ const Coupons = () => {
     };
 
     const getStatusBadge = (status) => {
-        return (
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                status === 'active' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-            }`}>
-                {status === 'active' ? 'Active' : 'Inactive'}
-            </span>
-        );
+        return status === 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
     };
 
-    // Table headers configuration
-    const tableHeaders = [
-        {
-            key: 'code',
-            label: 'Coupon',
-            subtitle: 'Coupon Details',
-                            icon: <IoEye className="w-5 h-5 text-white" />,
-            render: (value, row) => (
-                <div className="flex items-center space-x-3">
-                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                        <IoEye className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                        <p className="font-semibold text-gray-900">{row.code}</p>
-                        <p className="text-sm text-gray-500">ID: {row.id}</p>
-                    </div>
-                </div>
-            )
-        },
-        {
-            key: 'discount',
-            label: 'Discount',
-            subtitle: 'Discount Value',
-            render: (value, row) => (
-                <p className="text-gray-900 font-medium">{row.discount}%</p>
-            )
-        },
-        {
-            key: 'valid_from',
-            label: 'Valid From',
-            subtitle: 'Start Date',
-            isDate: true
-        },
-        {
-            key: 'valid_until',
-            label: 'Valid Until',
-            subtitle: 'End Date',
-            isDate: true
-        },
-        {
-            key: 'status',
-            label: 'Status',
-            subtitle: 'Coupon Status',
-            render: (value, row) => getStatusBadge(row.status)
-        }
-    ];
-
-    // Table actions
-    const tableActions = [
-        {
-                            icon: <IoEye className="w-4 h-4" />,
-            onClick: fetchCouponDetails,
-            className: "text-blue-600 hover:bg-blue-50",
-            title: "View Details"
-        },
-        {
-                            icon: <IoCreate className="w-4 h-4" />,
-            onClick: () => navigate(`/update-coupons?id=${couponDetails?.id}`),
-            className: "text-green-600 hover:bg-green-50",
-            title: "Edit Coupon"
-        }
-    ];
-
     return (
-        <div className="min-h-screen dark-bg animated-bg p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold dark-text mb-2">Coupon Management</h1>
-                        <p className="dark-text-secondary">Manage discount coupons and promotions</p>
+                        <h1 className="page-title dark-text">Coupon Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage discount coupons and promotions</p>
                     </div>
                     <button
                         onClick={openAddCouponPage}
                         className="btn-primary flex items-center space-x-2"
                     >
-                        <IoAdd className="w-4 h-4 mr-1" />
+                        <IoAdd className="w-4 h-4" />
                         <span>Add Coupon</span>
                     </button>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="dark-card p-6 mb-6">
+                <div className="dark-card p-6 search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
                                 placeholder="Search coupons by code..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input w-full"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Coupons
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'active' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
-                                Active Coupons
+                                Active
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'inactive' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
-                                Inactive Coupons
+                                Inactive
                             </button>
                         </div>
                     </div>
@@ -287,72 +221,86 @@ const Coupons = () => {
                 </div>
             ) : (
                 coupons?.length !== 0 ? (
-                    <div className="dark-card overflow-hidden">
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="modern-table-header">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Code
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Discount Type
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Discount Value
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Max Uses
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Uses
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Start Date
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             End Date
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="table-body">
                                     {coupons?.map(coupon => (
-                                        <tr key={coupon.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">{coupon.code}</div>
+                                        <tr key={coupon.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
+                                                        <IoPricetag className="w-5 h-5 text-white" />
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-medium dark-text">{coupon.code}</div>
+                                                        <div className="text-sm dark-text-muted">ID: {coupon.id}</div>
+                                                    </div>
+                                                </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{coupon.discount_type}</div>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {coupon.discount_type}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{coupon.discount_value}</div>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {coupon.discount_value}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{coupon.max_uses == null ? 'Unlimited' : coupon.max_uses}</div>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {coupon.max_uses == null ? 'Unlimited' : coupon.max_uses}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{coupon.uses}</div>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {coupon.uses}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{formatDate(coupon.start_date)}</div>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {formatDate(coupon.start_date)}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{coupon.end_date ? formatDate(coupon.end_date) : 'No Expiry'}</div>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {coupon.end_date ? formatDate(coupon.end_date) : 'No Expiry'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{coupon.is_active == 1 ? 'Active' : 'Inactive'}</div>
+                                            <td className="table-cell whitespace-nowrap">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                    coupon.is_active == 1 
+                                                        ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                        : 'bg-red-100 text-red-800 border border-red-200'
+                                                }`}>
+                                                    {coupon.is_active == 1 ? 'Active' : 'Inactive'}
+                                                </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-3">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
+                                                <div className="flex space-x-2">
                                                     <button
                                                         onClick={() => fetchCouponDetails(coupon.id)}
-                                                        className="text-blue-600 hover:text-blue-900"
+                                                        className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
@@ -360,7 +308,7 @@ const Coupons = () => {
                                                     <Link 
                                                         to={"/update-coupons"} 
                                                         state={coupon}
-                                                        className="text-green-600 hover:text-green-900"
+                                                        className="action-button action-button-view"
                                                         title="Edit Coupon"
                                                     >
                                                         <IoCreate className="w-4 h-4" />
@@ -374,12 +322,12 @@ const Coupons = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <IoGift className="w-6 h-6 text-white" />
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <IoGift className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No coupons found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No coupons found</h3>
+                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
@@ -413,38 +361,75 @@ const Coupons = () => {
                 className="modern-modal"
             >
                 <div>
-                    <h2 className="text-xl md:text-2xl mb-4 font-semibold text-center">Coupon Details</h2>
+                    <h2 className="text-2xl font-bold dark-text mb-6 text-center">Coupon Details</h2>
                     {couponDetails ? (
-                        <div className="space-y-4">
-                            <p><strong>Code:</strong> {couponDetails.code}</p>
-                            <p><strong>Discount Type:</strong> {couponDetails.discount_type}</p>
-                            <p><strong>Discount Value:</strong> {couponDetails.discount_value}</p>
-                            <p><strong>Max Uses:</strong> {couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
-                            <p><strong>Uses:</strong> {couponDetails.uses}</p>
-                            <p><strong>Start Date:</strong> {formatDate(couponDetails.start_date)}</p>
-                            <p><strong>End Date:</strong> {couponDetails.end_date ? formatDate(couponDetails.end_date) : 'No Expiry'}</p>
-                            <p><strong>Status:</strong> {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}</p>
-                            <p><strong>Products: </strong>
-                                {couponDetails.coupon_type == "1" ? (
-                                    (JSON.parse(couponDetails.product_ids)).map(item => (
-                                        <span key={item} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                                            {services[services.findIndex(service => service.value == item)]?.label || 'Unknown Service/Product'}
-                                        </span>
-                                    ))
-                                ) : (
-                                    <span>All Services</span>
-                                )}
-                            </p>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="form-label">Code:</label>
+                                    <p className="dark-text font-medium">{couponDetails.code}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Discount Type:</label>
+                                    <p className="dark-text">{couponDetails.discount_type}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Discount Value:</label>
+                                    <p className="dark-text font-medium">{couponDetails.discount_value}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Max Uses:</label>
+                                    <p className="dark-text">{couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Current Uses:</label>
+                                    <p className="dark-text">{couponDetails.uses}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Status:</label>
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                        couponDetails.is_active == 1 
+                                            ? 'bg-green-100 text-green-800 border border-green-200' 
+                                            : 'bg-red-100 text-red-800 border border-red-200'
+                                    }`}>
+                                        {couponDetails.is_active == 1 ? 'Active' : 'Inactive'}
+                                    </span>
+                                </div>
+                                <div>
+                                    <label className="form-label">Start Date:</label>
+                                    <p className="dark-text">{formatDate(couponDetails.start_date)}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">End Date:</label>
+                                    <p className="dark-text">{couponDetails.end_date ? formatDate(couponDetails.end_date) : 'No Expiry'}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="form-label">Products:</label>
+                                <div className="mt-2">
+                                    {couponDetails.coupon_type == "1" ? (
+                                        <div className="flex flex-wrap gap-2">
+                                            {(JSON.parse(couponDetails.product_ids)).map(item => (
+                                                <span key={item} className="inline-block bg-blue-100 text-blue-800 rounded-full px-3 py-1 text-sm font-semibold">
+                                                    {services[services.findIndex(service => service.value == item)]?.label || 'Unknown Service/Product'}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <span className="text-sm dark-text-muted">All Services</span>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     ) : (
                         <div className="flex justify-center items-center py-8">
                             <Loading />
                         </div>
                     )}
-                    <div className="flex justify-center space-x-4 mt-4">
+                    <div className="flex justify-center mt-6">
                         <button
                             type="button"
-                            className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                            className="btn-secondary"
                             onClick={closeViewModal}
                         >
                             Close
