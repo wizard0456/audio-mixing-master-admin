@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt, FaEdit, FaPlus } from "react-icons/fa";
-import { IoEye, IoTrash, IoCreate, IoAdd, IoNewspaper, IoEyeOutline } from 'react-icons/io5';
+import { IoEye, IoTrash, IoCreate, IoAdd, IoNewspaper, IoEyeOutline, IoSearch, IoFilter } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import { API_Endpoint, Per_Page } from '../utilities/constants';
@@ -102,16 +102,17 @@ const Blog = () => {
     const fetchCategories = async () => {
         try {
             const response = await axios({
-                method: 'get',
-                url: `${API_Endpoint}admin/blog-categories`,
+                method: "get",
+                url: `${API_Endpoint}admin/categories`,
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    "Authorization": `Bearer ${user.token}`
                 }
             });
-            const categoriesData = response.data?.data?.categories || response.data?.categories || response.data?.data || [];
-            setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+            const categoriesData = response.data.data || [];
+            console.log('Fetched categories:', categoriesData);
+            setCategories(categoriesData);
         } catch (error) {
-            console.error('Error fetching categories:', error);
+            console.error("Error fetching categories", error);
         }
     };
 
@@ -119,19 +120,16 @@ const Blog = () => {
         setBlogDetailsLoading(true);
         try {
             const response = await axios({
-                method: 'get',
+                method: "get",
                 url: `${API_Endpoint}admin/blogs/${blogId}`,
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    "Authorization": `Bearer ${user.token}`
                 }
             });
-            // Handle different response structures
-            const blogData = response.data?.data?.blog || response.data?.blog || response.data;
-            setSelectedBlog(blogData);
-            setBlogDetailsLoading(false);
+            setSelectedBlog(response.data.data || response.data);
+            setBlogDetailsModalOpen(true);
         } catch (error) {
-            console.error('Error fetching blog details:', error);
-            setBlogDetailsLoading(false);
+            console.error("Error fetching blog details", error);
             toast.error('Error fetching blog details', {
                 position: "top-right",
                 autoClose: 3000,
@@ -143,6 +141,8 @@ const Blog = () => {
                 theme: "light",
                 transition: Slide,
             });
+        } finally {
+            setBlogDetailsLoading(false);
         }
     };
 
@@ -167,13 +167,26 @@ const Blog = () => {
     };
 
     const closeConfirmationModal = () => {
-        setBlogToDelete(null);
         setConfirmationModalOpen(false);
+        setBlogToDelete(null);
     };
 
     const handleDeleteBlog = async () => {
         if (!blogToDelete) return;
+
         setIsDeleting(true);
+        const id = toast.loading('Deleting blog...', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
             await axios({
                 method: 'delete',
@@ -182,9 +195,7 @@ const Blog = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-            setIsDeleting(false);
-            fetchBlogs(currentPage, filter); // Reload fetching
-            closeConfirmationModal();
+            toast.dismiss(id);
             toast.success('Blog deleted successfully', {
                 position: "top-right",
                 autoClose: 3000,
@@ -196,35 +207,34 @@ const Blog = () => {
                 theme: "light",
                 transition: Slide,
             });
+            fetchBlogs(currentPage, filter, searchQuery);
+            closeConfirmationModal();
         } catch (error) {
+            toast.dismiss(id);
+            toast.error('Error deleting blog', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
             console.error('Error deleting blog:', error);
+        } finally {
             setIsDeleting(false);
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
-            } else {
-                toast.error('Error deleting blog', {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Slide,
-                });
-            }
         }
     };
 
     const openBlogDetailsModal = (blog) => {
         fetchBlogDetails(blog.id);
-        setBlogDetailsModalOpen(true);
     };
 
     const closeBlogDetailsModal = () => {
-        setSelectedBlog(null);
         setBlogDetailsModalOpen(false);
+        setSelectedBlog(null);
     };
 
     const openAddBlogModal = () => {
@@ -241,6 +251,7 @@ const Blog = () => {
             image_url: '',
             image_file: null
         });
+        setEditingBlogId(null);
         setAddBlogModalOpen(true);
     };
 
@@ -259,14 +270,23 @@ const Blog = () => {
             image_url: '',
             image_file: null
         });
+        setEditingBlogId(null);
     };
 
     const openEditBlogModal = (blog) => {
         const formatDateForInput = (dateString) => {
             if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toISOString().split('T')[0];
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return '';
+                return date.toISOString().split('T')[0];
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return '';
+            }
         };
+
+        console.log('Blog data for editing:', blog); // Debug log
 
         setBlogFormData({
             title: blog.title || '',
@@ -275,8 +295,8 @@ const Blog = () => {
             read_time: blog.read_time || '',
             keywords: blog.keywords || '',
             content: blog.content || '',
-            category_id: blog.category_id || '',
-            is_active: blog.is_active === 1,
+            category_id: String(blog.category_id || blog.category?.id || ''),
+            is_active: blog.is_published == '1' || blog.is_published === 1,
             html_content: blog.html_content || '',
             image_url: blog.image_url || '',
             image_file: null
@@ -287,7 +307,6 @@ const Blog = () => {
 
     const closeEditBlogModal = () => {
         setEditBlogModalOpen(false);
-        setEditingBlogId(null);
         setBlogFormData({
             title: '',
             author_name: '',
@@ -301,13 +320,14 @@ const Blog = () => {
             image_url: '',
             image_file: null
         });
+        setEditingBlogId(null);
     };
 
     const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target;
+        const { name, value } = e.target;
         setBlogFormData(prev => ({
             ...prev,
-            [name]: type === 'checkbox' ? checked : value
+            [name]: value
         }));
     };
 
@@ -330,9 +350,10 @@ const Blog = () => {
     };
 
     const handleImageUrlChange = (e) => {
+        const { value } = e.target;
         setBlogFormData(prev => ({
             ...prev,
-            image_url: e.target.value,
+            image_url: value,
             image_file: null // Clear file when URL is entered
         }));
     };
@@ -340,8 +361,8 @@ const Blog = () => {
     const clearImageInput = () => {
         setBlogFormData(prev => ({
             ...prev,
-            image_file: null,
-            image_url: ''
+            image_url: '',
+            image_file: null
         }));
     };
 
@@ -349,17 +370,94 @@ const Blog = () => {
         e.preventDefault();
         setIsSubmitting(true);
 
+        // Form validation
+        if (!blogFormData.title.trim()) {
+            toast.error('Title is required', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!blogFormData.author_name.trim()) {
+            toast.error('Author name is required', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!blogFormData.publish_date) {
+            toast.error('Publish date is required', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!blogFormData.category_id) {
+            toast.error('Category is required', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            setIsSubmitting(false);
+            return;
+        }
+
+        const id = toast.loading(editBlogModalOpen ? 'Updating blog...' : 'Creating blog...', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
             const formData = new FormData();
-            formData.append('title', blogFormData.title);
-            formData.append('author_name', blogFormData.author_name);
+            formData.append('title', blogFormData.title.trim());
+            formData.append('author_name', blogFormData.author_name.trim());
             formData.append('publish_date', blogFormData.publish_date);
-            formData.append('read_time', blogFormData.read_time);
-            formData.append('keywords', blogFormData.keywords);
-            formData.append('content', blogFormData.content);
+            formData.append('read_time', blogFormData.read_time || '5');
+            formData.append('keywords', blogFormData.keywords || '');
+            formData.append('content', blogFormData.content || '');
             formData.append('category_id', blogFormData.category_id);
-            formData.append('is_active', blogFormData.is_active ? 1 : 0);
-            formData.append('html_content', blogFormData.html_content);
+            formData.append('is_published', blogFormData.is_active ? 1 : 0);
+            formData.append('html_content', blogFormData.html_content || '');
 
             if (blogFormData.image_file) {
                 formData.append('image', blogFormData.image_file);
@@ -370,10 +468,17 @@ const Blog = () => {
             const url = editBlogModalOpen 
                 ? `${API_Endpoint}admin/blogs/${editingBlogId}`
                 : `${API_Endpoint}admin/blogs`;
-
+            
             const method = editBlogModalOpen ? 'put' : 'post';
-
-            await axios({
+            
+            console.log('Submitting blog data:', {
+                url,
+                method,
+                editingBlogId,
+                formData: Object.fromEntries(formData.entries())
+            });
+            
+            const response = await axios({
                 method: method,
                 url: url,
                 headers: {
@@ -383,7 +488,10 @@ const Blog = () => {
                 data: formData
             });
 
-            toast.success(editBlogModalOpen ? 'Blog updated successfully!' : 'Blog created successfully!', {
+            console.log('API Response:', response.data);
+
+            toast.dismiss(id);
+            toast.success(editBlogModalOpen ? 'Blog updated successfully' : 'Blog created successfully', {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -395,58 +503,49 @@ const Blog = () => {
                 transition: Slide,
             });
 
-            setIsSubmitting(false);
             if (editBlogModalOpen) {
                 closeEditBlogModal();
             } else {
                 closeAddBlogModal();
             }
-            fetchBlogs(currentPage, filter); // Refresh the blog list
+            fetchBlogs(currentPage, filter, searchQuery);
         } catch (error) {
-            console.error('Error submitting blog:', error);
+            toast.dismiss(id);
+            console.error('Error saving blog:', error);
+            console.error('Error response:', error.response?.data);
+            console.error('Error status:', error.response?.status);
+            
+            const errorMessage = error.response?.data?.message || error.message || 'Error saving blog';
+            toast.error(errorMessage, {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        } finally {
             setIsSubmitting(false);
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
-            } else {
-                const errorMessage = error.response?.data?.message || 'Error submitting blog';
-                toast.error(errorMessage, {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Slide,
-                });
-            }
         }
     };
 
     const handleToggleActivation = async (blogId, currentStatus) => {
-        const newStatus = currentStatus == '1' ? 0 : 1;
-        const id = toast.info('Updating status...', {
-            position: "top-right",
-            autoClose: 3000,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
-            theme: "light",
-            transition: Slide,
-        });
-        
         try {
             await axios({
                 method: 'put',
-                url: `${API_Endpoint}admin/blogs/${blogId}/status?status=${newStatus}`,
+                url: `${API_Endpoint}admin/blogs/${blogId}`,
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    'Authorization': `Bearer ${user.token}`,
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    is_published: currentStatus == '1' || currentStatus === 1 ? 0 : 1
                 }
             });
-            toast.dismiss(id);
+            
             toast.success('Blog status updated successfully', {
                 position: "top-right",
                 autoClose: 3000,
@@ -458,91 +557,89 @@ const Blog = () => {
                 theme: "light",
                 transition: Slide,
             });
-            fetchBlogs(currentPage, filter); // Refresh blog list
+            
+            fetchBlogs(currentPage, filter, searchQuery);
         } catch (error) {
-            toast.dismiss(id);
-            if (error.response && error.response.status === 401) {
-                dispatch(logout());
-            } else {
-                toast.error('Error updating blog status', {
-                    position: "top-right",
-                    autoClose: 3000,
-                    hideProgressBar: true,
-                    closeOnClick: true,
-                    pauseOnHover: false,
-                    draggable: false,
-                    progress: undefined,
-                    theme: "light",
-                    transition: Slide,
-                });
-            }
+            toast.error('Error updating blog status', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
             console.error('Error updating blog status:', error);
         }
     };
 
     return (
-        <div className="min-h-screen dark-bg animated-bg p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold dark-text mb-2">Blog Management</h1>
-                        <p className="dark-text-secondary">Manage and publish blog articles and content</p>
+                        <h1 className="page-title dark-text">Blog Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage your platform blogs and articles</p>
                     </div>
                     <button
                         onClick={openAddBlogModal}
                         className="btn-primary flex items-center space-x-2"
                     >
                         <IoAdd className="w-4 h-4" />
-                        <span>Add New Blog</span>
+                        <span>Add Blog</span>
                     </button>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="dark-card p-6 mb-6">
+                <div className="dark-card p-6 search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
                                 placeholder="Search blogs by title or author..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input w-full"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Blogs
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'active' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
-                                Active Blogs
+                                Active
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'inactive' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
-                                Inactive Blogs
+                                Inactive
                             </button>
                         </div>
                     </div>
@@ -556,85 +653,90 @@ const Blog = () => {
                 </div>
             ) : (
                 blogs.length !== 0 ? (
-                    <div className="dark-card overflow-hidden">
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="modern-table-header">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Title
+                                        <th className="table-header-cell">
+                                            Blog
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Author
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Category
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Publish Date
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Read Time
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="table-body">
                                     {blogs.map(blog => (
-                                        <tr key={blog.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={blog.title}>
-                                                    {blog.title}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{blog.author_name}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{blog.category?.name || 'N/A'}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
-                                                    {new Date(blog.publish_date).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">{blog.read_time}</div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={blog.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <Toggle
-                                                        checked={blog.is_published == '1' || blog.is_published === 1}
-                                                        onChange={() => handleToggleActivation(blog.id, blog.is_published)}
-                                                        icons={false}
-                                                        aria-label="Blog status"
-                                                    />
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
+                                                        <IoNewspaper className="w-5 h-5 text-white" />
+                                                    </div>
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-medium dark-text max-w-xs truncate" title={blog.title}>
+                                                            {blog.title}
+                                                        </div>
+                                                        <div className="text-sm dark-text-muted">ID: {blog.id}</div>
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-3">
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {blog.author_name}
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {blog.category?.name || 'N/A'}
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {new Date(blog.publish_date).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
+                                                {blog.read_time}
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap">
+                                                <Toggle
+                                                    checked={blog.is_published == '1' || blog.is_published === 1}
+                                                    onChange={() => handleToggleActivation(blog.id, blog.is_published)}
+                                                    icons={false}
+                                                    className="modern-toggle"
+                                                    aria-label="Blog status"
+                                                />
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
+                                                <div className="flex space-x-2">
                                                     <button
                                                         onClick={() => openBlogDetailsModal(blog)}
-                                                        className="text-blue-600 hover:text-blue-900"
+                                                        className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openEditBlogModal(blog)}
-                                                        className="text-green-600 hover:text-green-900"
+                                                        className="action-button action-button-view"
                                                         title="Edit Blog"
                                                     >
                                                         <IoCreate className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openConfirmationModal(blog)}
-                                                        className="text-red-600 hover:text-red-900"
+                                                        className="action-button action-button-delete"
                                                         title="Delete Blog"
                                                     >
                                                         <IoTrash className="w-4 h-4" />
@@ -648,12 +750,12 @@ const Blog = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <IoNewspaper className="w-6 h-6 text-white" />
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <IoNewspaper className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No blogs found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No blogs found</h3>
+                        <p className="empty-state-description">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
@@ -687,79 +789,79 @@ const Blog = () => {
                 className="modern-modal"
             >
                 <div className="max-w-4xl w-full">
-                    <h2 className="text-2xl mb-4 font-semibold">{editBlogModalOpen ? "Edit Blog" : "Add New Blog"}</h2>
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <h2 className="text-2xl font-bold dark-text mb-6">{editBlogModalOpen ? "Edit Blog" : "Add New Blog"}</h2>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                                <label className="form-label">Title *</label>
                                 <input
                                     type="text"
                                     name="title"
                                     value={blogFormData.title}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="form-input"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Author Name *</label>
+                                <label className="form-label">Author Name *</label>
                                 <input
                                     type="text"
                                     name="author_name"
                                     value={blogFormData.author_name}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="form-input"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Publish Date *</label>
+                                <label className="form-label">Publish Date *</label>
                                 <input
                                     type="date"
                                     name="publish_date"
                                     value={blogFormData.publish_date}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="form-input"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Read Time (e.g., 5) *</label>
+                                <label className="form-label">Read Time (e.g., 5) *</label>
                                 <input
                                     type="text"
                                     name="read_time"
                                     value={blogFormData.read_time}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="form-input"
                                     placeholder="5"
                                     required
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Category *</label>
+                                <label className="form-label">Category *</label>
                                 <select
                                     name="category_id"
                                     value={blogFormData.category_id}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="form-input"
                                     required
                                 >
                                     <option value="">Select Category</option>
                                     {Array.isArray(categories) && categories.map(category => (
-                                        <option key={category.id} value={category.id}>
+                                        <option key={category.id} value={String(category.id)}>
                                             {category.name}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Keywords (SEO)</label>
+                                <label className="form-label">Keywords (SEO)</label>
                                 <input
                                     type="text"
                                     name="keywords"
                                     value={blogFormData.keywords}
                                     onChange={handleInputChange}
-                                    className="w-full px-3 py-2 border rounded-md"
+                                    className="form-input"
                                     placeholder="keyword1, keyword2, keyword3"
                                 />
                             </div>
@@ -767,24 +869,24 @@ const Blog = () => {
                         
                         {/* Image Input Section */}
                         <div className="space-y-4">
-                            <h3 className="text-lg font-semibold text-gray-800">Blog Image</h3>
+                            <h3 className="text-lg font-semibold dark-text">Blog Image</h3>
                             
                             {/* Image URL Input */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                                <label className="form-label">Image URL</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="url"
                                         name="image_url"
                                         value={blogFormData.image_url}
                                         onChange={handleImageUrlChange}
-                                        className="flex-1 px-3 py-2 border rounded-md"
+                                        className="form-input flex-1"
                                         placeholder="https://example.com/image.jpg"
                                     />
                                     <button
                                         type="button"
                                         onClick={clearImageInput}
-                                        className="px-3 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                                        className="btn-secondary"
                                     >
                                         Clear
                                     </button>
@@ -793,18 +895,18 @@ const Blog = () => {
                             
                             {/* File Upload */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Upload Image File</label>
+                                <label className="form-label">Upload Image File</label>
                                 <div className="flex gap-2">
                                     <input
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageFileChange}
-                                        className="flex-1 px-3 py-2 border rounded-md"
+                                        className="form-input flex-1"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => document.querySelector('input[type="file"]').click()}
-                                        className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+                                        className="btn-secondary"
                                     >
                                         Browse
                                     </button>
@@ -819,9 +921,9 @@ const Blog = () => {
                             </div>
                             
                             {/* Image Preview */}
-                            {(blogFormData.image_url || blogFormData.image_file) && (
+                            {(blogFormData.image_url || blogFormData.image_file || (editBlogModalOpen && blogFormData.image_url)) && (
                                 <div className="mt-4">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Image Preview</label>
+                                    <label className="form-label">Image Preview</label>
                                     <div className="border rounded-md p-4 bg-gray-50">
                                         {blogFormData.image_file ? (
                                             <img
@@ -851,22 +953,34 @@ const Blog = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">HTML Content</label>
+                            <label className="form-label">Content</label>
+                            <textarea
+                                name="content"
+                                value={blogFormData.content}
+                                onChange={handleInputChange}
+                                className="form-input"
+                                rows="6"
+                                placeholder="Enter your blog content here..."
+                            />
+                        </div>
+
+                        <div>
+                            <label className="form-label">HTML Content</label>
                             <textarea
                                 name="html_content"
                                 value={blogFormData.html_content}
                                 onChange={handleInputChange}
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="form-input"
                                 rows="6"
                                 placeholder="Enter your HTML code here..."
                             />
                         </div>
 
-                        <div className="flex justify-end gap-4 pt-4">
+                        <div className="flex justify-end gap-4 pt-6 border-t border-gray-700">
                             <button
                                 type="button"
                                 onClick={editBlogModalOpen ? closeEditBlogModal : closeAddBlogModal}
-                                className="bg-gray-500 text-white px-4 py-2 rounded"
+                                className="btn-secondary"
                                 disabled={isSubmitting}
                             >
                                 Cancel
@@ -874,7 +988,7 @@ const Blog = () => {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="bg-[#0F2005] text-white px-4 py-2 rounded disabled:opacity-50"
+                                className="btn-primary"
                             >
                                 {isSubmitting ? 'Saving...' : (editBlogModalOpen ? 'Update Blog' : 'Add Blog')}
                             </button>
@@ -910,40 +1024,48 @@ const Blog = () => {
                 ) : (
                     selectedBlog && (
                         <div>
-                            <h2 className="text-2xl mb-4 font-semibold">Blog Details</h2>
-                            <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                                    <p className="text-gray-900">{selectedBlog.title}</p>
+                            <h2 className="text-2xl font-bold dark-text mb-6">Blog Details</h2>
+                            <div className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="form-label">Title</label>
+                                        <p className="dark-text">{selectedBlog.title}</p>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Author</label>
+                                        <p className="dark-text">{selectedBlog.author_name}</p>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Publish Date</label>
+                                        <p className="dark-text">
+                                            {new Date(selectedBlog.publish_date).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Read Time</label>
+                                        <p className="dark-text">{selectedBlog.read_time}</p>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Keywords</label>
+                                        <p className="dark-text">{selectedBlog.keywords}</p>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Category</label>
+                                        <p className="dark-text">{selectedBlog.category?.name || 'N/A'}</p>
+                                    </div>
+                                    <div>
+                                        <label className="form-label">Status</label>
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            selectedBlog.is_published == '1' || selectedBlog.is_published === 1
+                                                ? 'bg-green-100 text-green-800 border border-green-200' 
+                                                : 'bg-red-100 text-red-800 border border-red-200'
+                                        }`}>
+                                            {selectedBlog.is_published == '1' || selectedBlog.is_published === 1 ? 'Active' : 'Inactive'}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Author</label>
-                                    <p className="text-gray-900">{selectedBlog.author_name}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Publish Date</label>
-                                    <p className="text-gray-900">
-                                        {new Date(selectedBlog.publish_date).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Read Time</label>
-                                    <p className="text-gray-900">{selectedBlog.read_time}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
-                                    <p className="text-gray-900">{selectedBlog.keywords}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                                    <p className="text-gray-900">{selectedBlog.category?.name || 'N/A'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                    <p className="text-gray-900">{selectedBlog.is_published == '1' || selectedBlog.is_published === 1 ? 'Active' : 'Inactive'}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                                    <label className="form-label">Content</label>
                                     <div className="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50">
                                         {selectedBlog.content ? (
                                             <div dangerouslySetInnerHTML={{ __html: selectedBlog.content }} />
@@ -954,7 +1076,7 @@ const Blog = () => {
                                 </div>
                                 {selectedBlog.html_content && (
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">HTML Content</label>
+                                        <label className="form-label">HTML Content</label>
                                         <div className="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50">
                                             <pre className="text-xs whitespace-pre-wrap">{selectedBlog.html_content}</pre>
                                         </div>
@@ -965,7 +1087,7 @@ const Blog = () => {
                             <div className="flex justify-center mt-6">
                                 <button
                                     type="button"
-                                    className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                                    className="btn-secondary"
                                     onClick={closeBlogDetailsModal}
                                 >
                                     Close

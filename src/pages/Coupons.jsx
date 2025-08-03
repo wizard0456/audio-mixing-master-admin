@@ -114,9 +114,7 @@ const Coupons = () => {
                     "Authorization": `Bearer ${user.token}`
                 }
             });
-            // Handle both possible response structures
-            const couponData = response.data.data || response.data;
-            setCouponDetails(couponData);
+            setCouponDetails(response.data.data);
             setViewModalIsOpen(true);
         } catch (error) {
             console.error("Error fetching coupon details", error);
@@ -363,11 +361,11 @@ const Coupons = () => {
                 <div>
                     <h2 className="text-2xl font-bold dark-text mb-6 text-center">Coupon Details</h2>
                     {couponDetails ? (
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="form-label">Code:</label>
-                                    <p className="dark-text font-medium">{couponDetails.code}</p>
+                                    <p className="dark-text">{couponDetails.code}</p>
                                 </div>
                                 <div>
                                     <label className="form-label">Discount Type:</label>
@@ -375,14 +373,14 @@ const Coupons = () => {
                                 </div>
                                 <div>
                                     <label className="form-label">Discount Value:</label>
-                                    <p className="dark-text font-medium">{couponDetails.discount_value}</p>
+                                    <p className="dark-text">{couponDetails.discount_value}</p>
                                 </div>
                                 <div>
                                     <label className="form-label">Max Uses:</label>
                                     <p className="dark-text">{couponDetails.max_uses == null ? 'Unlimited' : couponDetails.max_uses}</p>
                                 </div>
                                 <div>
-                                    <label className="form-label">Current Uses:</label>
+                                    <label className="form-label">Uses:</label>
                                     <p className="dark-text">{couponDetails.uses}</p>
                                 </div>
                                 <div>
