@@ -15,7 +15,7 @@ import ConfirmationModal from '../components/ConfirmationModal';
 const Uploads = () => {
     const [uploads, setUploads] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [filter, setFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
@@ -29,46 +29,50 @@ const Uploads = () => {
     const abortController = useRef(null);
 
     useEffect(() => {
-        fetchUploads();
-    }, [currentPage, filter, searchQuery]);
+        fetchUploads(currentPage, filter);
+    }, [currentPage, filter]);
 
-    const fetchUploads = async () => {
+    const fetchUploads = async (page, filter) => {
+        if (abortController.current) {
+            abortController.current.abort();
+        }
+        abortController.current = new AbortController();
+
+        setLoading(true);
+        let url = `${API_Endpoint}admin/uploads?page=${page}&per_page=${Per_Page}`;
+        if (filter !== 'all') {
+            url += `&type=${filter}`;
+        }
+
         try {
-            setLoading(true);
-            if (abortController.current) {
-                abortController.current.abort();
-            }
-            abortController.current = new AbortController();
-
-            let url = `${API_Endpoint}admin/uploads?page=${currentPage + 1}&per_page=${Per_Page}`;
-            if (filter !== 'all') {
-                url += `&type=${filter}`;
-            }
-            if (searchQuery) {
-                url += `&search=${searchQuery}`;
-            }
-
-            const response = await axios.get(url, {
+            const response = await axios({
+                method: "get",
+                url: url,
                 headers: {
-                    'Authorization': `Bearer ${user.token}`
+                    "Authorization": `Bearer ${user.token}`
                 },
                 signal: abortController.current.signal,
             });
             setUploads(response.data.data || []);
-            setTotalPages(response.data.last_page || 1);
+            setCurrentPage(response.data.current_page);
+            setTotalPages(response.data.last_page);
             setLoading(false);
         } catch (error) {
-            if (error.name !== 'AbortError') {
-                console.error('Error fetching uploads:', error);
+            if (axios.isCancel(error)) {
+                return;
+            } else {
+                console.error("Error fetching uploads", error);
                 setLoading(false);
             }
         }
     };
 
     const fetchUploadDetails = async (uploadId) => {
+        setUploadDetailsLoading(true);
         try {
-            setUploadDetailsLoading(true);
-            const response = await axios.get(`${API_Endpoint}admin/uploads/${uploadId}`, {
+            const response = await axios({
+                method: 'get',
+                url: `${API_Endpoint}admin/uploads/${uploadId}`,
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 }
@@ -81,18 +85,28 @@ const Uploads = () => {
         }
     };
 
-    const handlePageChange = (data) => {
-        setCurrentPage(data.selected);
+    const handlePageClick = (event) => {
+        const selectedPage = event.selected + 1;
+        setCurrentPage(selectedPage);
     };
 
     const handleFilterChange = (newFilter) => {
         setFilter(newFilter);
-        setCurrentPage(0);
+        setCurrentPage(1);
     };
 
-    const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
-        setCurrentPage(0);
+    const handleSearchChange = (event) => {
+        setSearchQuery(event.target.value);
+    };
+
+    const getFilteredUploads = () => {
+        if (!searchQuery) return uploads;
+        
+        return uploads.filter(upload => 
+            upload.filename?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            upload.file_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            upload.uploaded_by?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
     };
 
     const openConfirmationModal = (upload) => {
@@ -101,23 +115,34 @@ const Uploads = () => {
     };
 
     const closeConfirmationModal = () => {
-        setConfirmationModalOpen(false);
         setUploadToDelete(null);
+        setConfirmationModalOpen(false);
     };
 
     const handleDeleteUpload = async () => {
         if (!uploadToDelete) return;
 
+        setIsDeleting(true);
+        const id = toast.loading('Deleting file...', {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+
         try {
-            setIsDeleting(true);
             await axios.delete(`${API_Endpoint}admin/uploads/${uploadToDelete.id}`, {
                 headers: {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
-            setIsDeleting(false);
-            fetchUploads();
-            closeConfirmationModal();
+
+            toast.dismiss(id);
             toast.success('File deleted successfully', {
                 position: "top-right",
                 autoClose: 3000,
@@ -129,9 +154,11 @@ const Uploads = () => {
                 theme: "light",
                 transition: Slide,
             });
+
+            fetchUploads(currentPage, filter);
+            closeConfirmationModal();
         } catch (error) {
-            console.error('Error deleting upload:', error);
-            setIsDeleting(false);
+            toast.dismiss(id);
             toast.error('Error deleting file', {
                 position: "top-right",
                 autoClose: 3000,
@@ -143,26 +170,57 @@ const Uploads = () => {
                 theme: "light",
                 transition: Slide,
             });
+            console.error('Error deleting upload:', error);
+        } finally {
+            setIsDeleting(false);
         }
     };
 
     const openUploadDetailsModal = (upload) => {
-        fetchUploadDetails(upload.id);
+        setSelectedUpload(upload);
         setUploadDetailsModalOpen(true);
+        fetchUploadDetails(upload.id);
     };
 
     const closeUploadDetailsModal = () => {
-        setUploadDetailsModalOpen(false);
         setSelectedUpload(null);
+        setUploadDetailsModalOpen(false);
     };
 
     const handleDownload = (fileUrl, fileName) => {
+        if (!fileUrl) {
+            toast.error('Download URL not available', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            return;
+        }
+
         const link = document.createElement('a');
         link.href = fileUrl;
         link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+
+        toast.success('Download started', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
     };
 
     const formatFileSize = (bytes) => {
@@ -173,74 +231,72 @@ const Uploads = () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     };
 
+    const filteredUploads = getFilteredUploads();
+
     return (
-        <div className="min-h-screen dark-bg animated-bg p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold dark-text mb-2">File Upload Management</h1>
-                        <p className="dark-text-secondary">Manage uploaded files and media</p>
+                        <h1 className="page-title dark-text">File Uploads Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage and review all uploaded files across the platform</p>
                     </div>
-                    <button className="btn-primary flex items-center space-x-2">
-                        <IoCloudUpload className="w-4 h-4" />
-                        <span>Upload File</span>
-                    </button>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="dark-card p-6 mb-6">
+                <div className="dark-card p-6 search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
-                            <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 dark-text-muted w-4 h-4" />
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
-                                placeholder="Search files by name..."
+                                placeholder="Search files by name, type, or uploader..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input pl-10"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
+                        <div className="filters-container">
                             <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Files
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'audio' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('audio')}
                             >
                                 Audio
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'image' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('image')}
                             >
                                 Image
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'document' 
-                                        ? 'green-gradient text-white shadow-lg' 
-                                        : 'dark-card dark-text-secondary hover:bg-gray-800'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('document')}
                             >
@@ -253,83 +309,85 @@ const Uploads = () => {
 
             {/* Uploads Table */}
             {loading ? (
-                <div className="flex justify-center items-center py-12">
+                <div className="flex justify-center items-center py-8">
                     <Loading />
                 </div>
             ) : (
-                uploads.length !== 0 ? (
-                    <div className="dark-card overflow-hidden">
+                filteredUploads.length !== 0 ? (
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="modern-table-header">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             File
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Type
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Size
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Uploaded By
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Uploaded
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium dark-text-muted uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="modern-table-body divide-y divide-gray-700">
-                                    {uploads.map(upload => (
-                                        <tr key={upload.id} className="hover:bg-gray-800 transition-colors duration-200">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                <tbody className="table-body">
+                                    {filteredUploads.map(upload => (
+                                        <tr key={upload.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-                                                        <IoDocument className="w-5 h-5 text-white" />
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                                                        <span className="text-white font-semibold text-sm">
+                                                            {upload.filename.charAt(0).toUpperCase()}
+                                                        </span>
                                                     </div>
-                                                    <div>
+                                                    <div className="ml-3">
                                                         <div className="text-sm font-medium dark-text">{upload.filename}</div>
                                                         <div className="text-sm dark-text-muted">ID: {upload.id}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium green-gradient text-white">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
                                                     {upload.file_type || 'Unknown'}
                                                 </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
                                                 {formatFileSize(upload.file_size || 0)}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
                                                 {upload.uploaded_by || 'System'}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm dark-text">
+                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
                                                 {new Date(upload.created_at).toLocaleDateString()}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex items-center space-x-3">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
+                                                <div className="flex items-center space-x-2">
                                                     <button
                                                         onClick={() => openUploadDetailsModal(upload)}
-                                                        className="text-blue-400 hover:text-blue-300 p-2 rounded-lg hover:bg-blue-900/20 transition-all duration-200"
+                                                        className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => handleDownload(upload.file_url, upload.filename)}
-                                                        className="text-green-400 hover:text-green-300 p-2 rounded-lg hover:bg-green-900/20 transition-all duration-200"
+                                                        className="action-button action-button-download"
                                                         title="Download File"
                                                     >
                                                         <IoDownload className="w-4 h-4" />
                                                     </button>
                                                     <button
                                                         onClick={() => openConfirmationModal(upload)}
-                                                        className="text-red-400 hover:text-red-300 p-2 rounded-lg hover:bg-red-900/20 transition-all duration-200"
+                                                        className="action-button action-button-delete"
                                                         title="Delete File"
                                                     >
                                                         <IoTrash className="w-4 h-4" />
@@ -343,24 +401,24 @@ const Uploads = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
                             <IoCloudUpload className="w-8 h-8 text-white" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium dark-text">No uploaded files found</h3>
-                        <p className="mt-1 text-sm dark-text-muted">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No uploaded files found</h3>
+                        <p className="empty-state-description">Files will appear here when users upload them.</p>
                     </div>
                 )
             )}
 
             {/* Pagination */}
-            {!loading && uploads.length > 0 && (
+            {!loading && filteredUploads.length > 0 && !searchQuery && (
                 <div className="mt-6">
                     <ReactPaginate
                         previousLabel={<FaAngleDoubleLeft />}
                         nextLabel={<FaAngleDoubleRight />}
                         pageCount={totalPages}
-                        onPageChange={handlePageChange}
+                        onPageChange={handlePageClick}
                         containerClassName="pagination"
                         pageClassName=""
                         pageLinkClassName=""
@@ -370,8 +428,17 @@ const Uploads = () => {
                         nextLinkClassName=""
                         activeClassName="active"
                         disabledClassName="disabled"
-                        forcePage={currentPage}
+                        forcePage={currentPage - 1}
                     />
+                </div>
+            )}
+
+            {/* Filtering message */}
+            {searchQuery && (
+                <div className="mt-4 text-center">
+                    <p className="text-sm text-gray-600">
+                        Showing {filteredUploads.length} of {uploads.length} files matching "{searchQuery}"
+                    </p>
                 </div>
             )}
 
@@ -401,40 +468,40 @@ const Uploads = () => {
                 ) : (
                     selectedUpload && (
                         <div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-6">File Details</h2>
+                            <h2 className="text-2xl font-bold dark-text mb-6">File Details</h2>
                             <div className="space-y-4">
                                 <div className="flex items-center space-x-4">
                                     <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
                                         <FaFile className="w-8 h-8 text-white" />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-semibold text-gray-900">{selectedUpload.filename}</h3>
-                                        <p className="text-gray-500">File ID: {selectedUpload.id}</p>
+                                        <h3 className="text-xl font-semibold dark-text">{selectedUpload.filename}</h3>
+                                        <p className="dark-text-muted">File ID: {selectedUpload.id}</p>
                                     </div>
                                 </div>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">File Type</p>
-                                        <p className="text-gray-900">{selectedUpload.file_type || 'Unknown'}</p>
+                                    <div className="dark-card p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">File Type</p>
+                                        <p className="dark-text">{selectedUpload.file_type || 'Unknown'}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">File Size</p>
-                                        <p className="text-gray-900 font-semibold">{formatFileSize(selectedUpload.file_size || 0)}</p>
+                                    <div className="dark-card p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">File Size</p>
+                                        <p className="dark-text font-semibold">{formatFileSize(selectedUpload.file_size || 0)}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">Uploaded By</p>
-                                        <p className="text-gray-900">{selectedUpload.uploaded_by || 'System'}</p>
+                                    <div className="dark-card p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">Uploaded By</p>
+                                        <p className="dark-text">{selectedUpload.uploaded_by || 'System'}</p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">Upload Date</p>
-                                        <p className="text-gray-900">
+                                    <div className="dark-card p-4 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">Upload Date</p>
+                                        <p className="dark-text">
                                             {new Date(selectedUpload.created_at).toLocaleDateString()}
                                         </p>
                                     </div>
-                                    <div className="bg-gray-50 rounded-lg p-4 md:col-span-2">
-                                        <p className="text-sm font-medium text-gray-500 mb-1">File URL</p>
-                                        <p className="text-gray-900 text-sm break-all">{selectedUpload.file_url || 'No URL available'}</p>
+                                    <div className="dark-card p-4 md:col-span-2 border border-slate-700/50">
+                                        <p className="text-sm font-medium dark-text-muted mb-1">File URL</p>
+                                        <p className="dark-text text-sm break-all">{selectedUpload.file_url || 'No URL available'}</p>
                                     </div>
                                 </div>
                             </div>

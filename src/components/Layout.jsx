@@ -20,6 +20,7 @@ import { IoSearch, IoNotifications, IoPerson, IoSettings, IoMail, IoLogOut, IoMe
 
 const Layout = () => {
     const [openSidebar, setOpenSidebar] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
@@ -69,9 +70,16 @@ const Layout = () => {
 
     return (
         <div className="flex h-screen dark-bg animated-bg">
-            <Sidebar openSidebar={openSidebar} setOpenSidebar={setOpenSidebar} />
+            <Sidebar 
+                openSidebar={openSidebar} 
+                setOpenSidebar={setOpenSidebar}
+                isCollapsed={isCollapsed}
+                setIsCollapsed={setIsCollapsed}
+            />
             
-            <main className="flex-1 flex flex-col overflow-hidden lg:ml-72">
+            <main className={`flex-1 flex flex-col overflow-hidden transition-all duration-300 ${
+                isCollapsed ? 'lg:ml-16' : 'lg:ml-72'
+            }`}>
                 {/* Modern Header */}
                 <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 px-6 py-4 sticky top-0 z-40">
                     <div className="flex items-center justify-between">

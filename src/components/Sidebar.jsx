@@ -25,11 +25,11 @@ import { GoChecklist } from 'react-icons/go';
 import { BsFillFileMusicFill, BsMusicNoteList } from 'react-icons/bs';
 import { PiImageSquareFill, PiMusicNotesPlus } from 'react-icons/pi';
 import { MdCategory, MdDashboard, MdPeople, MdEngineering, MdShoppingCart, MdLocalOffer, MdArticle, MdPhotoLibrary, MdAudiotrack, MdEmail, MdPhone, MdCloudUpload } from 'react-icons/md';
-import { IoAnalytics, IoPeopleCircle, IoConstruct, IoCart, IoMusicalNotes, IoPricetags, IoGrid, IoNewspaper, IoImages, IoMusicalNote, IoMail, IoCall, IoCloudUpload } from 'react-icons/io5';
+import { IoAnalytics, IoPeopleCircle, IoConstruct, IoCart, IoMusicalNotes, IoPricetags, IoGrid, IoNewspaper, IoImages, IoMusicalNote, IoMail, IoCall, IoCloudUpload, IoChevronBack, IoChevronForward } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, selectUser } from '../reducers/authSlice';
 
-const Sidebar = ({ openSidebar, setOpenSidebar }) => {
+const Sidebar = ({ openSidebar, setOpenSidebar, isCollapsed, setIsCollapsed }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector(selectUser);
@@ -147,35 +147,72 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
       <div className={`fixed top-0 left-0 h-full z-50 transition-all duration-300 ease-in-out lg:translate-x-0 ${
         openSidebar ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="w-72 h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-r border-slate-700/50">
+        <div className={`h-full bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 shadow-2xl border-r border-slate-700/50 transition-all duration-300 ${
+          isCollapsed ? 'w-16' : 'w-72'
+        }`}>
           {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-slate-700/50">
-            <div className="flex items-center space-x-3">
+          <div className={`flex items-center justify-between p-5 border-b border-slate-700/50 ${
+            isCollapsed ? 'justify-center' : ''
+          }`}>
+            {!isCollapsed && (
+              <div className="flex items-center space-x-3">
+                <div className="w-11 h-11 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-emerald-500/20">
+                  <FaMusic className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-white font-bold text-lg">AMM Admin</h1>
+                  <p className="text-slate-400 text-sm">Audio Mixing & Mastering</p>
+                </div>
+              </div>
+            )}
+            
+            {isCollapsed && (
               <div className="w-11 h-11 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg ring-2 ring-emerald-500/20">
                 <FaMusic className="w-5 h-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-white font-bold text-lg">AMM Admin</h1>
-                <p className="text-slate-400 text-sm">Audio Mixing & Mastering</p>
-              </div>
+            )}
+            
+            <div className={`flex items-center space-x-2 ${
+              isCollapsed ? 'absolute -right-3 top-1/2 transform -translate-y-1/2' : ''
+            }`}>
+              {/* Collapse Toggle Button */}
+              <button 
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className={`text-slate-400 hover:text-white transition-colors duration-200 p-2 rounded-lg hover:bg-slate-800 ${
+                  isCollapsed ? 'bg-slate-800/50' : ''
+                }`}
+                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isCollapsed ? (
+                  <IoChevronForward className="w-4 h-4" />
+                ) : (
+                  <IoChevronBack className="w-4 h-4" />
+                )}
+              </button>
+              
+              {/* Mobile Close Button */}
+              <button 
+                onClick={() => setOpenSidebar(false)} 
+                className="text-slate-400 hover:text-white transition-colors duration-200 p-2 rounded-lg hover:bg-slate-800 lg:hidden"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <button 
-              onClick={() => setOpenSidebar(false)} 
-              className="text-slate-400 hover:text-white transition-colors duration-200 lg:hidden p-2 rounded-lg hover:bg-slate-800"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
           </div>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 px-4 py-5 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)]">
-            <div className="mb-4">
-              <h3 className="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">
-                Main Navigation
-              </h3>
-            </div>
+          <nav className={`flex-1 px-4 py-5 space-y-1 overflow-y-auto max-h-[calc(100vh-200px)] ${
+            isCollapsed ? 'px-2' : ''
+          }`}>
+            {!isCollapsed && (
+              <div className="mb-4">
+                <h3 className="text-slate-400 text-xs font-semibold uppercase tracking-wider px-3 mb-2">
+                  Main Navigation
+                </h3>
+              </div>
+            )}
             
             {menuItems.map((item) => {
               if (!item.roles.includes(user?.role)) return null;
@@ -189,12 +226,14 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
                 >
                   {({ isActive }) => (
                     <div className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-300 relative overflow-hidden ${
+                      isCollapsed ? 'justify-center px-2' : ''
+                    } ${
                       isActive 
                         ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-300 border border-emerald-500/30 shadow-lg' 
                         : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
                     }`}>
                       {/* Active indicator */}
-                      {isActive && (
+                      {isActive && !isCollapsed && (
                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-r-full"></div>
                       )}
                       
@@ -205,16 +244,30 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
                         {item.icon}
                       </span>
                       
-                      {/* Text */}
-                      <div className="flex-1">
-                        <span className="font-medium">{item.name}</span>
-                      </div>
+                      {/* Text - Only show when not collapsed */}
+                      {!isCollapsed && (
+                        <div className="flex-1">
+                          <span className="font-medium">{item.name}</span>
+                        </div>
+                      )}
                       
-                      {/* Badge */}
-                      {item.badge && (
+                      {/* Badge - Only show when not collapsed */}
+                      {!isCollapsed && item.badge && (
                         <span className="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
                           {item.badge}
                         </span>
+                      )}
+                      
+                      {/* Tooltip for collapsed state */}
+                      {isCollapsed && (
+                        <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap z-50">
+                          {item.name}
+                          {item.badge && (
+                            <span className="ml-2 bg-red-500 text-white text-xs px-1 py-0.5 rounded-full">
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
                       )}
                       
                       {/* Hover effect */}
@@ -227,19 +280,26 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
           </nav>
 
           {/* Footer */}
-          <div className="p-4 border-t border-slate-700/50">
+          <div className={`p-4 border-t border-slate-700/50 ${
+            isCollapsed ? 'px-2' : ''
+          }`}>
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 w-full px-4 py-3 text-slate-300 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-300 group border border-slate-600/30 hover:border-red-500/30"
+              className={`flex items-center space-x-3 w-full px-4 py-3 text-slate-300 hover:text-white hover:bg-red-500/10 rounded-xl transition-all duration-300 group border border-slate-600/30 hover:border-red-500/30 ${
+                isCollapsed ? 'justify-center px-2' : ''
+              }`}
+              title={isCollapsed ? "Logout" : ""}
             >
               <FaSignOutAlt className="w-5 h-5 text-slate-400 group-hover:text-red-400 transition-colors duration-300" />
-              <span className="font-medium">Logout</span>
+              {!isCollapsed && <span className="font-medium">Logout</span>}
             </button>
             
-            {/* Version Info */}
-            <div className="mt-3 text-center">
-              <p className="text-xs text-slate-500">v2.1.0 • Admin Panel</p>
-            </div>
+            {/* Version Info - Only show when not collapsed */}
+            {!isCollapsed && (
+              <div className="mt-3 text-center">
+                <p className="text-xs text-slate-500">v2.1.0 • Admin Panel</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -250,6 +310,8 @@ const Sidebar = ({ openSidebar, setOpenSidebar }) => {
 Sidebar.propTypes = {
   openSidebar: PropTypes.bool.isRequired,
   setOpenSidebar: PropTypes.func.isRequired,
+  isCollapsed: PropTypes.bool.isRequired,
+  setIsCollapsed: PropTypes.func.isRequired,
 };
 
 export default Sidebar;
