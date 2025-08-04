@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
-import { IoSearch, IoFilter, IoTags } from 'react-icons/io5';
+import { IoSearch, IoFilter, IoPricetag } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import Toggle from 'react-toggle';
@@ -381,7 +381,7 @@ const Tags = () => {
                                             <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
                                                     <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                                        <IoTags className="text-white text-lg" />
+                                                        <IoPricetag className="text-white text-lg" />
                                                     </div>
                                                     <div className="ml-3">
                                                         <div className="text-sm font-medium dark-text">{tag.tag_name}</div>
@@ -428,7 +428,7 @@ const Tags = () => {
                 ) : (
                     <div className="empty-state">
                         <div className="empty-state-icon">
-                            <IoTags className="text-4xl" />
+                            <IoPricetag className="text-4xl" />
                         </div>
                         <h3 className="empty-state-title dark-text">No tags found</h3>
                         <p className="empty-state-description dark-text-secondary">Try adjusting your search or filter criteria.</p>
