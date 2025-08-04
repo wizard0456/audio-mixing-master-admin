@@ -35,7 +35,6 @@ const Blog = () => {
         publish_date: '',
         read_time: '',
         keywords: '',
-        content: '',
         category_id: '',
         is_active: true,
         html_content: '',
@@ -244,7 +243,6 @@ const Blog = () => {
             publish_date: '',
             read_time: '',
             keywords: '',
-            content: '',
             category_id: '',
             is_active: true,
             html_content: '',
@@ -263,7 +261,6 @@ const Blog = () => {
             publish_date: '',
             read_time: '',
             keywords: '',
-            content: '',
             category_id: '',
             is_active: true,
             html_content: '',
@@ -294,7 +291,6 @@ const Blog = () => {
             publish_date: formatDateForInput(blog.publish_date),
             read_time: blog.read_time || '',
             keywords: blog.keywords || '',
-            content: blog.content || '',
             category_id: String(blog.category_id || blog.category?.id || ''),
             is_active: blog.is_published == '1' || blog.is_published === 1,
             html_content: blog.html_content || '',
@@ -313,7 +309,6 @@ const Blog = () => {
             publish_date: '',
             read_time: '',
             keywords: '',
-            content: '',
             category_id: '',
             is_active: true,
             html_content: '',
@@ -328,13 +323,6 @@ const Blog = () => {
         setBlogFormData(prev => ({
             ...prev,
             [name]: value
-        }));
-    };
-
-    const handleContentChange = (content) => {
-        setBlogFormData(prev => ({
-            ...prev,
-            content: content
         }));
     };
 
@@ -454,7 +442,6 @@ const Blog = () => {
             formData.append('publish_date', blogFormData.publish_date);
             formData.append('read_time', blogFormData.read_time || '5');
             formData.append('keywords', blogFormData.keywords || '');
-            formData.append('content', blogFormData.content || '');
             formData.append('category_id', blogFormData.category_id);
             formData.append('is_published', blogFormData.is_active ? 1 : 0);
             formData.append('html_content', blogFormData.html_content || '');
@@ -843,7 +830,7 @@ const Blog = () => {
                                     name="category_id"
                                     value={blogFormData.category_id}
                                     onChange={handleInputChange}
-                                    className="form-input"
+                                    className="form-select"
                                     required
                                 >
                                     <option value="">Select Category</option>
@@ -953,25 +940,14 @@ const Blog = () => {
                         </div>
 
                         <div>
-                            <label className="form-label">Content</label>
-                            <textarea
-                                name="content"
-                                value={blogFormData.content}
-                                onChange={handleInputChange}
-                                className="form-input"
-                                rows="6"
-                                placeholder="Enter your blog content here..."
-                            />
-                        </div>
-
-                        <div>
                             <label className="form-label">HTML Content</label>
                             <textarea
                                 name="html_content"
                                 value={blogFormData.html_content}
                                 onChange={handleInputChange}
                                 className="form-input"
-                                rows="6"
+                                data-type="html"
+                                rows="8"
                                 placeholder="Enter your HTML code here..."
                             />
                         </div>
