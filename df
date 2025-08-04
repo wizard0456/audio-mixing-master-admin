@@ -1,0 +1,106 @@
+[33mbc5d587[m[33m ([m[1;36mHEAD[m[33m)[m 'admin-style-3'
+[33mf2bcaee[m 'admin-style-2'
+[33m5c0b449[m 'admin-style-13'
+[33ma5f36ed[m 'admin-style-12'
+[33m3119115[m 'admin-style-11'
+[33m8a6df51[m 'admin-style-10'
+[33m3babd00[m 'admin-style-9'
+[33mc07a322[m 'admin-sidebar'
+[33mc184816[m 'admin-style-7'
+[33m26d0a15[m 'admin-style-6'
+[33md8fb093[m 'admin-style-5'
+[33m7adf5c8[m 'admin-style-4'
+[33m6a995a2[m 'admin-style-3'
+[33meaae22a[m 'admin-style-2'
+[33m3749f80[m 'admin-style-1'
+[33m9c1c7aa[m 'blog-admin-1'
+[33m2f08d21[m refactor-admin-2
+[33mc4bd101[m refactor-admin-1
+[33m98cfb4a[m add search panel
+[33mc98dde7[m blog-image-edit
+[33m8e624d9[m[33m ([m[1;31mmyrepo/main[m[33m, [m[1;31mmyrepo/HEAD[m[33m)[m sdfdsafas
+[33mfa63615[m aaa
+[33m708bc6a[m dfs
+[33m0878fbd[m sdf
+[33m9d96c3a[m Merge pull request #2 from Pookie0717/DEV
+[33mbbbb01b[m Merge branch 'main' into DEV
+[33m265f631[m updated vite config
+[33m39bfa10[m Merge pull request #1 from Pookie0717/initial
+[33m41023f2[m init
+[33m115e3af[m Refactor OrderDetail component to handle link uploads instead of file uploads, update API endpoints, and adjust Vite configuration for base URL.
+[33m98ed727[m Update sidebar list spacing for improved layout
+[33mbe5c987[m Add Main Domain
+[33mac41973[m Show Order Type in Orders Page and add proxy for cors
+[33m403f40d[m Add Validation on file upload
+[33mb2503e1[m Chage Background
+[33m6c8c8ef[m Code Update
+[33mdb8d93b[m Code update
+[33mab246e5[m Issue and error fix
+[33mcf6d445[m Order Form Update
+[33m2a29aa4[m Upload form
+[33m016ff66[m Add show password functionality
+[33me396c6e[m Update Coupon
+[33m1a725ca[m Add variation functionality in service
+[33m00a398e[m Open order item by default
+[33m8cf4de9[m Update Code
+[33me0ec77b[m add live domain and backend api
+[33me415adb[m Order Status Update toaster when loading
+[33m0a8072f[m Update UI, Add Text Editor and Add is function to check orders in order
+[33m8459aef[m Fix Error and add new Edit Service page and functionality
+[33mf82320a[m Add Live Domains
+[33m99cf695[m Add Base URLs in config
+[33md42cb1a[m Update Date Format
+[33m7468da6[m UI Fix
+[33m4ec5b7c[m Fix Modal
+[33maabc8bf[m Fix UI
+[33md3cd21e[m Revision System Complete
+[33m95204cb[m Add revision api
+[33md483730[m Add Engineer Page
+[33mcacf39c[m Roll Management in orders and orders detail page
+[33m7bccabf[m Fix Styling
+[33m1878388[m Add New Pages and Fix Styling
+[33m301ce36[m Update Code
+[33m693b0eb[m Update todo.txt
+[33m1195602[m Fix horizontal scroll & Toggle Scroll when side is open
+[33m4dd8f69[m Change Serivce Detail Page Layout & Make Dashboard Responsive
+[33m68c2d7c[m Add Loader Component
+[33mdd011ba[m Fix UI & Functionality
+[33mc8da2e4[m Fix Styling
+[33m3151746[m Update Order filter and Coupon funcitonality
+[33m1889877[m Update Code
+[33m3c66b26[m Fix login with role
+[33m338df66[m Remove all console from project
+[33mf21e57f[m Complete Coupon functionality
+[33m5b35bd9[m Fix styling
+[33m0b6d96b[m Update Code
+[33mf6205d8[m Fix Add Service
+[33m9c2e703[m Remove Error in Sample Page
+[33maa6fa6a[m Update Code
+[33m00b34a9[m Update code
+[33md3d38b6[m Update code
+[33mc3e4f83[m Code Update
+[33ma310b40[m Add Order Fetch API
+[33mc870d4a[m Fix Services Page
+[33me6442a7[m Add Chat Page
+[33mf0968d7[m Fix Small Buxs
+[33m7de4c6a[m Fix Pagination
+[33m66261e2[m Complete User Page
+[33m4cb1b22[m Layout changes and Functionality Changes
+[33m8dbac0f[m Complete Label Functionality
+[33m0a1b78a[m Sample Page
+[33mad49f6d[m Contact Form Complete Functionality
+[33maf0db98[m Newsletter Page Complete Integration
+[33m7587a09[m Add Order Form Page with complete functionality
+[33m363122c[m Vite Config for server
+[33mbb8a94e[m Service Api Integration
+[33m955cba5[m Add CRUD in categories
+[33m129a857[m Add Category & Label Page & Integrate Label CRUD
+[33m7132c2e[m Get Sample Audio
+[33mde943e2[m Integrate Gallery Api
+[33md687768[m Login Api Integration
+[33m494c116[m Cleanup for functionality
+[33m4ce302e[m Add Sample page and fixed layout
+[33me4836fa[m Add Gallery Page
+[33mc9d446e[m Add Serices Page
+[33m305743f[m Orders Page
+[33me9499b7[m Initial Commit

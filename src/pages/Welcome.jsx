@@ -24,6 +24,23 @@ import { GoChecklist } from 'react-icons/go';
 import { MdCategory } from 'react-icons/md';
 import { IoPeople, IoMusicalNotes, IoCheckmarkCircle, IoNewspaper, IoPricetags, IoAnalytics, IoCash, IoEye, IoTime, IoCheckmark, IoWarning, IoRefresh, IoBarChart } from 'react-icons/io5';
 import Loading from '../components/Loading';
+import { 
+  LineChart, 
+  Line, 
+  BarChart, 
+  Bar, 
+  PieChart, 
+  Pie, 
+  Cell, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer,
+  AreaChart,
+  Area
+} from 'recharts';
 
 const Welcome = () => {
   const [stats, setStats] = useState({
@@ -33,8 +50,6 @@ const Welcome = () => {
     blogs: { total: 0, published: 0, views: 0, growth: 22 }
   });
   const [loading, setLoading] = useState(true);
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [recentUsers, setRecentUsers] = useState([]);
   const user = useSelector(selectUser);
 
   useEffect(() => {
@@ -102,10 +117,6 @@ const Welcome = () => {
           growth: 22
         }
       });
-
-      // Set recent data
-      setRecentOrders(orders.slice(0, 5));
-      setRecentUsers(users.slice(0, 5));
       
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -116,8 +127,6 @@ const Welcome = () => {
         services: { total: 0, active: 0, inactive: 0, growth: 15 },
         blogs: { total: 0, published: 0, views: 0, growth: 22 }
       });
-      setRecentOrders([]);
-      setRecentUsers([]);
     } finally {
       setLoading(false);
     }
@@ -144,39 +153,202 @@ const Welcome = () => {
     </div>
   );
 
-  const RecentItem = ({ title, subtitle, status, time, statusColor, amount }) => (
-    <div className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-100 hover:shadow-md transition-all duration-200 group">
-      <div className="flex items-center space-x-3">
-        <div className={`w-3 h-3 rounded-full ${statusColor} group-hover:scale-125 transition-transform duration-200`}></div>
-        <div>
-          <p className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200">{title}</p>
-          <p className="text-sm text-gray-500">{subtitle}</p>
-        </div>
-      </div>
-      <div className="text-right">
-        <p className="text-sm font-medium text-gray-700">{status}</p>
-        <p className="text-xs text-gray-400">{time}</p>
-        {amount && <p className="text-sm font-bold text-green-600">${amount}</p>}
-      </div>
-    </div>
-  );
+  const RevenueLineChart = () => {
+    const data = [
+      { month: 'Jan', revenue: 12500, orders: 45 },
+      { month: 'Feb', revenue: 15800, orders: 52 },
+      { month: 'Mar', revenue: 14200, orders: 48 },
+      { month: 'Apr', revenue: 18900, orders: 63 },
+      { month: 'May', revenue: 22100, orders: 74 },
+      { month: 'Jun', revenue: 19800, orders: 66 },
+      { month: 'Jul', revenue: 23400, orders: 78 },
+      { month: 'Aug', revenue: 26700, orders: 89 },
+      { month: 'Sep', revenue: 28900, orders: 96 },
+      { month: 'Oct', revenue: 31200, orders: 104 },
+      { month: 'Nov', revenue: 29800, orders: 99 },
+      { month: 'Dec', revenue: 34500, orders: 115 }
+    ];
 
-  const ChartCard = ({ title, data, color }) => (
-    <div className="dark-card p-6">
-      <h3 className="text-lg font-semibold dark-text mb-4">{title}</h3>
-      <div className="space-y-3">
-        {Object.entries(data).map(([key, value]) => (
-          <div key={key} className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className={`w-3 h-3 rounded-full ${color}`}></div>
-              <span className="text-sm font-medium dark-text-secondary capitalize">{key}</span>
-            </div>
-            <span className="text-sm font-bold dark-text">{value}</span>
-          </div>
-        ))}
+    return (
+      <div className="dark-card p-6">
+        <h3 className="text-lg font-semibold dark-text mb-4">Revenue Trend</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <AreaChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis 
+              dataKey="month" 
+              stroke="#9CA3AF"
+              fontSize={12}
+            />
+            <YAxis 
+              stroke="#9CA3AF"
+              fontSize={12}
+              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                color: '#F9FAFB'
+              }}
+              formatter={(value, name) => [
+                name === 'revenue' ? `$${value.toLocaleString()}` : value,
+                name === 'revenue' ? 'Revenue' : 'Orders'
+              ]}
+            />
+            <Legend />
+            <Area 
+              type="monotone" 
+              dataKey="revenue" 
+              stackId="1"
+              stroke="#10B981" 
+              fill="#10B981" 
+              fillOpacity={0.3}
+            />
+            <Area 
+              type="monotone" 
+              dataKey="orders" 
+              stackId="2"
+              stroke="#3B82F6" 
+              fill="#3B82F6" 
+              fillOpacity={0.3}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const ServiceBarChart = () => {
+    const data = [
+      { name: 'Mixing & Mastering', orders: 156, revenue: 23400, rating: 4.9 },
+      { name: 'Vocal Mixing', orders: 89, revenue: 13350, rating: 4.7 },
+      { name: 'Beat Production', orders: 67, revenue: 10050, rating: 4.8 },
+      { name: 'Audio Restoration', orders: 45, revenue: 6750, rating: 4.6 },
+      { name: 'Sound Design', orders: 34, revenue: 5100, rating: 4.5 }
+    ];
+
+    return (
+      <div className="dark-card p-6">
+        <h3 className="text-lg font-semibold dark-text mb-4">Service Performance</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis 
+              dataKey="name" 
+              stroke="#9CA3AF"
+              fontSize={10}
+              angle={-45}
+              textAnchor="end"
+              height={80}
+            />
+            <YAxis 
+              stroke="#9CA3AF"
+              fontSize={12}
+              tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                color: '#F9FAFB'
+              }}
+              formatter={(value, name) => [
+                name === 'revenue' ? `$${value.toLocaleString()}` : value,
+                name === 'revenue' ? 'Revenue' : 'Orders'
+              ]}
+            />
+            <Legend />
+            <Bar dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="orders" fill="#F59E0B" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
+
+  const OrderStatusPieChart = () => {
+    const data = [
+      { name: 'Pending', value: stats.orders.pending, color: '#F59E0B' },
+      { name: 'Processing', value: stats.orders.processing, color: '#3B82F6' },
+      { name: 'Completed', value: stats.orders.completed, color: '#10B981' }
+    ];
+
+    return (
+      <div className="dark-card p-6">
+        <h3 className="text-lg font-semibold dark-text mb-4">Order Status Distribution</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              outerRadius={80}
+              fill="#8884d8"
+              dataKey="value"
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                color: '#F9FAFB'
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
+
+  const CustomerActivityBarChart = () => {
+    const data = [
+      { activity: 'New Registrations', count: 23, trend: '+12%' },
+      { activity: 'Active Users', count: 156, trend: '+8%' },
+      { activity: 'Completed Orders', count: 89, trend: '+15%' },
+      { activity: 'Customer Reviews', count: 45, trend: '+22%' }
+    ];
+
+    return (
+      <div className="dark-card p-6">
+        <h3 className="text-lg font-semibold dark-text mb-4">Customer Activity</h3>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data} layout="horizontal">
+            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+            <XAxis 
+              type="number"
+              stroke="#9CA3AF"
+              fontSize={12}
+            />
+            <YAxis 
+              dataKey="activity" 
+              type="category"
+              stroke="#9CA3AF"
+              fontSize={12}
+              width={120}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#1F2937', 
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                color: '#F9FAFB'
+              }}
+            />
+            <Bar dataKey="count" fill="#EF4444" radius={[0, 4, 4, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
@@ -212,7 +384,7 @@ const Welcome = () => {
         <StatCard
           title="Total Users"
           value={stats.users.total}
-                          icon={<IoPeople className="w-6 h-6 text-white" />}
+          icon={<IoPeople className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-blue-500 to-blue-600"
           subtitle={`${stats.users.active} active users`}
           growth={stats.users.growth}
@@ -220,7 +392,7 @@ const Welcome = () => {
         <StatCard
           title="Total Orders"
           value={stats.orders.total}
-                          icon={<IoCheckmarkCircle className="w-6 h-6 text-white" />}
+          icon={<IoCheckmarkCircle className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-green-500 to-green-600"
           subtitle={`$${stats.orders.revenue.toFixed(2)} revenue`}
           growth={stats.orders.growth}
@@ -228,7 +400,7 @@ const Welcome = () => {
         <StatCard
           title="Active Services"
           value={stats.services.total}
-                          icon={<IoMusicalNotes className="w-6 h-6 text-white" />}
+          icon={<IoMusicalNotes className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-purple-500 to-purple-600"
           subtitle={`${stats.services.active} active services`}
           growth={stats.services.growth}
@@ -236,106 +408,23 @@ const Welcome = () => {
         <StatCard
           title="Blog Views"
           value={stats.blogs.views}
-                          icon={<IoEye className="w-6 h-6 text-white" />}
+          icon={<IoEye className="w-6 h-6 text-white" />}
           color="bg-gradient-to-r from-orange-500 to-orange-600"
           subtitle={`${stats.blogs.published} published blogs`}
           growth={stats.blogs.growth}
         />
       </div>
 
-      {/* Charts and Analytics */}
+      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <ChartCard
-          title="Order Status Overview"
-          data={{
-            pending: stats.orders.pending,
-            processing: stats.orders.processing,
-            completed: stats.orders.completed
-          }}
-          color="bg-yellow-500"
-        />
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-2 gap-3">
-            <button className="p-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <FaClipboardList className="w-5 h-5 mb-2" />
-              View Orders
-            </button>
-            <button className="p-4 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <FaMusic className="w-5 h-5 mb-2" />
-              Manage Services
-            </button>
-            <button className="p-4 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <FaBlog className="w-5 h-5 mb-2" />
-              Create Blog
-            </button>
-            <button className="p-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-sm font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              <FaUsers className="w-5 h-5 mb-2" />
-              View Users
-            </button>
-          </div>
-        </div>
+        <RevenueLineChart />
+        <ServiceBarChart />
       </div>
 
-      {/* Recent Activity */}
+      {/* Additional Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-            <FaChartBar className="w-5 h-5 text-blue-500" />
-          </div>
-          <div className="space-y-3">
-            {recentOrders.length > 0 ? (
-              recentOrders.map((order, index) => (
-                <RecentItem
-                  key={order.id}
-                  title={`Order #${order.id}`}
-                  subtitle={`${order.user?.first_name || 'User'} ${order.user?.last_name || ''}`}
-                  status={order.status === '0' ? 'Pending' : order.status === '1' ? 'Processing' : 'Completed'}
-                  time={new Date(order.created_at).toLocaleDateString()}
-                  statusColor={
-                    order.status === '0' ? 'bg-yellow-500' : 
-                    order.status === '1' ? 'bg-blue-500' : 'bg-green-500'
-                  }
-                  amount={order.amount}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <FaClipboardList className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-lg font-medium">No recent orders</p>
-                <p className="text-sm">Orders will appear here when they come in</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Users</h3>
-            <FaUsers className="w-5 h-5 text-green-500" />
-          </div>
-          <div className="space-y-3">
-            {recentUsers.length > 0 ? (
-              recentUsers.map((user, index) => (
-                <RecentItem
-                  key={user.id}
-                  title={`${user.first_name} ${user.last_name}`}
-                  subtitle={user.email}
-                  status={user.is_active === 1 ? 'Active' : 'Inactive'}
-                  time={new Date(user.created_at).toLocaleDateString()}
-                  statusColor={user.is_active === 1 ? 'bg-green-500' : 'bg-red-500'}
-                />
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                <FaUsers className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-lg font-medium">No recent users</p>
-                <p className="text-sm">New users will appear here when they register</p>
-              </div>
-            )}
-          </div>
-        </div>
+        <OrderStatusPieChart />
+        <CustomerActivityBarChart />
       </div>
     </div>
   );
