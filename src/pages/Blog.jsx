@@ -117,6 +117,7 @@ const Blog = () => {
 
     const fetchBlogDetails = async (blogId) => {
         setBlogDetailsLoading(true);
+        console.log('Fetching blog details for ID:', blogId);
         try {
             const response = await axios({
                 method: "get",
@@ -125,7 +126,13 @@ const Blog = () => {
                     "Authorization": `Bearer ${user.token}`
                 }
             });
-            setSelectedBlog(response.data.data || response.data);
+            
+            console.log('Blog details API response:', response.data);
+            
+            // Handle different response structures from backend
+            const blogData = response.data?.data?.blog || response.data?.blog || response.data?.data || response.data;
+            console.log('Processed blog data:', blogData);
+            setSelectedBlog(blogData);
             setBlogDetailsModalOpen(true);
         } catch (error) {
             console.error("Error fetching blog details", error);
@@ -228,6 +235,7 @@ const Blog = () => {
     };
 
     const openBlogDetailsModal = (blog) => {
+        console.log('Opening blog details modal for blog:', blog);
         fetchBlogDetails(blog.id);
     };
 
@@ -708,7 +716,10 @@ const Blog = () => {
                                             <td className="table-cell whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <button
-                                                        onClick={() => openBlogDetailsModal(blog)}
+                                                        onClick={() => {
+                                                            console.log('View button clicked for blog:', blog);
+                                                            openBlogDetailsModal(blog);
+                                                        }}
                                                         className="action-button action-button-view"
                                                         title="View Details"
                                                     >
@@ -992,85 +1003,100 @@ const Blog = () => {
                 onRequestClose={closeBlogDetailsModal}
                 contentLabel="Blog Details"
                 className="modern-modal"
+                overlayClassName="modal-overlay"
             >
+                {console.log('Modal render - blogDetailsModalOpen:', blogDetailsModalOpen, 'selectedBlog:', selectedBlog)}
                 {blogDetailsLoading ? (
                     <div className="flex justify-center items-center py-8">
                         <Loading />
                     </div>
-                ) : (
-                    selectedBlog && (
-                        <div>
-                            <h2 className="text-2xl font-bold dark-text mb-6">Blog Details</h2>
-                            <div className="space-y-6">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div>
-                                        <label className="form-label">Title</label>
-                                        <p className="dark-text">{selectedBlog.title}</p>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Author</label>
-                                        <p className="dark-text">{selectedBlog.author_name}</p>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Publish Date</label>
-                                        <p className="dark-text">
-                                            {new Date(selectedBlog.publish_date).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Read Time</label>
-                                        <p className="dark-text">{selectedBlog.read_time}</p>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Keywords</label>
-                                        <p className="dark-text">{selectedBlog.keywords}</p>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Category</label>
-                                        <p className="dark-text">{selectedBlog.category?.name || 'N/A'}</p>
-                                    </div>
-                                    <div>
-                                        <label className="form-label">Status</label>
-                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                            selectedBlog.is_published == '1' || selectedBlog.is_published === 1
-                                                ? 'bg-green-100 text-green-800 border border-green-200' 
-                                                : 'bg-red-100 text-red-800 border border-red-200'
-                                        }`}>
-                                            {selectedBlog.is_published == '1' || selectedBlog.is_published === 1 ? 'Active' : 'Inactive'}
-                                        </span>
-                                    </div>
+                ) : selectedBlog ? (
+                    <div>
+                        <h2 className="text-2xl font-bold dark-text mb-6">Blog Details</h2>
+                        <div className="space-y-6">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label className="form-label">Title</label>
+                                    <p className="dark-text">{selectedBlog.title || 'N/A'}</p>
                                 </div>
                                 <div>
-                                    <label className="form-label">Content</label>
-                                    <div className="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50">
-                                        {selectedBlog.content ? (
-                                            <div dangerouslySetInnerHTML={{ __html: selectedBlog.content }} />
-                                        ) : (
-                                            <p className="text-gray-500 italic">No content available</p>
-                                        )}
-                                    </div>
+                                    <label className="form-label">Author</label>
+                                    <p className="dark-text">{selectedBlog.author_name || 'N/A'}</p>
                                 </div>
-                                {selectedBlog.html_content && (
-                                    <div>
-                                        <label className="form-label">HTML Content</label>
-                                        <div className="max-h-40 overflow-y-auto border p-2 rounded bg-gray-50">
-                                            <pre className="text-xs whitespace-pre-wrap">{selectedBlog.html_content}</pre>
+                                <div>
+                                    <label className="form-label">Publish Date</label>
+                                    <p className="dark-text">
+                                        {selectedBlog.publish_date ? 
+                                            new Date(selectedBlog.publish_date).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'}) 
+                                            : 'N/A'
+                                        }
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Read Time</label>
+                                    <p className="dark-text">{selectedBlog.read_time || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Keywords</label>
+                                    <p className="dark-text">{selectedBlog.keywords || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Category</label>
+                                    <p className="dark-text">{selectedBlog.category?.name || 'N/A'}</p>
+                                </div>
+                                <div>
+                                    <label className="form-label">Status</label>
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                        selectedBlog.is_published == '1' || selectedBlog.is_published === 1
+                                            ? 'bg-green-100 text-green-800 border border-green-200' 
+                                            : 'bg-red-100 text-red-800 border border-red-200'
+                                    }`}>
+                                        {selectedBlog.is_published == '1' || selectedBlog.is_published === 1 ? 'Active' : 'Inactive'}
+                                    </span>
+                                </div>
+                            </div>
+                            {selectedBlog.featured_image && (
+                                <div>
+                                    <label className="form-label">Featured Image</label>
+                                    <div className="mt-2">
+                                        <img
+                                            src={selectedBlog.featured_image}
+                                            alt="Featured"
+                                            className="max-w-full h-auto max-h-48 object-contain border rounded"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'block';
+                                            }}
+                                        />
+                                        <div className="hidden text-sm text-red-600 mt-2">
+                                            Unable to load image
                                         </div>
                                     </div>
-                                )}
-                            </div>
-
-                            <div className="flex justify-center mt-6">
-                                <button
-                                    type="button"
-                                    className="btn-secondary"
-                                    onClick={closeBlogDetailsModal}
-                                >
-                                    Close
-                                </button>
-                            </div>
+                                </div>
+                            )}
                         </div>
-                    )
+
+                        <div className="flex justify-center mt-6">
+                            <button
+                                type="button"
+                                className="btn-secondary"
+                                onClick={closeBlogDetailsModal}
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                        <p className="text-gray-500 mb-4">Unable to load blog details</p>
+                        <button
+                            type="button"
+                            className="btn-secondary"
+                            onClick={closeBlogDetailsModal}
+                        >
+                            Close
+                        </button>
+                    </div>
                 )}
             </Modal>
         </div>
