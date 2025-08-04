@@ -1,216 +1,117 @@
 import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import { FaAngleDoubleLeft, FaAngleDoubleRight, FaEye, FaTrashAlt, FaSearch, FaFilter, FaUpload, FaDownload, FaFile } from "react-icons/fa";
-import { IoEye, IoTrash, IoSearch, IoFilter, IoCloudUpload, IoDownload, IoDocument, IoAdd } from 'react-icons/io5';
+import { FaEye, FaAngleDoubleLeft, FaAngleDoubleRight, FaDownload } from "react-icons/fa";
+import { IoSearch, IoFilter, IoDocument, IoEye, IoDownload as IoDownloadIcon } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
+import { API_Endpoint, Asset_Endpoint, Per_Page } from '../utilities/constants';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout, selectUser } from '../reducers/authSlice';
 import Modal from 'react-modal';
-import { useSelector } from 'react-redux';
-import { selectUser } from '../reducers/authSlice';
-import { API_Endpoint, Per_Page } from '../utilities/constants';
-import { toast } from 'react-toastify';
-import { Slide } from 'react-toastify';
-import Loading from '../components/Loading';
 import ConfirmationModal from '../components/ConfirmationModal';
+import { Slide, toast } from 'react-toastify';
+import Loading from '../components/Loading';
 
 const Uploads = () => {
-    const [uploads, setUploads] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
+    const dispatch = useDispatch();
+    const [orders, setOrders] = useState([]);
+    const [currentPage, setCurrentPage] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
-    const [filter, setFilter] = useState('all');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [selectedUpload, setSelectedUpload] = useState(null);
-    const [uploadDetailsModalOpen, setUploadDetailsModalOpen] = useState(false);
-    const [uploadDetailsLoading, setUploadDetailsLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
-    const [uploadToDelete, setUploadToDelete] = useState(null);
+    const [orderToDelete, setOrderToDelete] = useState(null);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filter, setFilter] = useState('all');
     const user = useSelector(selectUser);
-    const abortController = useRef(null);
+    const currentAudioRef = useRef(null);
 
     useEffect(() => {
-        fetchUploads(currentPage, filter);
-    }, [currentPage, filter]);
+        fetchOrders(currentPage + 1);
+    }, [currentPage, filter, searchQuery]);
 
-    const fetchUploads = async (page, filter) => {
-        if (abortController.current) {
-            abortController.current.abort();
-        }
-        abortController.current = new AbortController();
-
+    const fetchOrders = async (page) => {
         setLoading(true);
-        let url = `${API_Endpoint}admin/uploads?page=${page}&per_page=${Per_Page}`;
-        if (filter !== 'all') {
-            url += `&type=${filter}`;
-        }
-
         try {
+            let url = `${API_Endpoint}upload/lead/gen?page=${page}&per_page=${Per_Page}`;
+            if (filter !== 'all') {
+                url += `&status=${filter}`;
+            }
+            if (searchQuery) {
+                url += `&search=${searchQuery}`;
+            }
+
             const response = await axios({
                 method: "get",
                 url: url,
                 headers: {
                     "Authorization": `Bearer ${user.token}`
-                },
-                signal: abortController.current.signal,
-            });
-            setUploads(response.data.data || []);
-            setCurrentPage(response.data.current_page);
-            setTotalPages(response.data.last_page);
-            setLoading(false);
-        } catch (error) {
-            if (axios.isCancel(error)) {
-                return;
-            } else {
-                console.error("Error fetching uploads", error);
-                setLoading(false);
-            }
-        }
-    };
-
-    const fetchUploadDetails = async (uploadId) => {
-        setUploadDetailsLoading(true);
-        try {
-            const response = await axios({
-                method: 'get',
-                url: `${API_Endpoint}admin/uploads/${uploadId}`,
-                headers: {
-                    'Authorization': `Bearer ${user.token}`
                 }
             });
-            setSelectedUpload(response.data);
-            setUploadDetailsLoading(false);
+            setOrders(response.data.data || []);
+            setTotalPages(response.data.last_page || 1);
+            setCurrentPage(response.data.current_page);
         } catch (error) {
-            console.error('Error fetching upload details:', error);
-            setUploadDetailsLoading(false);
+            if (error.response && error.response.status === 401) {
+                dispatch(logout());
+            }
+            console.error("Error fetching orders", error);
+            toast.error('Error fetching uploads', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
     const handlePageClick = (event) => {
-        const selectedPage = event.selected + 1;
+        const selectedPage = event.selected;
         setCurrentPage(selectedPage);
     };
 
     const handleFilterChange = (newFilter) => {
         setFilter(newFilter);
-        setCurrentPage(1);
+        setCurrentPage(0);
     };
 
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
+        setCurrentPage(0);
     };
 
-    const getFilteredUploads = () => {
-        if (!searchQuery) return uploads;
-        
-        return uploads.filter(upload => 
-            upload.filename?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            upload.file_type?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            upload.uploaded_by?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+    const openModal = (order) => {
+        setSelectedOrder(order);
+        setModalIsOpen(true);
     };
 
-    const openConfirmationModal = (upload) => {
-        setUploadToDelete(upload);
+    const closeModal = () => {
+        setModalIsOpen(false);
+        setSelectedOrder(null);
+    };
+
+    const openConfirmationModal = (order) => {
+        setOrderToDelete(order);
         setConfirmationModalOpen(true);
     };
 
     const closeConfirmationModal = () => {
-        setUploadToDelete(null);
+        setOrderToDelete(null);
         setConfirmationModalOpen(false);
     };
 
-    const handleDeleteUpload = async () => {
-        if (!uploadToDelete) return;
-
+    const handleDeleteOrder = async () => {
+        if (!orderToDelete) return;
         setIsDeleting(true);
-        const id = toast.loading('Deleting file...', {
-            position: "top-right",
-            autoClose: false,
-            hideProgressBar: true,
-            closeOnClick: true,
-            pauseOnHover: false,
-            draggable: false,
-            progress: undefined,
-            theme: "light",
-            transition: Slide,
-        });
-
-        try {
-            await axios.delete(`${API_Endpoint}admin/uploads/${uploadToDelete.id}`, {
-                headers: {
-                    'Authorization': `Bearer ${user.token}`
-                }
-            });
-
-            toast.dismiss(id);
-            toast.success('File deleted successfully', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-
-            fetchUploads(currentPage, filter);
-            closeConfirmationModal();
-        } catch (error) {
-            toast.dismiss(id);
-            toast.error('Error deleting file', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            console.error('Error deleting upload:', error);
-        } finally {
-            setIsDeleting(false);
-        }
-    };
-
-    const openUploadDetailsModal = (upload) => {
-        setSelectedUpload(upload);
-        setUploadDetailsModalOpen(true);
-        fetchUploadDetails(upload.id);
-    };
-
-    const closeUploadDetailsModal = () => {
-        setSelectedUpload(null);
-        setUploadDetailsModalOpen(false);
-    };
-
-    const handleDownload = (fileUrl, fileName) => {
-        if (!fileUrl) {
-            toast.error('Download URL not available', {
-                position: "top-right",
-                autoClose: 3000,
-                hideProgressBar: true,
-                closeOnClick: true,
-                pauseOnHover: false,
-                draggable: false,
-                progress: undefined,
-                theme: "light",
-                transition: Slide,
-            });
-            return;
-        }
-
-        const link = document.createElement('a');
-        link.href = fileUrl;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        toast.success('Download started', {
+        const id = toast.loading('Deleting upload...', {
             position: "top-right",
             autoClose: 3000,
             hideProgressBar: true,
@@ -221,17 +122,102 @@ const Uploads = () => {
             theme: "light",
             transition: Slide,
         });
+        
+        try {
+            await axios({
+                method: 'delete',
+                url: `${API_Endpoint}upload/lead/gen/${orderToDelete.id}`,
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
+                }
+            });
+            toast.dismiss(id);
+            toast.success('Upload deleted successfully', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+            fetchOrders(currentPage + 1);
+            closeConfirmationModal();
+        } catch (error) {
+            toast.dismiss(id);
+            if (error.response && error.response.status === 401) {
+                dispatch(logout());
+            }
+            console.error('Error deleting order:', error);
+            toast.error('Error deleting upload', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
-    const formatFileSize = (bytes) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    const handleAudioPlay = (event) => {
+        if (currentAudioRef.current && currentAudioRef.current !== event.target) {
+            currentAudioRef.current.pause();
+        }
+        currentAudioRef.current = event.target;
     };
 
-    const filteredUploads = getFilteredUploads();
+    const handleDownloadAll = async (id) => {
+        try {
+            const response = await axios.get(`${API_Endpoint}download/zip/lead/${id}`);
+            window.open(response.data.url, '_blank');
+            toast.success('Download started', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        } catch (error) {
+            console.error('Error downloading files:', error);
+            toast.error('Error downloading files', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
+        }
+    };
+
+    const getFilteredOrders = () => {
+        if (!searchQuery) return orders;
+        
+        return orders.filter(order => 
+            order.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.arlist_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.tarck_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            order.services?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    };
+
+    const filteredOrders = getFilteredOrders();
 
     return (
         <div className="page-container dark-bg animated-bg">
@@ -239,20 +225,20 @@ const Uploads = () => {
             <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="page-title dark-text">File Uploads Management</h1>
-                        <p className="page-subtitle dark-text-secondary">Manage and review all uploaded files across the platform</p>
+                        <h1 className="page-title dark-text">Upload Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage user upload submissions and track requests</p>
                     </div>
                 </div>
 
                 {/* Search and Filters */}
-                <div className="dark-card p-6 search-filters-container">
+                <div className="dark-card search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
                         <div className="search-input-container">
                             <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
-                                placeholder="Search files by name, type, or uploader..."
+                                placeholder="Search uploads by name, email, artist, or track..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
                                 className="modern-input search-input"
@@ -270,37 +256,27 @@ const Uploads = () => {
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
-                                All Files
+                                All Uploads
                             </button>
                             <button
                                 className={`filter-button ${
-                                    filter === 'audio' 
+                                    filter === 'active' 
                                         ? 'filter-button-active' 
                                         : 'filter-button-inactive'
                                 }`}
-                                onClick={() => handleFilterChange('audio')}
+                                onClick={() => handleFilterChange('active')}
                             >
-                                Audio
+                                Active
                             </button>
                             <button
                                 className={`filter-button ${
-                                    filter === 'image' 
+                                    filter === 'inactive' 
                                         ? 'filter-button-active' 
                                         : 'filter-button-inactive'
                                 }`}
-                                onClick={() => handleFilterChange('image')}
+                                onClick={() => handleFilterChange('inactive')}
                             >
-                                Image
-                            </button>
-                            <button
-                                className={`filter-button ${
-                                    filter === 'document' 
-                                        ? 'filter-button-active' 
-                                        : 'filter-button-inactive'
-                                }`}
-                                onClick={() => handleFilterChange('document')}
-                            >
-                                Document
+                                Inactive
                             </button>
                         </div>
                     </div>
@@ -309,30 +285,33 @@ const Uploads = () => {
 
             {/* Uploads Table */}
             {loading ? (
-                <div className="flex justify-center items-center py-8">
+                <div className="flex justify-center items-center py-12">
                     <Loading />
                 </div>
             ) : (
-                filteredUploads.length !== 0 ? (
+                filteredOrders.length !== 0 ? (
                     <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead className="table-header">
                                     <tr>
                                         <th className="table-header-cell">
-                                            File
+                                            Name
                                         </th>
                                         <th className="table-header-cell">
-                                            Type
+                                            Email
                                         </th>
                                         <th className="table-header-cell">
-                                            Size
+                                            Artist Name
                                         </th>
                                         <th className="table-header-cell">
-                                            Uploaded By
+                                            Track Title
                                         </th>
                                         <th className="table-header-cell">
-                                            Uploaded
+                                            Services
+                                        </th>
+                                        <th className="table-header-cell">
+                                            Submission Time
                                         </th>
                                         <th className="table-header-cell">
                                             Actions
@@ -340,57 +319,55 @@ const Uploads = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="table-body">
-                                    {filteredUploads.map(upload => (
-                                        <tr key={upload.id} className="table-row">
+                                    {filteredOrders.map(order => (
+                                        <tr key={order.id} className="table-row">
                                             <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                                                        <span className="text-white font-semibold text-sm">
-                                                            {upload.filename.charAt(0).toUpperCase()}
-                                                        </span>
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                                        <IoDocument className="text-white text-lg" />
                                                     </div>
                                                     <div className="ml-3">
-                                                        <div className="text-sm font-medium dark-text">{upload.filename}</div>
-                                                        <div className="text-sm dark-text-muted">ID: {upload.id}</div>
+                                                        <div className="text-sm font-medium dark-text">{order.name}</div>
+                                                        <div className="text-sm dark-text-secondary">ID: {order.id}</div>
                                                     </div>
                                                 </div>
                                             </td>
+                                            <td className="table-cell whitespace-nowrap dark-text">
+                                                {order.email}
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap dark-text">
+                                                {order.arlist_name}
+                                            </td>
+                                            <td className="table-cell whitespace-nowrap dark-text">
+                                                {order.tarck_title}
+                                            </td>
                                             <td className="table-cell whitespace-nowrap">
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
-                                                    {upload.file_type || 'Unknown'}
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                                    {order.services}
                                                 </span>
                                             </td>
-                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
-                                                {formatFileSize(upload.file_size || 0)}
-                                            </td>
-                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
-                                                {upload.uploaded_by || 'System'}
-                                            </td>
-                                            <td className="table-cell whitespace-nowrap text-sm dark-text">
-                                                {new Date(upload.created_at).toLocaleDateString()}
+                                            <td className="table-cell whitespace-nowrap dark-text">
+                                                {new Date(order.createdAt).toLocaleDateString("en-US", { 
+                                                    month: 'long', 
+                                                    day: 'numeric', 
+                                                    year: 'numeric' 
+                                                })}
                                             </td>
                                             <td className="table-cell whitespace-nowrap text-sm font-medium">
                                                 <div className="flex items-center space-x-2">
                                                     <button
-                                                        onClick={() => openUploadDetailsModal(upload)}
+                                                        onClick={() => openModal(order)}
                                                         className="action-button action-button-view"
                                                         title="View Details"
                                                     >
                                                         <IoEye className="w-4 h-4" />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDownload(upload.file_url, upload.filename)}
-                                                        className="action-button action-button-download"
-                                                        title="Download File"
-                                                    >
-                                                        <IoDownload className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => openConfirmationModal(upload)}
+                                                        onClick={() => openConfirmationModal(order)}
                                                         className="action-button action-button-delete"
-                                                        title="Delete File"
+                                                        title="Delete Upload"
                                                     >
-                                                        <IoTrash className="w-4 h-4" />
+                                                        <FaEye className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -403,16 +380,16 @@ const Uploads = () => {
                 ) : (
                     <div className="empty-state">
                         <div className="empty-state-icon">
-                            <IoCloudUpload className="w-8 h-8 text-white" />
+                            <IoDocument className="text-4xl" />
                         </div>
-                        <h3 className="empty-state-title dark-text">No uploaded files found</h3>
-                        <p className="empty-state-description">Files will appear here when users upload them.</p>
+                        <h3 className="empty-state-title dark-text">No upload submissions found</h3>
+                        <p className="empty-state-description dark-text-secondary">Upload submissions will appear here when users submit their requests.</p>
                     </div>
                 )
             )}
 
             {/* Pagination */}
-            {!loading && filteredUploads.length > 0 && !searchQuery && (
+            {!loading && filteredOrders.length > 0 && !searchQuery && (
                 <div className="mt-6">
                     <ReactPaginate
                         previousLabel={<FaAngleDoubleLeft />}
@@ -428,7 +405,7 @@ const Uploads = () => {
                         nextLinkClassName=""
                         activeClassName="active"
                         disabledClassName="disabled"
-                        forcePage={currentPage - 1}
+                        forcePage={currentPage}
                     />
                 </div>
             )}
@@ -436,95 +413,135 @@ const Uploads = () => {
             {/* Filtering message */}
             {searchQuery && (
                 <div className="mt-4 text-center">
-                    <p className="text-sm text-gray-600">
-                        Showing {filteredUploads.length} of {uploads.length} files matching "{searchQuery}"
+                    <p className="text-sm dark-text-secondary">
+                        Showing {filteredOrders.length} of {orders.length} uploads matching "{searchQuery}"
                     </p>
                 </div>
             )}
 
-            {/* Modals */}
+            {/* Order Details Modal */}
+            <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={closeModal}
+                contentLabel="Order Details"
+                className="modern-modal"
+            >
+                {selectedOrder && (
+                    <div>
+                        <h2 className="text-2xl font-bold dark-text mb-6">Upload Details</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center space-x-4">
+                                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <IoDocument className="text-white text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-semibold dark-text">{selectedOrder.name}</h3>
+                                    <p className="dark-text-secondary">Upload ID: {selectedOrder.id}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-1">Email</p>
+                                    <p className="dark-text">{selectedOrder.email}</p>
+                                </div>
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-1">Artist Name</p>
+                                    <p className="dark-text">{selectedOrder.arlist_name}</p>
+                                </div>
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-1">Track Title</p>
+                                    <p className="dark-text">{selectedOrder.tarck_title}</p>
+                                </div>
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-1">Services</p>
+                                    <p className="dark-text">{selectedOrder.services}</p>
+                                </div>
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-1">Received At</p>
+                                    <p className="dark-text">
+                                        {new Date(selectedOrder.createdAt).toLocaleDateString("en-US", { 
+                                            month: 'long', 
+                                            day: 'numeric', 
+                                            year: 'numeric' 
+                                        })}
+                                    </p>
+                                </div>
+                                <div className="dark-card p-4 md:col-span-2 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-1">Reference</p>
+                                    <p className="dark-text text-sm break-all">{selectedOrder.reference || 'No reference provided'}</p>
+                                </div>
+                            </div>
+
+                            {/* Media Files Section */}
+                            {selectedOrder.file_type == 1 ? (
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <p className="text-sm font-medium dark-text-secondary">Media Files</p>
+                                        <button
+                                            onClick={() => handleDownloadAll(selectedOrder.id)}
+                                            className="btn-primary flex items-center space-x-2"
+                                        >
+                                            <IoDownloadIcon className="w-4 h-4" />
+                                            <span>Download All</span>
+                                        </button>
+                                    </div>
+                                    {JSON.parse(selectedOrder.image).map((file, index) => (
+                                        <div key={index} className="mb-4">
+                                            <audio
+                                                controls
+                                                className="w-full rounded bg-gray-700 text-white"
+                                                onPlay={handleAudioPlay}
+                                            >
+                                                <source src={`${Asset_Endpoint}${file}`} type="audio/mpeg" />
+                                                Your browser does not support the audio element.
+                                            </audio>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="dark-card p-4 border border-slate-700/50">
+                                    <p className="text-sm font-medium dark-text-secondary mb-2">Media Links</p>
+                                    {JSON.parse(selectedOrder.image).map((file, index) => (
+                                        <div key={index} className="mb-2">
+                                            <a 
+                                                href={file} 
+                                                className="text-blue-400 underline hover:no-underline hover:text-blue-300" 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                            >
+                                                {file}
+                                            </a>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="flex justify-end mt-6">
+                            <button
+                                onClick={closeModal}
+                                className="btn-secondary"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
+
+            {/* Confirmation Modal */}
             <ConfirmationModal
                 isOpen={confirmationModalOpen}
                 onClose={closeConfirmationModal}
-                onConfirm={handleDeleteUpload}
-                title="Delete File"
-                message="Are you sure you want to delete this file? This action cannot be undone."
+                onConfirm={handleDeleteOrder}
+                title="Delete Upload"
+                message="Are you sure you want to delete this upload submission? This action cannot be undone."
                 confirmText="Delete"
                 cancelText="Cancel"
                 isLoading={isDeleting}
                 confirmButtonClass="bg-red-600 hover:bg-red-700"
             />
-
-            <Modal
-                isOpen={uploadDetailsModalOpen}
-                onRequestClose={closeUploadDetailsModal}
-                contentLabel="Upload Details"
-                className="modern-modal"
-            >
-                {uploadDetailsLoading ? (
-                    <div className="flex justify-center items-center py-8">
-                        <Loading />
-                    </div>
-                ) : (
-                    selectedUpload && (
-                        <div>
-                            <h2 className="text-2xl font-bold dark-text mb-6">File Details</h2>
-                            <div className="space-y-4">
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                                        <FaFile className="w-8 h-8 text-white" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-xl font-semibold dark-text">{selectedUpload.filename}</h3>
-                                        <p className="dark-text-muted">File ID: {selectedUpload.id}</p>
-                                    </div>
-                                </div>
-                                
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="dark-card p-4 border border-slate-700/50">
-                                        <p className="text-sm font-medium dark-text-muted mb-1">File Type</p>
-                                        <p className="dark-text">{selectedUpload.file_type || 'Unknown'}</p>
-                                    </div>
-                                    <div className="dark-card p-4 border border-slate-700/50">
-                                        <p className="text-sm font-medium dark-text-muted mb-1">File Size</p>
-                                        <p className="dark-text font-semibold">{formatFileSize(selectedUpload.file_size || 0)}</p>
-                                    </div>
-                                    <div className="dark-card p-4 border border-slate-700/50">
-                                        <p className="text-sm font-medium dark-text-muted mb-1">Uploaded By</p>
-                                        <p className="dark-text">{selectedUpload.uploaded_by || 'System'}</p>
-                                    </div>
-                                    <div className="dark-card p-4 border border-slate-700/50">
-                                        <p className="text-sm font-medium dark-text-muted mb-1">Upload Date</p>
-                                        <p className="dark-text">
-                                            {new Date(selectedUpload.created_at).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                    <div className="dark-card p-4 md:col-span-2 border border-slate-700/50">
-                                        <p className="text-sm font-medium dark-text-muted mb-1">File URL</p>
-                                        <p className="dark-text text-sm break-all">{selectedUpload.file_url || 'No URL available'}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div className="flex justify-end space-x-3 mt-6">
-                                <button
-                                    onClick={() => handleDownload(selectedUpload.file_url, selectedUpload.filename)}
-                                    className="btn-primary flex items-center space-x-2"
-                                >
-                                    <FaDownload className="w-4 h-4" />
-                                    <span>Download</span>
-                                </button>
-                                <button
-                                    onClick={closeUploadDetailsModal}
-                                    className="btn-secondary"
-                                >
-                                    Close
-                                </button>
-                            </div>
-                        </div>
-                    )
-                )}
-            </Modal>
         </div>
     );
 };

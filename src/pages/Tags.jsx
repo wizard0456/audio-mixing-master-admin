@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { FaAngleDoubleLeft, FaAngleDoubleRight, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { TiPencil } from "react-icons/ti";
+import { IoSearch, IoFilter, IoTags } from 'react-icons/io5';
 import ReactPaginate from 'react-paginate';
 import Modal from 'react-modal';
 import Toggle from 'react-toggle';
@@ -67,11 +68,22 @@ const Tags = () => {
             if (axios.isCancel(error)) {
                 return;
             } else {
-                console.error("Error fetching tags", error);
-                setLoading(false);
                 if (error.response && error.response.status === 401) {
                     dispatch(logout());
                 }
+                console.error("Error fetching tags", error);
+                toast.error('Error fetching tags', {
+                    position: "top-right",
+                    autoClose: 3000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: false,
+                    draggable: false,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Slide,
+                });
+                setLoading(false);
             }
         }
     };
@@ -114,6 +126,18 @@ const Tags = () => {
     const handleAddOrUpdateTag = async (event) => {
         event.preventDefault();
         setAdding(true);
+        const id = toast.loading(tagId ? 'Updating tag...' : 'Adding tag...', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+        
         try {
             if (tagId) {
                 // Update tag
@@ -125,7 +149,8 @@ const Tags = () => {
                         'Content-Type': 'application/json'
                     }
                 });
-                toast.success("Tag updated successfully!", {
+                toast.dismiss(id);
+                toast.success("Tag updated successfully", {
                     position: "top-right",
                     autoClose: 3000,
                     hideProgressBar: true,
@@ -147,7 +172,8 @@ const Tags = () => {
                     },
                     data: { tag_name: tagName, is_active: isActive ? 1 : 0 }
                 });
-                toast.success("Tag added successfully!", {
+                toast.dismiss(id);
+                toast.success("Tag added successfully", {
                     position: "top-right",
                     autoClose: 3000,
                     hideProgressBar: true,
@@ -163,12 +189,13 @@ const Tags = () => {
             closeModal();
             fetchTags(currentPage, filter); // Refetch tags to get the updated list
         } catch (error) {
+            toast.dismiss(id);
             if (error.response && error.response.status === 401) {
                 dispatch(logout());
             }
             console.error('Error adding/updating tag:', error);
             setAdding(false);
-            toast.error("Error adding/updating tag.", {
+            toast.error("Error adding/updating tag", {
                 position: "top-right",
                 autoClose: 3000,
                 hideProgressBar: true,
@@ -195,6 +222,18 @@ const Tags = () => {
     const handleDeleteTag = async () => {
         if (!tagToDelete) return;
         setIsDeleting(true);
+        const id = toast.loading('Deleting tag...', {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: false,
+            progress: undefined,
+            theme: "light",
+            transition: Slide,
+        });
+        
         try {
             await axios({
                 method: 'delete',
@@ -203,23 +242,50 @@ const Tags = () => {
                     'Authorization': `Bearer ${user.token}`
                 }
             });
+            toast.dismiss(id);
+            toast.success('Tag deleted successfully', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
             setIsDeleting(false);
             fetchTags(currentPage, filter); // Reload fetching
             closeConfirmationModal();
         } catch (error) {
+            toast.dismiss(id);
+            if (error.response && error.response.status === 401) {
+                dispatch(logout());
+            }
             console.error('Error deleting tag:', error);
+            toast.error('Error deleting tag', {
+                position: "top-right",
+                autoClose: 3000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: false,
+                draggable: false,
+                progress: undefined,
+                theme: "light",
+                transition: Slide,
+            });
             setIsDeleting(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6">
+        <div className="page-container dark-bg animated-bg">
             {/* Header */}
-            <div className="mb-8">
+            <div className="page-header">
                 <div className="flex items-center justify-between mb-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Tag Management</h1>
-                        <p className="text-gray-600">Manage and configure all platform tags and categories</p>
+                        <h1 className="page-title dark-text">Tag Management</h1>
+                        <p className="page-subtitle dark-text-secondary">Manage and configure all platform tags and categories</p>
                     </div>
                     <button
                         onClick={() => openModal()}
@@ -231,46 +297,48 @@ const Tags = () => {
                 </div>
 
                 {/* Search and Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+                <div className="dark-card search-filters-container">
                     <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
                         {/* Search */}
-                        <div className="relative flex-1 max-w-md">
+                        <div className="search-input-container">
+                            <IoSearch className="search-icon dark-text-muted" />
                             <input
                                 type="text"
                                 placeholder="Search tags by name..."
                                 value={searchQuery}
                                 onChange={handleSearchChange}
-                                className="modern-input w-full"
+                                className="modern-input search-input"
                             />
                         </div>
 
                         {/* Filters */}
-                        <div className="flex items-center space-x-2">
+                        <div className="filters-container">
+                            <IoFilter className="dark-text-muted w-4 h-4" />
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'all' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('all')}
                             >
                                 All Tags
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'active' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('active')}
                             >
                                 Active Tags
                             </button>
                             <button
-                                className={`px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                                className={`filter-button ${
                                     filter === 'inactive' 
-                                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' 
-                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                        ? 'filter-button-active' 
+                                        : 'filter-button-inactive'
                                 }`}
                                 onClick={() => handleFilterChange('inactive')}
                             >
@@ -288,58 +356,66 @@ const Tags = () => {
                 </div>
             ) : (
                 tags.length !== 0 ? (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="dark-card table-container">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-gray-50">
+                                <thead className="table-header">
                                     <tr>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Name
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Created At
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Status
                                         </th>
-                                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="table-header-cell">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="table-body">
                                     {tags.map(tag => (
-                                        <tr key={tag.id} className="hover:bg-gray-50">
-                                            <td className="px-6 py-4 whitespace-nowrap">
+                                        <tr key={tag.id} className="table-row">
+                                            <td className="table-cell whitespace-nowrap">
                                                 <div className="flex items-center">
-                                                    <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                                                        <span className="text-white font-semibold text-sm">
-                                                            {tag.tag_name.charAt(0).toUpperCase()}
-                                                        </span>
+                                                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                                        <IoTags className="text-white text-lg" />
                                                     </div>
                                                     <div className="ml-3">
-                                                        <div className="text-sm font-medium text-gray-900">{tag.tag_name}</div>
+                                                        <div className="text-sm font-medium dark-text">{tag.tag_name}</div>
+                                                        <div className="text-sm dark-text-secondary">ID: {tag.id}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
-                                                    {new Date(tag.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
-                                                </div>
+                                            <td className="table-cell whitespace-nowrap dark-text">
+                                                {new Date(tag.created_at).toLocaleDateString("en-US",{month:'long',day:'numeric',year:'numeric'})}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm text-gray-900">
+                                            <td className="table-cell whitespace-nowrap">
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                                    tag.is_active == 1 
+                                                        ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                                                        : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                                                }`}>
                                                     {tag.is_active == 1 ? 'Active' : 'Inactive'}
-                                                </div>
+                                                </span>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-3">
+                                            <td className="table-cell whitespace-nowrap text-sm font-medium">
+                                                <div className="flex items-center space-x-2">
                                                     <button
                                                         onClick={() => openModal(tag)}
-                                                        className="text-blue-600 hover:text-blue-900"
+                                                        className="action-button action-button-view"
                                                         title="Edit Tag"
                                                     >
                                                         <TiPencil className="w-4 h-4" />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => openConfirmationModal(tag)}
+                                                        className="action-button action-button-delete"
+                                                        title="Delete Tag"
+                                                    >
+                                                        <FaTrashAlt className="w-4 h-4" />
                                                     </button>
                                                 </div>
                                             </td>
@@ -350,12 +426,12 @@ const Tags = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="text-center py-12">
-                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <span className="text-white font-semibold text-lg">T</span>
+                    <div className="empty-state">
+                        <div className="empty-state-icon">
+                            <IoTags className="text-4xl" />
                         </div>
-                        <h3 className="mt-2 text-sm font-medium text-gray-900">No tags found</h3>
-                        <p className="mt-1 text-sm text-gray-500">Try adjusting your search or filter criteria.</p>
+                        <h3 className="empty-state-title dark-text">No tags found</h3>
+                        <p className="empty-state-description dark-text-secondary">Try adjusting your search or filter criteria.</p>
                     </div>
                 )
             )}
@@ -389,32 +465,36 @@ const Tags = () => {
                 className="modern-modal"
             >
                 <div>
-                    <h2 className="text-2xl mb-4 font-semibold">{tagId ? 'Update Tag' : 'Add Tag'}</h2>
+                    <h2 className="text-2xl mb-4 font-semibold dark-text">{tagId ? 'Update Tag' : 'Add Tag'}</h2>
                     <form onSubmit={handleAddOrUpdateTag} className="space-y-4">
                         <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tag">Tag Name</label>
+                            <label className="form-label" htmlFor="tag">Tag Name</label>
                             <input
                                 type="text"
                                 name="tag"
-                                className="w-full px-3 py-2 border rounded-md"
+                                className="form-input"
                                 value={tagName}
                                 onChange={(e) => setTagName(e.target.value)}
                                 required
                             />
                         </div>
                         <div className="flex items-center gap-2 mb-4">
-                            <p><strong>Status:</strong></p>
+                            <label className="form-label">Status:</label>
                             <Toggle
                                 checked={isActive}
                                 onChange={() => setIsActive(!isActive)}
                                 icons={false}
                                 aria-label="Tag status"
+                                className="modern-toggle"
                             />
+                            <span className="text-sm dark-text-secondary">
+                                {isActive ? 'Active' : 'Inactive'}
+                            </span>
                         </div>
-                        <div className="flex justify-end space-x-4">
+                        <div className="flex justify-end space-x-4 pt-4 border-t border-gray-700">
                             <button
                                 type="button"
-                                className="bg-red-500 font-semibold text-base text-white px-4 py-2 rounded"
+                                className="btn-secondary"
                                 onClick={closeModal}
                                 disabled={adding}
                             >
@@ -422,7 +502,7 @@ const Tags = () => {
                             </button>
                             <button
                                 type="submit"
-                                className="font-medium text-[14px] bg-[#4BC500] text-white px-5 py-2 rounded-lg"
+                                className="btn-primary"
                                 disabled={adding}
                             >
                                 {adding ? (tagId ? 'Updating...' : 'Adding...') : (tagId ? 'Update Tag' : 'Add Tag')}
